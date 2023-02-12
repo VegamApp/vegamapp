@@ -9,14 +9,6 @@ abstract class _AuthTokenBase with Store {
   String? get loginToken => _loginToken;
 
   @observable
-  String? _cartId;
-  String? get cartId => _cartId;
-
-  @observable
-  int _cartCount = 0;
-  int get cartCount => _cartCount;
-
-  @observable
   int _wishlistCount = 0;
   int get wishlistCount => _wishlistCount;
 
@@ -37,19 +29,5 @@ abstract class _AuthTokenBase with Store {
 
   printToken() {
     //print(loginToken);
-  }
-
-  @action
-  putCartCount(int count) {
-    _cartCount = count;
-  }
-
-  @action
-  putCartId(String newCartId) {
-    _cartId = newCartId;
-  }
-
-  clearCartId() {
-    _cartId = null;
   }
 }

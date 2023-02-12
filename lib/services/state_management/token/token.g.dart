@@ -25,38 +25,6 @@ mixin _$AuthToken on _AuthTokenBase, Store {
     });
   }
 
-  late final _$_cartIdAtom =
-      Atom(name: '_AuthTokenBase._cartId', context: context);
-
-  @override
-  String? get _cartId {
-    _$_cartIdAtom.reportRead();
-    return super._cartId;
-  }
-
-  @override
-  set _cartId(String? value) {
-    _$_cartIdAtom.reportWrite(value, super._cartId, () {
-      super._cartId = value;
-    });
-  }
-
-  late final _$_cartCountAtom =
-      Atom(name: '_AuthTokenBase._cartCount', context: context);
-
-  @override
-  int get _cartCount {
-    _$_cartCountAtom.reportRead();
-    return super._cartCount;
-  }
-
-  @override
-  set _cartCount(int value) {
-    _$_cartCountAtom.reportWrite(value, super._cartCount, () {
-      super._cartCount = value;
-    });
-  }
-
   late final _$_wishlistCountAtom =
       Atom(name: '_AuthTokenBase._wishlistCount', context: context);
 
@@ -104,28 +72,6 @@ mixin _$AuthToken on _AuthTokenBase, Store {
         name: '_AuthTokenBase.clearLoginToken');
     try {
       return super.clearLoginToken();
-    } finally {
-      _$_AuthTokenBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  dynamic putCartCount(int count) {
-    final _$actionInfo = _$_AuthTokenBaseActionController.startAction(
-        name: '_AuthTokenBase.putCartCount');
-    try {
-      return super.putCartCount(count);
-    } finally {
-      _$_AuthTokenBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  dynamic putCartId(String newCartId) {
-    final _$actionInfo = _$_AuthTokenBaseActionController.startAction(
-        name: '_AuthTokenBase.putCartId');
-    try {
-      return super.putCartId(newCartId);
     } finally {
       _$_AuthTokenBaseActionController.endAction(_$actionInfo);
     }

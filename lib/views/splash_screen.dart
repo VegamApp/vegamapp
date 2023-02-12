@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/example.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   navigateToPage() {
     Timer(const Duration(seconds: 5), () {
-      GoRouter.of(context).pushReplacement(ExPage.route);
+      GoRouter.of(context).pushReplacement(Auth.route);
     });
   }
 }

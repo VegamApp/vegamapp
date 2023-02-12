@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/splash_screen.dart';
 
@@ -26,12 +27,12 @@ final router = GoRouter(
         return getCustomTransition(state, const ExPage());
       },
     ),
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
+    GoRoute(
+      path: Auth.route,
+      pageBuilder: (context, state) {
+        return getCustomTransition(state, const Auth());
+      },
+    ),
     // GoRoute(
     //   path: '/',
     //   pageBuilder: (context, state) {
