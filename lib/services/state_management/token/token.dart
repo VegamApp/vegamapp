@@ -26,8 +26,4 @@ abstract class _AuthTokenBase with Store {
   clearLoginToken() {
     _loginToken = null;
   }
-
-  printToken() {
-    //print(loginToken);
-  }
 }

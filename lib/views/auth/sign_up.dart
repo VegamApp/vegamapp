@@ -174,25 +174,7 @@ class _SignUpState extends State<SignUp> {
             obscureText: true,
           ),
           const SizedBox(height: 30),
-          // Mutation(
-          //   options: MutationOptions(
-          //     document: gql(MutationServices.signUp),
-          //     // ignore: void_checks
-          //     update: (GraphQLDataProxy cache, QueryResult? result) {
-          //       return cache;
-          //     },
-          //     onError: (error) {
-          //       errorData = error!.graphqlErrors[0].message;
-          //       setState(() {});
-          //     },
-          //     onCompleted: (dynamic resultData) {
-          //       navigate(context, Auth.route);
-          //       print('resultData:$resultData');
-          //     },
-          //   ),
-          //   builder: (RunMutation runMutation, QueryResult? result) {
-          //     int gender = _gender == Gender.male ? 1 : 2;
-          //     return
+
           TextButton(
             style: TextButton.styleFrom(
                 fixedSize: Size(widget.size.width, 40),

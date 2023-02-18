@@ -16,6 +16,21 @@ abstract class _CategoriesDataBase with Store {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  @observable
+  List<bool> _portalTargets = [];
+  List<bool> get portalTargets => _portalTargets;
+
+  @action
+  void populateTargets() {
+    _portalTargets = List.generate(data['categories']['items'][0]['children'].length, (index) => false);
+  }
+
+  @action
+  void editTargets(int index) {
+    populateTargets();
+    portalTargets[index] = true;
+  }
+
   @action
   void setLoading(bool value) => _isLoading = value;
 
@@ -24,7 +39,6 @@ abstract class _CategoriesDataBase with Store {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: gql(ApiServices.getCategories)));
-    // print(result.data);
     _data = result.data!;
     setLoading(false);
   }

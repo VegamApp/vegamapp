@@ -55,7 +55,6 @@ abstract class _CartDataBase with Store {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: ApiServices.cart, variables: {'id': _cartId}));
-    print(result.data);
     setCartData(result.data!);
     setLoading(false);
   }
@@ -83,7 +82,6 @@ abstract class _CartDataBase with Store {
   }
 
   setToken(String cartId) async {
-    // print(cartId);
     // get previously stored token if any.
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString('cartId', cartId);

@@ -58,35 +58,7 @@ class _SignInState extends State<SignIn> {
           if (errorData != null) Text(errorData!, style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.red)),
           // const SizedBox(height: 10),
           const SizedBox(height: 30),
-          // Mutation(
-          //     options: MutationOptions(
-          //         document: gql(MutationServices.signIn),
-          //         onCompleted: (result) async {
-          //           print(result);
-          //           if (result != null) {
-          //             try {
-          //               SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-          //               sharedPreferences.setString('key', result['generateCustomerToken']['token']);
-          //               print(result);
-          //               loginToken.putLoginToken(result['generateCustomerToken']['token']);
-          //               print(loginToken.loginToken);
-          //               Navigator.pushAndRemoveUntil(context, PageTransition(child: const MyApp(), type: PageTransitionType.fade), (route) => false);
-          //             } catch (e) {
-          //               print(e);
-          //             }
-          //           }
-          //         },
-          //         onError: (error) {
-          //           print(error);
-          //           try {
-          //             errorData = error!.graphqlErrors[0].message;
-          //           } catch (e) {
-          //             errorData = error!.linkException!.originalException.toString();
-          //           }
-          //           setState(() {});
-          //         }),
-          //     builder: (RunMutation runMutation, QueryResult? result) {
-          //       return
+
           TextButton(
             style: TextButton.styleFrom(
                 fixedSize: Size(widget.size.width, 40),
@@ -98,22 +70,8 @@ class _SignInState extends State<SignIn> {
               setState(() {
                 errorData = null;
               });
-              print(email.text);
-              print(password.text);
-              // runMutation({
-              //   'email': email.text,
-              //   'password': password.text,
-              // });
             },
-            child:
-                //  result!.isLoading
-                //     ? SizedBox(
-                //         height: 25,
-                //         width: 25,
-                //         child: CircularProgressIndicator(color: AppColors.buttonColor),
-                //       )
-                //     :
-                Text(
+            child: Text(
               'SIGN IN',
               style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: AppColors.buttonColor),
             ),
@@ -138,14 +96,23 @@ class _SignInState extends State<SignIn> {
 }
 
 class BuildLoginTextFormField extends StatefulWidget {
-  const BuildLoginTextFormField({Key? key, required this.controller, required this.title, this.keyboardType, this.obscureText, this.validator})
+  const BuildLoginTextFormField(
+      {Key? key,
+      required this.controller,
+      required this.title,
+      this.keyboardType,
+      this.obscureText,
+      this.validator,
+      this.hintTextStyle,
+      this.maxLines})
       : super(key: key);
   final TextEditingController controller;
   final String title;
   final TextInputType? keyboardType;
   final bool? obscureText;
   final String? Function(String?)? validator;
-
+  final TextStyle? hintTextStyle;
+  final int? maxLines;
   @override
   State<BuildLoginTextFormField> createState() => _BuildLoginTextFormFieldState();
 }
@@ -182,8 +149,9 @@ class _BuildLoginTextFormFieldState extends State<BuildLoginTextFormField> {
           borderSide: BorderSide(color: AppColors.buttonColor),
         ),
         hintText: widget.title,
-        hintStyle: AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.buttonColor),
+        hintStyle: widget.hintTextStyle ?? AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.buttonColor),
       ),
+      maxLength: widget.maxLines ?? 1,
     );
   }
 }

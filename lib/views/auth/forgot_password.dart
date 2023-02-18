@@ -102,31 +102,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   const SizedBox(height: 10),
                   if (errorData != null) Text(errorData!, style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.red)),
                   const SizedBox(height: 40),
-                  // Mutation(
-                  //     options: MutationOptions(
-                  //       document: gql(emailSent ? MutationServices.passwordReset : MutationServices.requestPasswordResetEmail),
-                  //       onCompleted: (result) {
-                  //         if (result != null) {
-                  //           try {
-                  //             print('result $result');
-                  //             errorData = 'An email with a password reset token has been sent to your email';
-                  //             emailSent = true;
-                  //             setState(() {});
-                  //             // Navigator.pushAndRemoveUntil(
-                  //             //     context, PageTransition(child: const Home(), type: PageTransitionType.fade), (route) => false);
-                  //           } catch (e) {
-                  //             debugPrint(e.toString());
-                  //           }
-                  //         }
-                  //       },
-                  //       onError: (error) {
-                  //         print(error);
-                  //         errorData = error!.graphqlErrors[0].message;
-                  //         setState(() {});
-                  //       },
-                  //     ),
-                  //     builder: (RunMutation runMutation, QueryResult? queryResult) {
-                  //       return
+
                   TextButton(
                     style: TextButton.styleFrom(
                         fixedSize: Size(size.width, 40),

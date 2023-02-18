@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/fragments.dart';
+import 'package:m2/services/models/search_model.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class ApiServices {
@@ -72,4 +74,37 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
   }
 }
 ''';
+
+  static final searchSuggession = gql(r'''
+ query Products($searchQuery: String!){   
+   products(search: $searchQuery, pageSize: 5) {
+     total_count
+     items {
+        name
+        sku
+        image {
+          url          
+          label        
+        }
+     }
+   }
+ }''');
+
+  Future<List<SearchModel>> searchSuggessionApi({required searchQuery, required BuildContext context}) async {
+    var graphqlClient = GraphQLProvider.of(context);
+    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: searchSuggession, variables: {"searchQuery": searchQuery}));
+    List<SearchModel> searchModelList = [];
+    if (result.data != null) {
+      try {
+        searchModelList = List<SearchModel>.generate(
+          result.data!['products']['items'].length,
+          (index) => SearchModel.fromJson(result.data!['products']['items'][index]),
+        );
+        return searchModelList;
+      } catch (e) {
+        print(e);
+      }
+    }
+    return [];
+  }
 }

@@ -8,7 +8,7 @@ import 'package:m2/views/auth/sign_up.dart';
 
 class Auth extends StatefulWidget {
   const Auth({Key? key}) : super(key: key);
-  static String route = '/auth';
+  static String route = 'auth';
   @override
   State<Auth> createState() => _AuthState();
 }

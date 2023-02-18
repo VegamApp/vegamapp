@@ -6,6 +6,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
+import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,7 @@ void main() async {
       Provider<AuthToken>(create: (context) => AuthToken()),
       Provider<CartData>(create: (context) => CartData()),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
+      Provider<HomeData>(create: (context) => HomeData()),
     ], child: const MyApp()),
   );
 }
@@ -63,7 +65,6 @@ class _MyAppState extends State<MyApp> {
 
       final HttpLink httpLink = HttpLink(ApiServices.path, defaultHeaders: {'Content-Type': 'application/json'});
 
-      // print('My app: ${loginToken.loginToken}');
       if (loginToken.loginToken != null) {
         print('auth key initiated');
         final AuthLink authLink = AuthLink(

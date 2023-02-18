@@ -41,6 +41,22 @@ mixin _$CategoriesData on _CategoriesDataBase, Store {
     });
   }
 
+  late final _$_portalTargetsAtom =
+      Atom(name: '_CategoriesDataBase._portalTargets', context: context);
+
+  @override
+  List<bool> get _portalTargets {
+    _$_portalTargetsAtom.reportRead();
+    return super._portalTargets;
+  }
+
+  @override
+  set _portalTargets(List<bool> value) {
+    _$_portalTargetsAtom.reportWrite(value, super._portalTargets, () {
+      super._portalTargets = value;
+    });
+  }
+
   late final _$getCategoryDataAsyncAction =
       AsyncAction('_CategoriesDataBase.getCategoryData', context: context);
 
@@ -52,6 +68,28 @@ mixin _$CategoriesData on _CategoriesDataBase, Store {
 
   late final _$_CategoriesDataBaseActionController =
       ActionController(name: '_CategoriesDataBase', context: context);
+
+  @override
+  void populateTargets() {
+    final _$actionInfo = _$_CategoriesDataBaseActionController.startAction(
+        name: '_CategoriesDataBase.populateTargets');
+    try {
+      return super.populateTargets();
+    } finally {
+      _$_CategoriesDataBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void editTargets(int index) {
+    final _$actionInfo = _$_CategoriesDataBaseActionController.startAction(
+        name: '_CategoriesDataBase.editTargets');
+    try {
+      return super.editTargets(index);
+    } finally {
+      _$_CategoriesDataBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setLoading(bool value) {

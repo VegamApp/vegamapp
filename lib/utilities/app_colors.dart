@@ -23,6 +23,11 @@ class AppColors {
   static Color textFieldColor = const Color(0xffE9F1F4);
   static Color blogText = const Color(0xff103F50);
 
+  static Color snackbarSuccessBackgroundColor = Colors.green;
+  static Color snackbarSuccessTextColor = Colors.white;
+  static Color snackbarErrorBackgroundColor = Colors.red;
+  static Color snackbarErrorTextColor = Colors.white;
+
   static Map<int, Color> color = const {
     50: Color.fromRGBO(14, 136, 124, 0.1),
     100: Color.fromRGBO(14, 136, 124, 0.2),
