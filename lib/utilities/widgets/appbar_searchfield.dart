@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/search_services.dart';
 import 'package:m2/utilities/app_colors.dart';
 import 'package:m2/utilities/text_style.dart';
+import 'package:m2/views/product_views/product_view.dart';
 
 class AppbarSearchService extends StatefulWidget {
   const AppbarSearchService({super.key});
@@ -36,12 +38,14 @@ class _AppbarSearchServiceState extends State<AppbarSearchService> {
           padding: const EdgeInsets.only(right: 10),
           child: IconButton(
             splashRadius: 25,
-            onPressed: () {},
+            onPressed: () {
+              context.push(Uri(path: '/${ProductView.route}', queryParameters: {"search": _controller.text}).toString());
+            },
             icon: Icon(Icons.search, color: AppColors.fadedText),
           ),
         ),
       ),
-      // onSubmitted: (value) => navigate(context, ProductListingPage.route, arguments: {'searchQuery': searchQuery.text}),
+      onSubmitted: (value) => context.push(Uri(path: '/${ProductView.route}', queryParameters: {"search": _controller.text}).toString()),
     );
     //          TextField(
     //   controller: _controller,

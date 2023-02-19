@@ -6,11 +6,10 @@ import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
-import 'package:m2/views/splash_screen.dart';
 
 // GoRouter configuration
 final router = GoRouter(
-  initialLocation: '/products/carina-basic-capri.html',
+  initialLocation: '/',
   routes: [
     // GoRoute(
     //   path: "/home/:page",
@@ -39,13 +38,14 @@ final router = GoRouter(
         GoRoute(
           path: ProductView.route,
           pageBuilder: (context, state) {
+            print(state.queryParams);
             return getCustomTransition(
               state,
               ProductView(
-                categoryId: state.params['categoryId'],
-                categoryUid: state.params['categoryUid'],
-                viewAll: state.params['viewAll'] == 'true',
-                searchQuery: state.params['search'],
+                categoryId: state.queryParams['categoryId'],
+                categoryUid: state.queryParams['categoryUid'],
+                viewAll: state.queryParams['viewAll'] == 'true',
+                searchQuery: state.queryParams['search'],
               ),
             );
           },
@@ -94,7 +94,7 @@ final router = GoRouter(
 
 CustomTransitionPage<dynamic> getCustomTransition(GoRouterState state, Widget child) {
   return CustomTransitionPage(
-    key: state.pageKey,
+    key: UniqueKey(),
     child: child,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       // Change the opacity of the screen using a Curve based on the the animation's

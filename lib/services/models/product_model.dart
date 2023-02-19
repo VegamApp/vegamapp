@@ -108,6 +108,7 @@ class Items {
   String? name;
   String? sku;
   String? urlKey;
+  String? urlSuffix;
   Image? image;
   int? ratingSummary;
   int? reviewCount;
@@ -123,29 +124,32 @@ class Items {
   List<MediaGallery>? mediaGallery;
   List<Items>? relatedProducts;
 
-  Items(
-      {this.name,
-      this.sku,
-      this.urlKey,
-      this.image,
-      this.ratingSummary,
-      this.reviewCount,
-      this.stockStatus,
-      this.categories,
-      this.description,
-      this.shortDescription,
-      this.sTypename,
-      this.specialPrice,
-      this.priceRange,
-      this.configurableOptions,
-      this.variants,
-      this.mediaGallery,
-      this.relatedProducts});
+  Items({
+    this.name,
+    this.sku,
+    this.urlKey,
+    this.image,
+    this.ratingSummary,
+    this.reviewCount,
+    this.stockStatus,
+    this.categories,
+    this.description,
+    this.shortDescription,
+    this.sTypename,
+    this.specialPrice,
+    this.priceRange,
+    this.configurableOptions,
+    this.variants,
+    this.mediaGallery,
+    this.relatedProducts,
+    this.urlSuffix,
+  });
 
   Items.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     sku = json['sku'];
     urlKey = json['url_key'];
+    urlSuffix = json['url_suffix'];
     image = json['image'] != null ? Image.fromJson(json['image']) : null;
     ratingSummary = json['rating_summary'];
     reviewCount = json['review_count'];
@@ -161,6 +165,7 @@ class Items {
     sTypename = json['__typename'];
     specialPrice = json['special_price'];
     priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
+
     if (json['configurable_options'] != null) {
       configurableOptions = <ConfigurableOptions>[];
       json['configurable_options'].forEach((v) {
@@ -343,14 +348,14 @@ class MinimumPrice {
 
 class RegularPrice {
   String? sTypename;
-  int? value;
+  double? value;
   String? currency;
 
   RegularPrice({this.sTypename, this.value, this.currency});
 
   RegularPrice.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    value = json['value'];
+    value = double.parse(json['value'].toString());
     currency = json['currency'];
   }
 
@@ -391,14 +396,14 @@ class MaximumPrice {
 
 class Discount {
   String? sTypename;
-  int? amountOff;
+  double? amountOff;
   int? percentOff;
 
   Discount({this.sTypename, this.amountOff, this.percentOff});
 
   Discount.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    amountOff = json['amount_off'];
+    amountOff = double.parse(json['amount_off'].toString());
     percentOff = json['percent_off'];
   }
 

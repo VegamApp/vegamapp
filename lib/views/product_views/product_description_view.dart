@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
+import 'package:m2/services/sliver_grid_with_fixed_height.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/description_and_review.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
@@ -66,12 +70,13 @@ class _ProductDescriptionState extends State<ProductDescription> {
         const SizedBox(height: 20),
         ProductVarientWidget(productModel: productModel),
         const SizedBox(height: 30),
-        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!)
+        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
       ],
     );
   }
 
   Widget getDesktopChildren(Size size) {
+    print(productModel.items![0].relatedProducts!.length);
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: AppResponsive.isMobile(context) ? 20 : 60, vertical: 20),
       children: [
@@ -133,7 +138,37 @@ class _ProductDescriptionState extends State<ProductDescription> {
           ],
         ),
         const SizedBox(height: 30),
-        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!)
+        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
+        const SizedBox(height: 20),
+        if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
+          TwoColoredTitle(firstHead: 'Related', secondHead: "Products", firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
+        if (productModel.items![0].relatedProducts != null)
+          LayoutBuilder(builder: (context, constraints) {
+            return GridView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: productModel.items![0].relatedProducts!.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCountAndFixedHeight(
+                crossAxisCount: (constraints.maxWidth / 250).floor(),
+                crossAxisSpacing: 40,
+                mainAxisSpacing: 40,
+                height: 400.0,
+              ),
+              itemBuilder: (context, index) {
+                var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
+                var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
+                return ProductItem(
+                  productModel: productModel.items![0].relatedProducts![index],
+                  price: price,
+                  originalPrice: originalPrice,
+                  offer: offer,
+                  sku: productModel.items![0].relatedProducts![index].sku!,
+                );
+              },
+            );
+          }),
       ],
     );
   }

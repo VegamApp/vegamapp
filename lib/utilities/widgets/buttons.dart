@@ -5,6 +5,7 @@ import 'package:m2/services/api_services/product_apis.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
+import 'package:m2/utilities/widgets/loading_builder.dart';
 import 'package:provider/provider.dart';
 
 class BuildButtonSingle extends StatefulWidget {
@@ -90,23 +91,23 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               //print(data);
             }),
         builder: (RunMutation runMutation, QueryResult? result) {
-          if (result!.isLoading) {
-            return Container(
-              width: widget.width * 0.4,
-              height: widget.width * 0.1,
-              constraints: const BoxConstraints(maxWidth: 160, maxHeight: 40),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.width * 0.05),
-                border: Border.all(width: 2, color: widget.buttonColor),
-              ),
-              child: Center(
-                  child: Container(
-                      width: widget.width * 0.075,
-                      height: widget.width * 0.075,
-                      constraints: const BoxConstraints(maxWidth: 30, maxHeight: 30),
-                      child: CircularProgressIndicator(color: widget.buttonColor, strokeWidth: 2))),
-            );
-          }
+          // if (result!.isLoading) {
+          //   return Container(
+          //     width: widget.width * 0.4,
+          //     height: widget.width * 0.1,
+          //     constraints: const BoxConstraints(maxWidth: 160, maxHeight: 40),
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(widget.width * 0.05),
+          //       border: Border.all(width: 2, color: widget.buttonColor),
+          //     ),
+          //     child: Center(
+          //         child: Container(
+          //             width: widget.width * 0.075,
+          //             height: widget.width * 0.075,
+          //             constraints: const BoxConstraints(maxWidth: 30, maxHeight: 30),
+          //             child: CircularProgressIndicator(color: widget.buttonColor, strokeWidth: 2))),
+          //   );
+          // }
           return TextButton(
             onHover: (value) {
               if (value) {
@@ -119,14 +120,15 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               setState(() {});
             },
             style: TextButton.styleFrom(
-              fixedSize: Size(widget.width * 0.4, widget.width * 0.1),
-              maximumSize: const Size(160, 40),
+              // fixedSize: Size(widget.width * 0.4, widget.width * 0.1),
+              maximumSize: const Size.fromHeight(40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(widget.width * 0.05),
                 side: BorderSide(width: 2, color: widget.buttonColor),
               ),
               backgroundColor: textButtonColor,
               shadowColor: AppColors.shadowColor,
+              padding: const EdgeInsets.all(10),
             ),
             onPressed: () {
               // //print(widget.typeName);
@@ -161,24 +163,26 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                 });
               }
             },
-            child: Stack(
-              children: [
-                Center(
-                  child: Text(
-                    widget.title,
-                    style: AppStyles.getMediumTextStyle(fontSize: widget.width * 0.028 > 14 ? 14 : widget.width * 0.028, color: textColor),
+            child: result!.isLoading
+                ? BuildLoadingWidget(color: textColor)
+                : Stack(
+                    children: [
+                      Center(
+                        child: Text(
+                          widget.title,
+                          style: AppStyles.getMediumTextStyle(fontSize: widget.width * 0.028 > 14 ? 14 : widget.width * 0.028, color: textColor),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: SvgPicture.asset(
+                          widget.svg,
+                          color: textColor,
+                          width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
+                        ),
+                      )
+                    ],
                   ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: SvgPicture.asset(
-                    widget.svg,
-                    color: textColor,
-                    width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
-                  ),
-                )
-              ],
-            ),
           );
         });
   }

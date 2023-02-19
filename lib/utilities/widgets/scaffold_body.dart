@@ -57,7 +57,7 @@ class _BuildScaffoldState extends State<BuildScaffold> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       key: key,
-      appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 200),
+      appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
       body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 1400), child: widget.child)),
       endDrawer: DrawerContainer(size: size),
     );

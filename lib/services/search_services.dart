@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'dart:async';
 
 import 'package:m2/services/models/search_model.dart';
 import 'package:m2/utilities/utilities.dart';
+import 'package:m2/views/product_views/product_view.dart';
 
 class TextFieldSearch extends StatefulWidget {
   /// A default list of values that can be used for an initial list of elements to select from
@@ -143,6 +145,7 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
     resetState(tempList);
   }
 
+  @override
   void initState() {
     super.initState();
 
@@ -229,7 +232,7 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
                 onTap: () {
                   // Navigator.push(
                   //     context, PageTransition(child: ProductListingPage.route, (searchQuery: widget.controller.text), type: PageTransitionType.fade));
-                  //TODO    navigate(context, ProductListingPage.route, arguments: {'searchQuery': widget.controller.text});
+                  context.go(Uri(path: ProductView.route, queryParameters: {"search": widget.controller.text}).toString());
                   resetList();
                   FocusScope.of(context).unfocus();
                 },
@@ -238,8 +241,10 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
               const SizedBox(height: 10),
               ListTile(
                 onTap: () {
-                  // Navigator.push(context, PageTransition(child: ProductDetails(sku: filteredList![i].sku!), type: PageTransitionType.fade));
+                  print(filteredList![i].name);
                   //TODO  navigate(context, ProductDetails.route, arguments: filteredList![i].sku);
+                  context.go('/${ProductView.route}/${filteredList![i].urlKey}.${filteredList![i].urlSuffix}');
+
                   resetList();
                   FocusScope.of(context).unfocus();
                 },
@@ -251,8 +256,10 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
         }
         return ListTile(
           onTap: () {
-            // Navigator.push(context, PageTransition(child: ProductDetails(sku: filteredList![i].sku!), type: PageTransitionType.fade));
+            print(filteredList![i].name);
             //TODO  navigate(context, ProductDetails.route, arguments: filteredList![i].sku);
+            context.go('/${ProductView.route}/${filteredList![i].urlKey}.${filteredList![i].urlSuffix}');
+
             resetList();
             FocusScope.of(context).unfocus();
           },

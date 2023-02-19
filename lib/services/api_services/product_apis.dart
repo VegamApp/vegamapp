@@ -1,7 +1,7 @@
 class ProductApi {
   static String products = r'''
-  query products( $pageSize: Int!, $page: Int!,  $filter: ProductAttributeFilterInput!){
-  products(filter: $filter, pageSize: $pageSize, currentPage: $page) {
+  query products( $pageSize: Int!, $page: Int!,  $filter: ProductAttributeFilterInput!,$searchQuery: String){
+  products(search: $searchQuery, filter: $filter, pageSize: $pageSize, currentPage: $page) {
       aggregations(
       filter: {
         category: {
@@ -25,6 +25,7 @@ class ProductApi {
         name
         sku
         url_key
+        url_suffix
         image{
           url
         }
@@ -174,7 +175,9 @@ class ProductApi {
         }
         related_products{
           name
-          sku
+          sku      
+          url_key
+          url_suffix
           image{
             url
           }

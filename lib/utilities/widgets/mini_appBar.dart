@@ -41,7 +41,7 @@ class MiniAppBar extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       if (index != navigationChild.length - 1) {
-                        context.go(Uri(path: ProductView.route, queryParameters: {"categoryUid": navigationChild[index]['uid']}).toString());
+                        context.go(Uri(path: '/${ProductView.route}', queryParameters: {"categoryUid": navigationChild[index]['uid']}).toString());
                       }
                       //  navigate(context, ProductListing(categoryUID: navigationChild[index]['uid']));
                     },

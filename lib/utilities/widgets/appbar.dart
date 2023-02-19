@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/appbar_searchfield.dart';
 import 'package:m2/utilities/widgets/delivery_hover.dart';
+import 'package:m2/views/home/home_view.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -17,51 +19,60 @@ class BuildAppBar extends StatelessWidget implements PreferredSize {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    if (!AppResponsive.isDesktop(context)) height = 60;
     return Align(
       alignment: Alignment.center,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 1400),
         padding: const EdgeInsets.symmetric(horizontal: 20),
         height: AppResponsive.isDesktop(context) ? 200 : 60,
-        child: AppResponsive(
-          desktop: Row(
-            children: [
-              getHomeButton(size),
-              const SizedBox(width: 50),
-              const DeliveryHoverWidget(),
-              const Expanded(
-                child: AppbarCategories(),
-              )
-            ],
-          ),
-          mobile: Row(
-            children: [
-              getHomeButton(size),
-              const Spacer(),
-              InkWell(
-                onTap: () => scaffoldKey.currentState?.openEndDrawer(),
-                child: SizedBox(
-                  width: 40,
-                  child: Icon(Icons.menu, color: AppColors.fadedText),
+        width: size.width,
+        decoration: BoxDecoration(
+          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 5, offset: const Offset(0, 3))],
+          color: AppColors.appBarColor,
+        ),
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1400),
+          child: AppResponsive(
+            desktop: Row(
+              children: [
+                getHomeButton(size),
+                const SizedBox(width: 50),
+                const DeliveryHoverWidget(),
+                const Expanded(
+                  child: AppbarCategories(),
+                )
+              ],
+            ),
+            mobile: Row(
+              children: [
+                getHomeButton(size),
+                const Spacer(),
+                InkWell(
+                  onTap: () => scaffoldKey.currentState?.openEndDrawer(),
+                  child: SizedBox(
+                    width: 40,
+                    child: Icon(Icons.menu, color: AppColors.fadedText),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  InkWell getHomeButton(Size size) {
-    return InkWell(
-      // onTap: () => onPressed(0),
-      child: SizedBox(
-        width: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
-        height: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
-        child: Align(alignment: Alignment.centerLeft, child: Image.asset(logoUrl)),
-      ),
-    );
+  Widget getHomeButton(Size size) {
+    return Builder(builder: (context) {
+      return InkWell(
+        onTap: () => context.go(HomeView.route),
+        child: SizedBox(
+          width: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
+          height: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
+          child: Align(alignment: Alignment.centerLeft, child: Image.asset(logoUrl)),
+        ),
+      );
+    });
   }
 
   @override

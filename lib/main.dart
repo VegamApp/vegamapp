@@ -94,6 +94,10 @@ class _MyAppState extends State<MyApp> {
               primarySwatch: AppColors.primaryColor,
               drawerTheme: DrawerThemeData(scrimColor: AppColors.fadedText),
               scaffoldBackgroundColor: AppColors.scaffoldColor,
+              hoverColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              splashFactory: NoSplash.splashFactory,
             ),
             routerConfig: routes.router,
 

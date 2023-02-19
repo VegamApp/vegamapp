@@ -82,6 +82,8 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
      items {
         name
         sku
+        url_key
+        url_suffix
         image {
           url          
           label        
