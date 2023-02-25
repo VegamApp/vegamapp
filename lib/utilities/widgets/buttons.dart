@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:m2/services/api_services/product_apis.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
@@ -56,11 +57,12 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
 
     return Mutation(
         options: MutationOptions(
-            document: gql(ProductApi.addProductToCart),
+            document: gql(CartApis.addProductToCart),
             onCompleted: (result) {
               //print("result: $result");
               try {
                 cart.putCartCount(result!['addProductsToCart']['cart']['total_quantity']);
+                cart.getCartData(context);
                 try {
                   showSnackBar(
                     backgroundColor: AppColors.snackbarErrorBackgroundColor,
@@ -131,10 +133,9 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               padding: const EdgeInsets.all(10),
             ),
             onPressed: () {
-              // //print(widget.typeName);
-              //print(loginToken.cartId);
-              //print(loginToken.loginToken);
-              //print(widget.selectedSku);
+              print(widget.typeName);
+              print(widget.parentSku);
+              print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
                 runMutation({
                   'cartIdString': '${cart.cartId}',

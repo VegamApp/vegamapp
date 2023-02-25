@@ -18,6 +18,8 @@ class ProductVarientWidget extends StatefulWidget {
 
 class _ProductVarientWidgetState extends State<ProductVarientWidget> {
   double quantity = 1;
+  late String? selectedSku = widget.productModel.items![0].variants?[0].product?.sku;
+
   TextEditingController pinCode = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -50,14 +52,14 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
           children: [
             Expanded(
               child: BuildButtonSingle(
-                typeName: "typeName",
+                typeName: widget.productModel.sTypename!,
+                parentSku: widget.productModel.items![0].sku!,
+                selectedSku: selectedSku,
                 width: size.width,
                 title: 'ADD TO CART',
                 buttonColor: AppColors.buttonColor,
                 textColor: Colors.white,
                 svg: 'assets/svg/shopping-cart.svg',
-                parentSku: 'parentSku',
-                selectedSku: 'selectedSku',
                 quantity: quantity,
               ),
             ),
@@ -70,8 +72,8 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                 buttonColor: AppColors.fontColor,
                 textColor: Colors.white,
                 svg: 'assets/svg/flash.svg',
-                parentSku: 'parentSku',
-                selectedSku: 'selectedSku',
+                parentSku: widget.productModel.items![0].sku!,
+                selectedSku: selectedSku,
                 quantity: quantity,
               ),
             ),

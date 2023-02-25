@@ -18,7 +18,7 @@ abstract class _AuthTokenBase with Store {
   }
 
   @action
-  putLoginToken(String token) {
+  putLoginToken(String? token) {
     _loginToken = token;
   }
 

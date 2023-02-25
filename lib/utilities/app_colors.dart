@@ -24,6 +24,7 @@ class AppColors {
   static Color scaffoldColor = Colors.white; // Main background color
 
   static Color buttonColor = const Color(0xff31aca0); // Color of buttons throughout the app
+  static Color buttonTextColor = Colors.white;
 
   static Color facebookBlue = const Color(0xff4267B2);
   static Color googleRed = const Color(0xffdb4a39);

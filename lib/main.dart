@@ -16,6 +16,9 @@ import 'package:m2/services/route_services.dart' as routes;
 void main() async {
   await initHiveForFlutter();
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  String? key = sharedPreferences.getString('token');
+  String? cart = sharedPreferences.getString('cartId');
 
   runApp(
     MultiProvider(providers: [
@@ -23,31 +26,23 @@ void main() async {
       Provider<CartData>(create: (context) => CartData()),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
       Provider<HomeData>(create: (context) => HomeData()),
-    ], child: const MyApp()),
+    ], child: MyApp(token: key, cartId: cart)),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, this.signIn = false}) : super(key: key);
+  const MyApp({Key? key, this.signIn = false, this.token, this.cartId}) : super(key: key);
   final bool signIn;
-
+  final String? token;
+  final String? cartId;
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   getToken(AuthToken authToken, CartData cartData) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? key = sharedPreferences.getString('key');
-    String? cart = sharedPreferences.getString('cartId');
-
-    // final authToken = Provider.of<AuthToken>(context);
-    if (key != null) {
-      authToken.putLoginToken(key);
-    }
-    if (cart != null) {
-      cartData.putCartId(cart);
-    }
+    authToken.putLoginToken(widget.token);
+    cartData.putCartId(widget.cartId);
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/api_services.dart';
+import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 part 'cart_data.g.dart';
@@ -31,8 +32,12 @@ abstract class _CartDataBase with Store {
   }
 
   @action
-  putCartId(String newCartId) {
+  putCartId(String? newCartId) async {
     _cartId = newCartId;
+    if (newCartId != null) {
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setString('cart', newCartId);
+    }
   }
 
   @action
@@ -54,8 +59,13 @@ abstract class _CartDataBase with Store {
   getCartData(BuildContext context) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: ApiServices.cart, variables: {'id': _cartId}));
-    setCartData(result.data!);
+    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: CartApis.cart, variables: {'id': _cartId}));
+    if (result.hasException) {
+      print(result.exception);
+    } else {
+      // putCartCount(result.data!['cart']['total_quantity']);
+      setCartData(result.data!);
+    }
     setLoading(false);
   }
 
@@ -77,8 +87,21 @@ abstract class _CartDataBase with Store {
     QueryResult? result = await graphqlClient.value.query(
       QueryOptions(document: gql("{customerCart {id}}")),
     );
-    await setToken(result.data!['customerCart']['id']);
+    try {
+      await mergeCarts(graphqlClient, result.data!['customerCart']['id']);
+    } catch (e) {
+      await setToken(result.data!['customerCart']['id']);
+    }
     setLoading(false);
+  }
+
+  @action
+  mergeCarts(ValueNotifier<GraphQLClient> graphqlClient, String newCart) async {
+    QueryResult? result = await graphqlClient.value.mutate(
+      MutationOptions(document: gql(CartApis.mergeCart), variables: {'oldCart': _cartId, 'newCart': newCart}),
+    );
+    print(result.data);
+    if (result.data != null) setToken(newCart);
   }
 
   setToken(String cartId) async {

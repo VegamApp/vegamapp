@@ -56,7 +56,7 @@ mixin _$AuthToken on _AuthTokenBase, Store {
   }
 
   @override
-  dynamic putLoginToken(String token) {
+  dynamic putLoginToken(String? token) {
     final _$actionInfo = _$_AuthTokenBaseActionController.startAction(
         name: '_AuthTokenBase.putLoginToken');
     try {

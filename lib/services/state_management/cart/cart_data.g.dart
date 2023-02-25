@@ -73,6 +73,14 @@ mixin _$CartData on _CartDataBase, Store {
     });
   }
 
+  late final _$putCartIdAsyncAction =
+      AsyncAction('_CartDataBase.putCartId', context: context);
+
+  @override
+  Future putCartId(String? newCartId) {
+    return _$putCartIdAsyncAction.run(() => super.putCartId(newCartId));
+  }
+
   late final _$getCartDataAsyncAction =
       AsyncAction('_CartDataBase.getCartData', context: context);
 
@@ -98,6 +106,16 @@ mixin _$CartData on _CartDataBase, Store {
         .run(() => super.getCustomerCart(context));
   }
 
+  late final _$mergeCartsAsyncAction =
+      AsyncAction('_CartDataBase.mergeCarts', context: context);
+
+  @override
+  Future mergeCarts(
+      ValueNotifier<GraphQLClient> graphqlClient, String newCart) {
+    return _$mergeCartsAsyncAction
+        .run(() => super.mergeCarts(graphqlClient, newCart));
+  }
+
   late final _$_CartDataBaseActionController =
       ActionController(name: '_CartDataBase', context: context);
 
@@ -107,17 +125,6 @@ mixin _$CartData on _CartDataBase, Store {
         name: '_CartDataBase.putCartCount');
     try {
       return super.putCartCount(count);
-    } finally {
-      _$_CartDataBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  dynamic putCartId(String newCartId) {
-    final _$actionInfo = _$_CartDataBaseActionController.startAction(
-        name: '_CartDataBase.putCartId');
-    try {
-      return super.putCartId(newCartId);
     } finally {
       _$_CartDataBaseActionController.endAction(_$actionInfo);
     }

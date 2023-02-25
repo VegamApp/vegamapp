@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/views/auth/sign_in.dart';
 // import 'package:m2/views/home.dart';
 // import '../../services/services.dart';
@@ -8,7 +9,7 @@ import '../../utilities/utilities.dart';
 // Password reset page
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
-
+  static String route = 'passwordreset';
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();
 }
@@ -36,11 +37,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController token = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confPassword = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: ListView(
+    return BuildScaffold(
+      child: ListView(
         children: [
           Center(
             child: Container(

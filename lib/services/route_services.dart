@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/auth/auth.dart';
+import 'package:m2/views/auth/forgot_password.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
@@ -30,6 +32,12 @@ final router = GoRouter(
           },
         ),
         GoRoute(
+          path: ForgotPassword.route,
+          pageBuilder: (context, state) {
+            return getCustomTransition(state, const ForgotPassword());
+          },
+        ),
+        GoRoute(
           path: '${ProductView.route}/:url',
           pageBuilder: (context, state) {
             return getCustomTransition(state, ProductView(urlKey: state.params['url']));
@@ -50,6 +58,20 @@ final router = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: 'account',
+          pageBuilder: (context, state) {
+            return getCustomTransition(state, const AccountInformationView());
+          },
+          routes: [
+            GoRoute(
+              path: AccountInformationView.route,
+              pageBuilder: (context, state) {
+                return getCustomTransition(state, const AccountInformationView());
+              },
+            ),
+          ],
+        ),
       ],
     ),
     GoRoute(
@@ -58,37 +80,6 @@ final router = GoRouter(
         return getCustomTransition(state, const ExPage());
       },
     ),
-
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
-    // GoRoute(
-    //   path: '/',
-    //   pageBuilder: (context, state) {
-    //     return getCustomTransition(state, SplashScreen());
-    //   },
-    // ),
   ],
 );
 

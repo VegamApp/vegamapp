@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -112,11 +114,13 @@ class _ProductViewState extends State<ProductView> {
       child: Query(
         options: QueryOptions(document: gql(queryString), variables: variables),
         builder: (result, {fetchMore, refetch}) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
+          // WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
 
           if ((result.isLoading && result.data == null) || isLoading) return const BuildLoadingWidget();
           if (result.hasException) {
-            return BuildErrorWidget(onRefresh: refetch, errorMsg: result.exception?.graphqlErrors[0].message);
+            log(result.exception.toString());
+            return BuildErrorWidget(
+                onRefresh: refetch, errorMsg: result.exception!.graphqlErrors.isEmpty ? "Server error" : result.exception?.graphqlErrors[0].message);
           }
           if (result.data!['products']['items'].isEmpty) {
             return Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show"));
@@ -255,7 +259,7 @@ class _ProductViewState extends State<ProductView> {
                                   },
                                 ),
                                 const SizedBox(height: 20),
-                                if (isLoading) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                                if (isLoading || totalPages >= page) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
                                 const SizedBox(height: 20),
                               ],
                             ),

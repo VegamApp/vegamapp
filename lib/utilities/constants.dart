@@ -6,8 +6,7 @@ import 'package:gql/ast.dart';
 String logoUrl = 'assets/images/logo.png';
 String currency = '₹';
 
-// navigate(BuildContext context, Widget child) =>
-//     Navigator.push(context, PageTransition(child: child, type: PageTransitionType.fade, isIos: Platform.isIOS));
+enum Gender { male, female }
 
 navigate(BuildContext context, String routeName, {var arguments}) => Navigator.pushNamed(context, routeName, arguments: arguments);
 

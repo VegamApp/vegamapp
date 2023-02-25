@@ -14,37 +14,6 @@ class ApiServices {
   static String domain = 'https://flutter.ceymox.net/';
   static String path = '$domain/graphql/';
 
-  static final cart = addFragments(gql(r'''
-  query getCart($id: String!) {
-  cart(cart_id: $id) {
-     ...AppliedCoupons
-    ...AvailablePaymentMethod
-    ...BillingAddress
-    email
-    ...GiftMessage
-    id
-    is_virtual
-    items{
-      product{
-        name
-      }
-    }
-    ...Prices
-    ...SelectedPaymentMethod
-    ...ShippingAddresses
-    total_quantity
-    __typename
-  }
-}'''), [
-    Fragments.appliedCouponFragment,
-    Fragments.availablePaymentMethodFragment,
-    Fragments.billingAddressFragment,
-    Fragments.giftMessageFragment,
-    Fragments.pricesFragment,
-    Fragments.selectedPaymentMethodFragment,
-    Fragments.shippingAddressesFragment
-  ]);
-
   static String getCategories = r'''
 query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
   categories(filters: $filter, pageSize: $pagesize, currentPage: $page) {
@@ -56,6 +25,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
         include_in_menu
         url_key
         url_path
+        url_suffix
         uid
         children {
           name
@@ -64,6 +34,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
           include_in_menu
           url_key
           url_path
+          url_suffix
           __typename
         }
         __typename

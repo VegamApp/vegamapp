@@ -313,31 +313,6 @@ class ProductApi {
   }
 }''';
 
-  static String addProductToCart = r'''
-  mutation addProductsToCart($cartIdString: String!,$cartItemsMap:[CartItemInput!]!){
-    addProductsToCart(
-     cartId: $cartIdString
-     cartItems: $cartItemsMap
-  ) {
-    cart {
-      items {
-        id
-        product {
-          sku
-          stock_status
-        }
-        quantity
-      }
-      
-      total_quantity
-    }
-    user_errors {
-      code
-      message
-    }
-  }
-  }''';
-
   static String createReview = r'''
 mutation createProductReview($name:String!, $sku: String!, $summary: String!, $text:String!, $ratings: [ProductReviewRatingInput]!){
   createProductReview(
