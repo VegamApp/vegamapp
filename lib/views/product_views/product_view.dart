@@ -191,16 +191,18 @@ class _ProductViewState extends State<ProductView> {
                   ? null
                   : dController.isAttached && dController.pixels == 0
                       ? FloatingActionButton.extended(
-                          onPressed: () {
-                            dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                          onPressed: () async {
+                            await dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                            setState(() {});
                           },
                           backgroundColor: AppColors.primaryColor,
                           isExtended: true,
                           label: Text('Filters', style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.scaffoldColor)),
                         )
                       : FloatingActionButton(
-                          onPressed: () {
-                            dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                          onPressed: () async {
+                            await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                            setState(() {});
                           },
                           backgroundColor: AppColors.primaryColor,
                           isExtended: true,
@@ -292,14 +294,14 @@ class _ProductViewState extends State<ProductView> {
 
   getGridViewHeight(double width) {
     print(width);
-    if (width > 500) return 400.0;
-    if (width > 450) return width * 0.9;
-    if (width > 400) return width;
-    if (width > 350) return width * 1.05;
-    if (width > 300) return width * 1.1;
-    if (width > 250) return width * 1.2;
-    return width * 1.3;
-    // constraints.maxWidth < 500 ? constraints.maxWidth : 400.0
+    // if (width > 500) return 400.0;
+    // if (width > 450) return width * 0.9;
+    // if (width > 400) return width;
+    // if (width > 350) return width * 1.05;
+    // if (width > 300) return width * 1.1;
+    // if (width > 250) return width * 1.2;
+    // return width * 1.3;
+    return 400.0;
   }
 
   getFilter(Size size, QueryResult result, VoidCallback? refetch, {ScrollController? scrollController}) {
@@ -372,7 +374,9 @@ class _ProductViewState extends State<ProductView> {
             //     ),
             //   )
             // else
-            Text('Filters', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
+            const SizedBox(height: 20),
+
+            Text('Filters', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText)),
             const SizedBox(height: 20),
             Container(
               color: Colors.white,
@@ -460,7 +464,7 @@ class _ProductViewState extends State<ProductView> {
       }
       //print(filter);
       return ExpansionTile(
-          initiallyExpanded: true,
+          initiallyExpanded: false,
           // tilePadding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
           controlAffinity: ListTileControlAffinity.leading,
           leading: const SizedBox(),

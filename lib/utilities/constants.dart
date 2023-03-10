@@ -8,8 +8,6 @@ String currency = '₹';
 
 enum Gender { male, female }
 
-navigate(BuildContext context, String routeName, {var arguments}) => Navigator.pushNamed(context, routeName, arguments: arguments);
-
 //Temp images
 // List<Map<String, dynamic>> photosBig = List.generate(3, (index) => {'url': 'https://picsum.photos/400/560?random=$index'});
 
@@ -23,6 +21,20 @@ String? validateEmail(String? value) {
   } else {
     return null;
   }
+}
+
+Color getButtonColor(Set<MaterialState> states) {
+  if (states.contains(MaterialState.hovered)) {
+    return AppColors.scaffoldColor;
+  }
+  return AppColors.buttonColor;
+}
+
+Color getTextColor(Set<MaterialState> states) {
+  if (states.contains(MaterialState.hovered)) {
+    return AppColors.buttonColor;
+  }
+  return AppColors.buttonTextColor;
 }
 
 Future<void> launchPhone(String phoneNo) async {

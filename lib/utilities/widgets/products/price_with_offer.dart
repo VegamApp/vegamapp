@@ -25,7 +25,7 @@ class BuildPriceWithOffer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text.rich(
       TextSpan(
-        text: currency != null ? '$currency' : '₹',
+        text: currency != null ? '$currency ' : '₹ ',
         style: TextStyle(fontSize: priceSize, fontWeight: FontWeight.w600),
         children: [
           if (price != null)

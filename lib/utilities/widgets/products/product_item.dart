@@ -51,32 +51,36 @@ class _ProductItemState extends State<ProductItem> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 100, maxHeight: 240),
-                // color: Colors.amber,
-                // height: 250,
-                child: CachedNetworkImage(imageUrl: widget.productModel.image!.url!),
+            Expanded(
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 100, maxHeight: 220),
+                  // color: Colors.amber,
+                  // height: 250,
+                  child: CachedNetworkImage(imageUrl: widget.productModel.image!.url!),
+                ),
               ),
             ),
-            // const SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "${widget.productModel.name}",
               style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText),
               maxLines: 2,
             ),
-            // const SizedBox(height: 5),
-            BuildPriceWithOffer(
-              price: widget.price,
-              currency: currency,
-              priceSize: widget.priceSize ?? 18,
-              originalPrice: widget.originalPrice,
-              originalPriceSize: widget.originalPriceSize ?? 16,
-              offer: widget.offer,
-              offerSize: widget.offerSize ?? 13,
+            const SizedBox(height: 5),
+            FittedBox(
+              child: BuildPriceWithOffer(
+                price: widget.price,
+                currency: currency,
+                priceSize: widget.priceSize ?? 18,
+                originalPrice: widget.originalPrice,
+                originalPriceSize: widget.originalPriceSize ?? 16,
+                offer: widget.offer,
+                offerSize: widget.offerSize ?? 13,
+              ),
             ),
             // const SizedBox(height: 5),
             AppResponsive.isMobile(context)

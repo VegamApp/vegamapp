@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/api_services.dart';
@@ -21,8 +24,19 @@ abstract class _HomeDataBase with Store {
   @action
   getHomeData(BuildContext context) async {
     setLoading(true);
-    var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: gql(ApiServices.getCategories)));
+    Link link;
+    final HttpLink httpLink = HttpLink("https://api.routestoroots.in/graphql", defaultHeaders: {'Content-Type': 'application/json'});
+    link = httpLink;
+    ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
+      GraphQLClient(
+        link: link,
+        cache: GraphQLCache(
+          store: InMemoryStore(),
+        ),
+      ),
+    );
+    QueryResult? result = await client.value.query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
+    // log(jsonEncode(result.data));
     _data = result.data!;
     setLoading(false);
   }

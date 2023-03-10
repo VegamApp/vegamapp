@@ -1,0 +1,461 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:m2/services/api_services/cart_apis.dart';
+import 'package:m2/services/app_responsive.dart';
+import 'package:m2/services/search_services.dart';
+import 'package:m2/services/state_management/cart/cart_data.dart';
+import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/utilities/utilities.dart';
+import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/cart_views/cart_addresss_view.dart';
+import 'package:provider/provider.dart';
+
+class CartView extends StatefulWidget {
+  const CartView({super.key});
+  static String route = 'cart';
+  @override
+  State<CartView> createState() => _CartViewState();
+}
+
+class _CartViewState extends State<CartView> {
+  var f = NumberFormat("#,##,##,##0.00", "en_IN");
+  ScrollController scrollController = ScrollController();
+  final deboucer = Debouncer(milliseconds: 500);
+
+  getCart() async {
+    var cartData = Provider.of<CartData>(context, listen: false);
+    var token = Provider.of<AuthToken>(context, listen: false);
+    cartData.getCartData(context, token);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => getCart());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    scrollController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    // log(jsonEncode(cartData.cartData));
+    return BuildScaffold(
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Observer(builder: (_) {
+          var cartData = Provider.of<CartData>(context);
+          var token = Provider.of<AuthToken>(context);
+
+          if (cartData.isLoading) {
+            return const BuildLoadingWidget();
+          }
+          if (cartData.cartData.isEmpty) {
+            return BuildErrorWidget(
+              errorMsg: 'An error occured, please try again.',
+              onRefresh: () => cartData.getCartData(context, token),
+            );
+          }
+          return Query(
+              options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
+              builder: (result, {fetchMore, refetch}) {
+                if (result.isLoading) {
+                  return const BuildLoadingWidget();
+                }
+                if (result.hasException) {
+                  return BuildErrorWidget(
+                    errorMsg: result.exception?.graphqlErrors[0].message,
+                    onRefresh: refetch,
+                  );
+                }
+                cartData.setCartData(result.data!);
+                cartData.putCartCount(result.data!['cart']['total_quantity']);
+                return ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        width: constraints.maxWidth * 0.75 - 40,
+                        decoration: AppResponsive.isDesktop(context)
+                            ? BoxDecoration(
+                                color: AppColors.shadowColor,
+                                borderRadius: BorderRadius.circular(30),
+                              )
+                            : null,
+                        child: const BuildCartSteps(currentCartIndex: 0),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    AppResponsive(
+                      mobile: Column(
+                        children: [
+                          getBody(size, cartData, result, refetch),
+                          const SizedBox(height: 20),
+                          CartSummaryWidget(
+                            buttonText: "Go to Checkout",
+                            onButtonTap: () {
+                              context.go("/${CartView.route}/${CartAddressView.route}");
+                            },
+                          ),
+                        ],
+                      ),
+                      desktop: SizedBox(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 75, child: getBody(size, cartData, result, refetch)),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              flex: 25,
+                              child: CartSummaryWidget(
+                                buttonText: "Go to Checkout",
+                                onButtonTap: () {
+                                  context.go("/${CartView.route}/${CartAddressView.route}");
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              });
+        });
+      }),
+    );
+  }
+
+  Widget getBody(Size size, CartData cartData, QueryResult result, Future<QueryResult<Object?>?> Function()? refetch) {
+    return AppResponsive(mobile: getMainMobileCart(size, cartData, result, refetch), desktop: getDesktopCartContainer(cartData, result, refetch));
+  }
+
+  Container getDesktopCartContainer(CartData cartData, QueryResult result, Future<QueryResult<Object?>?> Function()? refetch) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 100),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: AppColors.evenFadedText),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+            height: 70,
+            child: Row(
+              children: [
+                Expanded(
+                    flex: 4,
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Item', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Price', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Qty', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Subtotal', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                    )),
+              ],
+            ),
+          ),
+          Divider(height: 1, color: AppColors.dividerColor),
+          const SizedBox(height: 20),
+          Column(
+            children: List.generate(
+              result.data!['cart']['items'].length,
+              (index) {
+                var item = result.data!['cart']['items'][index];
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          flex: 4,
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                                  width: 100,
+                                  height: 125,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(width: 1, color: AppColors.evenFadedText),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: CachedNetworkImage(imageUrl: item['product']['image']['url']),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
+                              ],
+                            ),
+                          )),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: BuildPriceWithOffer(
+                            price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
+                            priceSize: 17,
+                            currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          height: 50,
+                          alignment: Alignment.topLeft,
+                          child: getItemNoChanger(
+                              size: const Size(500, 50),
+                              item: item,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              height: 30,
+                              cartData: cartData,
+                              refetch: refetch),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: BuildPriceWithOffer(
+                            price:
+                                (f.format(item['product']['price_range']['minimum_price']['regular_price']['value'] * item['quantity'])).toString(),
+                            priceSize: 17,
+                            currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Container getMainMobileCart(Size size, CartData cartData, QueryResult result, Future<QueryResult<Object?>?> Function()? refetch) {
+    return Container(
+      width: size.width,
+      padding: EdgeInsets.all(size.width * 0.05),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: AppColors.evenFadedText),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: result.data!['cart']['items'].length,
+            separatorBuilder: (context, index) => const SizedBox(height: 30),
+            itemBuilder: (context, index) {
+              var item = result.data!['cart']['items'][index];
+              return Column(
+                children: [
+                  SizedBox(height: 100, child: CachedNetworkImage(imageUrl: item['product']['image']['url'])),
+                  const SizedBox(height: 15),
+                  Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
+                  const SizedBox(height: 10),
+                  BuildPriceWithOffer(
+                    price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
+                    priceSize: 17,
+                    currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                  ),
+                  const SizedBox(height: 10),
+                  getItemNoChanger(size: size, item: item, cartData: cartData, refetch: refetch),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 15),
+          // Text.rich(
+          //   TextSpan(
+          //     children: [
+          //       TextSpan(text: 'Subtotal', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+          //       TextSpan(text: '  ₹', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.buttonColor)),
+          //       TextSpan(
+          //         text: '$subTotal',
+          //         style: AppStyles.getMediumTextStyle(
+          //           fontSize: 18,
+          //           color: AppColors.buttonColor,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                alignment: Alignment.center,
+                width: size.width * 0.1,
+                height: 50,
+                child: InkWell(
+                  onTap: () {},
+                  child: Icon(FontAwesomeIcons.penToSquare, color: AppColors.buttonColor),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                alignment: Alignment.center,
+                width: size.width * 0.1,
+                height: 50,
+                child: InkWell(
+                  onTap: () {
+                    // cartList.clear();
+                  },
+                  child: const Icon(FontAwesomeIcons.xmark, color: Colors.red),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Row getItemNoChanger({
+    required Size size,
+    required Map item,
+    required CartData cartData,
+    required Future<QueryResult<Object?>?> Function()? refetch,
+    MainAxisAlignment? mainAxisAlignment,
+    double? height,
+  }) {
+    return Row(
+      mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(width: 1, color: AppColors.evenFadedText),
+          ),
+          // padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          width: size.width * 0.1,
+          height: height ?? 50,
+          child: FittedBox(
+              child:
+                  Text(item['quantity'].toString().padLeft(2, '0'), style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText))),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(width: 1, color: AppColors.evenFadedText),
+          ),
+          alignment: Alignment.center,
+          width: size.width * 0.1,
+          height: height ?? 50,
+          child: FittedBox(
+            child: Mutation(
+                options: MutationOptions(
+                  document: gql(CartApis.updateCart),
+                  onCompleted: (data) async {
+                    //print(data);
+                    // await cartData.getCartData(context, token);
+                    refetch!();
+                    setState(() {});
+                  },
+                  onError: (error) {
+                    print(error);
+                    showSnackBar(context: context, message: error!.graphqlErrors[0].message, backgroundColor: Colors.red);
+                  },
+                ),
+                builder: (runMutation, result) {
+                  return Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          // cartList[index].noOfItems++;
+
+                          item['quantity']++;
+                          deboucer.run(() {
+                            print(item['quantity']);
+                            runMutation({
+                              "input": {
+                                "cart_id": cartData.cartId,
+                                "cart_items": [
+                                  {"cart_item_id": item['id'], "quantity": item['quantity']}
+                                ]
+                              }
+                            });
+                          });
+                          setState(() {});
+                        },
+                        child: SizedBox(
+                            width: size.width * 0.1,
+                            height: height != null ? height * 0.5 : 24,
+                            child: Icon(Icons.expand_less, size: height != null ? height * 0.5 : 24)),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          // if (cartList[index].noOfItems != 0) cartList[index].noOfItems--;
+                          // if (cartList[index].noOfItems == 0) cartList.removeAt(index);
+                          if (item['quantity'] > 1) {
+                            setState(() => item['quantity']--);
+
+                            deboucer.run(() {
+                              print(item['quantity']);
+                              runMutation({
+                                "input": {
+                                  "cart_id": cartData.cartId,
+                                  "cart_items": [
+                                    {"cart_item_id": item['id'], "quantity": item['quantity']}
+                                  ]
+                                }
+                              });
+                            });
+                          }
+                          setState(() {});
+                        },
+                        child: SizedBox(
+                            height: height != null ? height * 0.5 : 24,
+                            width: size.width * 0.1,
+                            child: Icon(Icons.expand_more, size: height != null ? height * 0.5 : 24)),
+                      )
+                    ],
+                  );
+                }),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
+import 'package:m2/services/state_management/token/token.dart';
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 part 'cart_data.g.dart';
 
@@ -10,6 +12,7 @@ part 'cart_data.g.dart';
 class CartData = _CartDataBase with _$CartData;
 
 abstract class _CartDataBase with Store {
+  _CartDataBase(this._cartId);
   @observable
   String? _cartId;
   String? get cartId => _cartId;
@@ -21,6 +24,10 @@ abstract class _CartDataBase with Store {
   @observable
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  @observable
+  bool _hasExceptions = false;
+  bool get hasExceptions => _hasExceptions;
 
   @observable
   Map<String, dynamic> _cartData = {};
@@ -56,15 +63,22 @@ abstract class _CartDataBase with Store {
   }
 
   @action
-  getCartData(BuildContext context) async {
+  getCartData(BuildContext context, AuthToken token) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: CartApis.cart, variables: {'id': _cartId}));
+    // print("cartResult $result");
     if (result.hasException) {
-      print(result.exception);
+      // var token = Provider.of<AuthToken>(context, listen: false);
+      if (token.loginToken == null) {
+        await getGuestCart(context);
+      } else {
+        await getCustomerCart(context, token);
+      }
     } else {
       // putCartCount(result.data!['cart']['total_quantity']);
       setCartData(result.data!);
+      putCartCount(result.data!['cart']['total_quantity']);
     }
     setLoading(false);
   }
@@ -76,21 +90,29 @@ abstract class _CartDataBase with Store {
     QueryResult? result = await graphqlClient.value.mutate(
       MutationOptions(document: gql("mutation {createEmptyCart}")),
     );
+    // print(result);
     await setToken(result.data!['createEmptyCart']);
     setLoading(false);
   }
 
   @action
-  getCustomerCart(BuildContext context) async {
+  getCustomerCart(BuildContext context, AuthToken token) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(
       QueryOptions(document: gql("{customerCart {id}}")),
     );
-    try {
-      await mergeCarts(graphqlClient, result.data!['customerCart']['id']);
-    } catch (e) {
-      await setToken(result.data!['customerCart']['id']);
+    // print("customerCart $result");
+    if (result.hasException) {
+      token.clearLoginToken();
+      token.putWishlistCount(0);
+    }
+    {
+      try {
+        await mergeCarts(graphqlClient, result.data!['customerCart']['id']);
+      } catch (e) {
+        await setToken(result.data!['customerCart']['id']);
+      }
     }
     setLoading(false);
   }
@@ -100,12 +122,12 @@ abstract class _CartDataBase with Store {
     QueryResult? result = await graphqlClient.value.mutate(
       MutationOptions(document: gql(CartApis.mergeCart), variables: {'oldCart': _cartId, 'newCart': newCart}),
     );
-    print(result.data);
-    if (result.data != null) setToken(newCart);
+    // print(result.data);
+    setToken(newCart);
+    return result;
   }
 
   setToken(String cartId) async {
-    // get previously stored token if any.
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString('cartId', cartId);
     putCartId(cartId);

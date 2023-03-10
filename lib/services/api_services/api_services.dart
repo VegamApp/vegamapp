@@ -80,4 +80,194 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
     }
     return [];
   }
+
+  static String queryHome = '''
+  {
+    homepage{
+      blocks{
+        data{
+          status
+          mobile_status
+          name
+          store
+          store_label
+          show_title
+          __typename
+          ... on SliderBlock{
+            autoplay
+            autoplay_hover_pause
+            autoplay_timeout
+            banners{
+              image
+              layout
+              link
+              position
+              title
+              link_info {
+                  category_id
+                  external_url
+                  link_type
+                  link_url
+                  open_tab
+                  page_id
+                  product_id
+                  product_sku
+                }  
+            }
+            mobile_status
+            name
+            show_dots
+            templateType
+            slider_width
+            sliders{
+              description
+              start_date
+              end_date
+              position
+              link{
+                category_id
+                external_url
+                link_type
+                link_url
+                page_id
+                product_id
+                product_sku  
+              }
+                slider_image
+              }
+            store
+            store_label
+            templateType
+          }
+          ...on BannerBlock{
+            banneritems{
+              image
+              layout
+              link
+                link_info{
+                  category_id
+                  external_url
+                  link_type
+                  link_url
+                  page_id
+                  product_id
+                  product_sku
+                  open_tab
+                }
+              position
+              title
+            }
+            banner_template
+            }
+          ...on CategoryBlock{
+            category_info{
+              name
+              category_id
+              url_path
+              url_key
+              image
+            }
+          }
+          ...on ContentBlock{
+            content
+            mobile_status
+            name
+            store
+            store_label
+          }
+          ...on ProductBlock{
+            mobile_status
+            name
+            product_type
+            products{
+              name
+              sku
+              special_price
+              image {
+                url
+                label
+              }
+              price_range {
+                maximum_price {
+                  discount {
+                      amount_off
+                      percent_off
+                  }
+                }
+                minimum_price {
+                  regular_price {
+                    value
+                    currency
+                  }
+                }
+                maximum_price {
+                  regular_price {
+                    value
+                    currency
+                  }
+                  discount {
+                      amount_off
+                      percent_off
+                  }
+                }
+              } 
+              wishlistData{
+                wishlistItem
+              }       
+            }
+            store
+            store_label
+            
+          }
+          ...on CustomBlock{
+          description
+          image
+          link
+          products{
+            name
+          }
+        }
+        }
+        page_info{
+          current_page
+          page_size
+          total_pages
+          __typename
+        }
+        total_count
+        __typename
+      }
+      }
+    }''';
+
+  static String getCountries = '''
+    query {
+        countries {
+            id
+            two_letter_abbreviation
+            three_letter_abbreviation
+            full_name_locale
+            full_name_english
+            available_regions {
+                id
+                code
+                name
+            }
+        }
+    }''';
+
+  static String getRegion(String code) => '''{
+    country(id: "$code") {
+        id
+        two_letter_abbreviation
+        three_letter_abbreviation
+        full_name_locale
+        full_name_english
+        available_regions {
+            id
+            code
+            name
+        }
+      }
+    }''';
 }

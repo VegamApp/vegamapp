@@ -31,6 +31,35 @@ class CustomerApis {
       }
     }''';
 
+  static String requestUserData = '''
+  {
+    customer {
+      firstname
+      lastname
+      suffix
+      email
+      gender
+      is_subscribed
+      wishlist{
+        id
+      }
+      addresses {
+        firstname
+        lastname
+        street
+        city
+        region {
+          region_code
+          region
+        }
+        postcode
+        country_code
+        telephone
+      }
+    }
+  }
+''';
+
   static String updateCustomer = r'''
     mutation updateCustomerV2($input: CustomerUpdateInput!) {
       updateCustomerV2(input: $input) 
@@ -43,4 +72,74 @@ class CustomerApis {
       }
     }
   ''';
+
+  static String orderDetails = r'''
+    query Orders($page:Int!){
+      customer {
+        orders(currentPage: $page, pageSize:10){
+            items {
+            number
+            id
+            order_date
+            status
+            total{
+              grand_total{
+                value
+              }
+            }
+            items{
+              product_name
+              status
+              product_sku
+              quantity_ordered
+              product_sale_price{
+                  value
+              }
+              
+            }
+            status
+          }
+          page_info {
+          current_page
+          page_size
+          total_pages
+        }
+        }
+      }
+    }
+  ''';
+
+  static String createCustomerAddress = r'''
+  mutation createCustomerAddress($street:[String], $telephone:String, $postcode:String, $city:String, $firstname:String!, $lastname:String!, $default_shipping: Boolean, $default_billing: Boolean){
+    createCustomerAddress(input: {
+      region: {
+        region: "California"
+        region_code: "CA"
+        region_id: 12
+      }
+      country_code: US
+      street: $street
+      telephone: $telephone
+      postcode: $postcode
+      city: $city
+      firstname: $firstname
+      lastname: $lastname
+      default_shipping: $default_shipping
+      default_billing: $default_billing
+    }) {
+      id
+      region {
+        region
+        region_code
+      }
+      country_code
+      street
+      telephone
+      postcode
+      city
+      default_shipping
+      default_billing
+    }
+  }
+''';
 }

@@ -12,6 +12,7 @@ import 'package:m2/utilities/widgets/appbar_searchfield.dart';
 import 'package:m2/utilities/widgets/delivery_hover.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/auth/auth.dart';
+import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
 import 'package:provider/provider.dart';
@@ -181,7 +182,7 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
 
                                                     context.go(
                                                         '/${ProductView.route}/${categories.data['categories']['items'][0]['children'][index]['children'][index2]['url_key']}${categories.data['categories']['items'][0]['children'][index]['children'][index2]['url_suffix']}');
-                                                    print(categories.data['categories']['items'][0]['children'][index]['children'][index2]);
+                                                    // print(categories.data['categories']['items'][0]['children'][index]['children'][index2]);
                                                   },
                                                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                                                   title: Text(
@@ -258,9 +259,7 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                       onEnter: (event) => setState(() => cartPortalTarget = true),
                       onExit: (event) => setState(() => cartPortalTarget = false),
                       child: InkWell(
-                        onTap: () => setState(() {
-                          // go to cart
-                        }),
+                        onTap: () => context.go("/${CartView.route}"),
                         child: SizedBox(
                           width: 35,
                           height: 35,

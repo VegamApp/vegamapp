@@ -1,105 +1,84 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart' show CarouselController, CarouselOptions, CarouselSlider;
 import 'package:flutter/material.dart';
+import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/utilities.dart';
 
-class BuildCarousel extends StatefulWidget {
-  const BuildCarousel({Key? key, required this.images, this.autoplay = true, required this.aspectRatio, this.clipEdge = false}) : super(key: key);
-  final bool clipEdge;
-  final List<Map<String, dynamic>> images;
-  final bool autoplay;
-  final double aspectRatio;
+class CarouselContainer extends StatefulWidget {
+  const CarouselContainer({
+    Key? key,
+    required this.width,
+    required this.data,
+    this.padding,
+  }) : super(key: key);
+  final double width;
+  final Map<String, dynamic> data;
+  final EdgeInsetsGeometry? padding;
   @override
-  State<BuildCarousel> createState() => _BuildCarouselState();
+  State<CarouselContainer> createState() => _CarouselContainerState();
 }
 
-class _BuildCarouselState extends State<BuildCarousel> {
-  final CarouselController _controller = CarouselController();
+class _CarouselContainerState extends State<CarouselContainer> {
   int currentIndex = 0;
-
+  final CarouselController _controller = CarouselController();
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    for (int i = 0; i < widget.images.length; i++) {
-      precacheImage(CachedNetworkImageProvider(widget.images[i]['image'] ?? widget.images[i]['slider_image']), context);
-    }
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SizedBox(
-      // height: size.width / widget.aspectRatio,
-      width: size.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            // height: size.width / widget.aspectRatio,
-            width: size.width,
-            child: ClipRRect(
-              borderRadius: widget.clipEdge ? BorderRadius.circular(size.width * 0.025) : BorderRadius.zero,
-              child: CarouselSlider(
-                carouselController: _controller,
-                options: CarouselOptions(
-                  scrollPhysics: widget.images.length == 1 ? const NeverScrollableScrollPhysics() : null,
-                  autoPlay: widget.images.length == 1 ? false : widget.autoplay,
-                  aspectRatio: widget.aspectRatio,
-                  viewportFraction: 1,
-                  onPageChanged: (index, reason) => setState(() => currentIndex = index),
-                ),
-                items: widget.images.map((e) {
-                  return InkWell(
-                    onTap: () => navigateToPages(context, e['link']),
-                    child: CachedNetworkImage(
-                      fit: BoxFit.contain,
-                      imageUrl: e['image'] ?? e['slider_image'],
-                      progressIndicatorBuilder: (context, string, progress) => Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.primaryColor,
-                          value: progress.progress,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          if (widget.images.length != 1) const SizedBox(height: 10),
-          if (widget.images.length != 1)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                widget.images.length,
-                (index) => InkWell(
-                  onTap: () => _controller.animateToPage(index),
-                  child: Container(
-                    height: 5,
-                    width: 5,
-                    margin: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: index == currentIndex ? AppColors.primaryColor : AppColors.evenFadedText,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+    return Container(
+      width: widget.width,
+      // padding: widget.padding ?? const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.containerColor,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 30,
+            offset: const Offset(0, 3),
+          )
         ],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: CarouselSlider(
+        carouselController: _controller,
+        items: List.generate(
+            widget.data['sliders'].length,
+            (index) => InkWell(
+                  onTap: () {
+                    //print(widget.data['sliders'][index]);
+                    switch (widget.data['sliders'][index]['link']['link_type']) {
+                      case 'product':
+                        if (widget.data['sliders'][index]['link']['product_sku'] != null) {
+                          // navigate(context, ProductDetail(sku: widget.data['sliders'][index]['link']['product_sku']));
+                        }
+                        break;
+                      case 'category':
+                        if (widget.data['sliders'][index]['link']['category_id'] != null) {
+                          // navigate(context, ProductListing(catergoryId: widget.data['sliders'][index]['link']['category_id']));
+                        }
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                  child: SizedBox(
+                      height: AppResponsive.isMobile(context) ? size.width : 450,
+                      child: CachedNetworkImage(imageUrl: widget.data['sliders'][index]['slider_image'], fit: BoxFit.contain)),
+                )),
+        options: CarouselOptions(
+            scrollDirection: Axis.horizontal,
+            viewportFraction: 1,
+            autoPlay: widget.data['autoplay'],
+            height: AppResponsive.isMobile(context) ? size.width : 400,
+            onPageChanged: (index, reason) {
+              currentIndex = index;
+              setState(() {});
+            }),
       ),
     );
-  }
-
-  navigateToPages(BuildContext context, var link) {
-    print(link);
-    // if (link['category_id'] != null) {
-    //   return navigate(context, ProductListingPage.route, arguments: {'catergoryId': link['category_id']});
-    // }
-    // if (link['product_id'] != null) {
-    //   navigate(context, ProductDetails.route, arguments: link['product_id']);
-    // }
-    // if (link['']) {}
-    // if (link['']) {}
   }
 }

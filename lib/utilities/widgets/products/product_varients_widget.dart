@@ -28,20 +28,21 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListView.separated(
-          addAutomaticKeepAlives: true,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.productModel.items![0].configurableOptions!.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
-          itemBuilder: (context, index) => widget.productModel.items![0].configurableOptions![index].attributeCode == 'color'
-              ? buildColor(index)
-              : buildVarient(widget.productModel.items![0].configurableOptions![index].label!, index),
-          // : SizedBox(),
-        ),
-        const SizedBox(height: 20),
-        Divider(height: 1, color: AppColors.dividerColor),
-        const SizedBox(height: 20),
+        if (widget.productModel.items![0].configurableOptions != null)
+          ListView.separated(
+            addAutomaticKeepAlives: true,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: widget.productModel.items![0].configurableOptions!.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 20),
+            itemBuilder: (context, index) => widget.productModel.items![0].configurableOptions![index].attributeCode == 'color'
+                ? buildColor(index)
+                : buildVarient(widget.productModel.items![0].configurableOptions![index].label!, index),
+            // : SizedBox(),
+          ),
+        if (widget.productModel.items![0].configurableOptions != null) const SizedBox(height: 20),
+        if (widget.productModel.items![0].configurableOptions != null) Divider(height: 1, color: AppColors.dividerColor),
+        if (widget.productModel.items![0].configurableOptions != null) const SizedBox(height: 20),
         buildQuantityChanger(),
         const SizedBox(height: 30),
         buildDelivery(size),

@@ -4,6 +4,7 @@ import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/widgets/drawer.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -20,20 +21,28 @@ class _BuildScaffoldState extends State<BuildScaffold> {
   final key = GlobalKey<ScaffoldState>();
 
   getData(context) async {
-    var cart = Provider.of<CartData>(context);
-    var token = Provider.of<AuthToken>(context);
-    var categories = Provider.of<CategoriesData>(context);
-    var homeData = Provider.of<HomeData>(context);
+    var cart = Provider.of<CartData>(context, listen: false);
+    var token = Provider.of<AuthToken>(context, listen: false);
+    var categories = Provider.of<CategoriesData>(context, listen: false);
+    var homeData = Provider.of<HomeData>(context, listen: false);
+    var userData = Provider.of<UserData>(context, listen: false);
 
     if (cart.cartId == null) {
       if (token.loginToken == null) {
         cart.getGuestCart(context);
       } else {
-        cart.getCustomerCart(context);
+        cart.getCustomerCart(context, token);
       }
     } else {
       if (cart.cartData.isEmpty) {
-        cart.getCartData(context);
+        cart.getCartData(context, token);
+      }
+    }
+    if (token.loginToken != null && userData.data.email == null) {
+      bool valid = await userData.getUserData(context);
+      if (!valid) {
+        token.clearLoginToken();
+        token.putWishlistCount(0);
       }
     }
     if (categories.data.isEmpty || categories.data['categories']['items'].isEmpty) {
@@ -48,13 +57,14 @@ class _BuildScaffoldState extends State<BuildScaffold> {
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) =>);
-    // getData();
+    // WidgetsBinding.instance.addPostFrameCallback((_) => getData(context));
   }
 
   @override
   Widget build(BuildContext context) {
-    getData(context);
     final size = MediaQuery.of(context).size;
+    getData(context);
+
     return Scaffold(
       key: key,
       appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),

@@ -8,6 +8,7 @@ import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,9 +24,10 @@ void main() async {
   runApp(
     MultiProvider(providers: [
       Provider<AuthToken>(create: (context) => AuthToken()),
-      Provider<CartData>(create: (context) => CartData()),
+      Provider<CartData>(create: (context) => CartData(cart)),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
       Provider<HomeData>(create: (context) => HomeData()),
+      Provider<UserData>(create: (context) => UserData()),
     ], child: MyApp(token: key, cartId: cart)),
   );
 }
@@ -40,14 +42,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  getToken(AuthToken authToken, CartData cartData) async {
-    authToken.putLoginToken(widget.token);
+  getToken() {
+    final loginToken = Provider.of<AuthToken>(context, listen: false);
+    final cartData = Provider.of<CartData>(context, listen: false);
+
+    loginToken.putLoginToken(widget.token);
     cartData.putCartId(widget.cartId);
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => getToken());
   }
 
   @override
@@ -55,18 +61,20 @@ class _MyAppState extends State<MyApp> {
     return Observer(builder: (_) {
       Link link;
       final loginToken = Provider.of<AuthToken>(context);
-      final cartData = Provider.of<CartData>(context);
-      getToken(loginToken, cartData);
+      // final cartData = Provider.of<CartData>(context);
+      // getToken(loginToken, cartData);
 
       final HttpLink httpLink = HttpLink(ApiServices.path, defaultHeaders: {'Content-Type': 'application/json'});
 
       if (loginToken.loginToken != null) {
         print('auth key initiated');
+        // print(loginToken.loginToken);
         final AuthLink authLink = AuthLink(
           getToken: () => 'Bearer ${loginToken.loginToken}',
         );
         link = authLink.concat(httpLink);
       } else {
+        print('no auth key');
         link = httpLink;
       }
 

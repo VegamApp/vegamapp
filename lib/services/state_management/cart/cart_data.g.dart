@@ -57,6 +57,22 @@ mixin _$CartData on _CartDataBase, Store {
     });
   }
 
+  late final _$_hasExceptionsAtom =
+      Atom(name: '_CartDataBase._hasExceptions', context: context);
+
+  @override
+  bool get _hasExceptions {
+    _$_hasExceptionsAtom.reportRead();
+    return super._hasExceptions;
+  }
+
+  @override
+  set _hasExceptions(bool value) {
+    _$_hasExceptionsAtom.reportWrite(value, super._hasExceptions, () {
+      super._hasExceptions = value;
+    });
+  }
+
   late final _$_cartDataAtom =
       Atom(name: '_CartDataBase._cartData', context: context);
 
@@ -85,8 +101,9 @@ mixin _$CartData on _CartDataBase, Store {
       AsyncAction('_CartDataBase.getCartData', context: context);
 
   @override
-  Future getCartData(BuildContext context) {
-    return _$getCartDataAsyncAction.run(() => super.getCartData(context));
+  Future getCartData(BuildContext context, AuthToken token) {
+    return _$getCartDataAsyncAction
+        .run(() => super.getCartData(context, token));
   }
 
   late final _$getGuestCartAsyncAction =
@@ -101,9 +118,9 @@ mixin _$CartData on _CartDataBase, Store {
       AsyncAction('_CartDataBase.getCustomerCart', context: context);
 
   @override
-  Future getCustomerCart(BuildContext context) {
+  Future getCustomerCart(BuildContext context, AuthToken token) {
     return _$getCustomerCartAsyncAction
-        .run(() => super.getCustomerCart(context));
+        .run(() => super.getCustomerCart(context, token));
   }
 
   late final _$mergeCartsAsyncAction =

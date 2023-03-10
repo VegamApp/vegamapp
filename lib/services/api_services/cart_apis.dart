@@ -13,11 +13,40 @@ class CartApis {
     ...GiftMessage
     id
     is_virtual
-    items{
-      product{
+    items {
+      id
+      product {
         name
+        sku
+        url_key
+        url_suffix
+        image{
+          url
+        }
+        stock_status
+        special_price
+        price_range{
+          minimum_price{
+            regular_price{
+              value
+              currency
+            }
+          }
+          maximum_price {
+            regular_price {
+              value
+              currency
+            }
+            discount {
+                amount_off
+                percent_off
+            }
+          }
+        }
       }
+      quantity
     }
+      
     ...Prices
     ...SelectedPaymentMethod
     ...ShippingAddresses
@@ -44,8 +73,33 @@ class CartApis {
       items {
         id
         product {
+          name
           sku
+          url_key
+          url_suffix
+          image{
+            url
+          }
           stock_status
+          special_price
+          price_range{
+            minimum_price{
+              regular_price{
+                value
+                currency
+              }
+            }
+            maximum_price {
+              regular_price {
+                value
+                currency
+              }
+              discount {
+                  amount_off
+                  percent_off
+              }
+            }
+          }
         }
         quantity
       }
@@ -67,4 +121,27 @@ class CartApis {
       }
     }
   ''';
+
+  static String updateCart = r'''
+      mutation updateCartItems($input: UpdateCartItemsInput){
+        updateCartItems(
+          input: $input
+        ){
+          cart {
+            items {
+              uid
+              product {
+                name
+              }
+              quantity
+            }
+            prices {
+              grand_total{
+                value
+                currency
+              }
+            }
+          }
+        }
+      }''';
 }

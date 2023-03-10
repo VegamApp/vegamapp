@@ -41,28 +41,28 @@ class BuildButtonSingle extends StatefulWidget {
 }
 
 class _BuildButtonSingleState extends State<BuildButtonSingle> {
-  late Color textButtonColor;
-  late Color textColor;
+  MaterialStatesController statesController = MaterialStatesController();
+
   @override
   void initState() {
     super.initState();
-    textButtonColor = widget.buttonColor;
-    textColor = widget.textColor;
   }
 
   @override
   Widget build(BuildContext context) {
     final loginToken = Provider.of<AuthToken>(context);
     var cart = Provider.of<CartData>(context);
+    var token = Provider.of<AuthToken>(context);
 
     return Mutation(
         options: MutationOptions(
             document: gql(CartApis.addProductToCart),
             onCompleted: (result) {
-              //print("result: $result");
+              print("cartId ${cart.cartId}");
+              // print("addProductToCart: $result");
               try {
                 cart.putCartCount(result!['addProductsToCart']['cart']['total_quantity']);
-                cart.getCartData(context);
+                cart.getCartData(context, token);
                 try {
                   showSnackBar(
                     backgroundColor: AppColors.snackbarErrorBackgroundColor,
@@ -86,11 +86,18 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                   }
                 }
               } catch (e) {
-                //print(e);
+                print(e);
               }
             },
             onError: (data) {
-              //print(data);
+              print("addProductToCarterror $data");
+              try {
+                if (data!.graphqlErrors[0].extensions!['category'] == "graphql-authorization") {
+                  cart.getCartData(context, token);
+                  showSnackBar(
+                      context: context, message: "Error occured, please try again.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
+                }
+              } catch (e) {}
             }),
         builder: (RunMutation runMutation, QueryResult? result) {
           // if (result!.isLoading) {
@@ -111,31 +118,19 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
           //   );
           // }
           return TextButton(
-            onHover: (value) {
-              if (value) {
-                textButtonColor = AppColors.containerColor;
-                textColor = widget.buttonColor;
-              } else {
-                textButtonColor = widget.buttonColor;
-                textColor = widget.textColor;
-              }
-              setState(() {});
-            },
-            style: TextButton.styleFrom(
+            style: ButtonStyle(
               // fixedSize: Size(widget.width * 0.4, widget.width * 0.1),
-              maximumSize: const Size.fromHeight(40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(widget.width * 0.05),
-                side: BorderSide(width: 2, color: widget.buttonColor),
-              ),
-              backgroundColor: textButtonColor,
-              shadowColor: AppColors.shadowColor,
-              padding: const EdgeInsets.all(10),
+              maximumSize: MaterialStateProperty.all(const Size.fromHeight(40)),
+              shape: MaterialStateProperty.all(StadiumBorder(side: BorderSide(color: widget.buttonColor, width: 2))),
+              backgroundColor: MaterialStateProperty.resolveWith(getButtonColor),
+              foregroundColor: MaterialStateProperty.resolveWith(getTextColor),
+              padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
             ),
+            statesController: statesController,
             onPressed: () {
-              print(widget.typeName);
-              print(widget.parentSku);
-              print(widget.selectedSku);
+              // print(widget.typeName);
+              // print(widget.parentSku);
+              // print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
                 runMutation({
                   'cartIdString': '${cart.cartId}',
@@ -165,20 +160,19 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               }
             },
             child: result!.isLoading
-                ? BuildLoadingWidget(color: textColor)
+                ? BuildLoadingWidget(color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor)
                 : Stack(
                     children: [
                       Center(
                         child: Text(
                           widget.title,
-                          style: AppStyles.getMediumTextStyle(fontSize: widget.width * 0.028 > 14 ? 14 : widget.width * 0.028, color: textColor),
+                          style: AppStyles.getMediumTextStyle(fontSize: widget.width * 0.028 > 14 ? 14 : widget.width * 0.028),
                         ),
                       ),
                       Align(
                         alignment: Alignment.centerRight,
                         child: SvgPicture.asset(
                           widget.svg,
-                          color: textColor,
                           width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
                         ),
                       )
@@ -186,5 +180,19 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                   ),
           );
         });
+  }
+
+  Color getButtonColor(Set<MaterialState> states) {
+    if (states.contains(MaterialState.hovered)) {
+      return AppColors.scaffoldColor;
+    }
+    return widget.buttonColor;
+  }
+
+  Color getTextColor(Set<MaterialState> states) {
+    if (states.contains(MaterialState.hovered)) {
+      return widget.buttonColor;
+    }
+    return widget.textColor;
   }
 }

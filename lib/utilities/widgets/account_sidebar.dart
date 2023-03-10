@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
+import 'package:m2/services/state_management/cart/cart_data.dart';
+import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
+import 'package:m2/views/account_view/address_view.dart';
+import 'package:m2/views/account_view/billing_agreement_view.dart';
+import 'package:m2/views/account_view/downloadable_products_view.dart';
+import 'package:m2/views/account_view/orders_view.dart';
+import 'package:m2/views/auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountSideBar extends StatefulWidget {
-  const AccountSideBar({super.key, required this.currentPage, required this.scrollController});
+  const AccountSideBar({super.key, required this.currentPage});
   final String currentPage;
-  final ScrollController scrollController;
   @override
   State<AccountSideBar> createState() => _AccountSideBarState();
 }
@@ -16,51 +26,82 @@ class AccountSideBar extends StatefulWidget {
 class _AccountSideBarState extends State<AccountSideBar> {
   // final ScrollController _sidebarScroller = ScrollController();
 
-  signOut() async {
+  signOut(BuildContext context) async {
     // clear all data of the logged in user and show logout screen
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.clear();
-    // loginToken.clearCartId();
-    // loginToken.clearLoginToken();
-    // print(loginToken.loginToken);
-    // print(loginToken.cartId);
-    // Phoenix.rebirth(context);
+    var cart = Provider.of<CartData>(context, listen: false);
+    var token = Provider.of<AuthToken>(context, listen: false);
+
+    cart.clearCartId();
+    cart.putCartCount(0);
+    token.clearLoginToken();
+    token.putWishlistCount(0);
+
+    context.go('/${Auth.route}');
     // Navigator.pushAndRemoveUntil(context, PageTransition(child: const MyApp(signIn: true), type: PageTransitionType.fade), (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppResponsive(mobile: Scaffold(body: getScaffoldChild()), desktop: getScaffoldChild());
+    return AppResponsive(mobile: Scaffold(body: getScaffoldChild(context)), desktop: getScaffoldChild(context));
   }
 
-  LayoutBuilder getScaffoldChild() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            // controller: widget.scrollController,
-            children: [
-              const SizedBox(height: 20),
-              getContainer(
-                constraints: constraints,
-                // height: constraints.maxWidth * 0.6,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 125,
-                      height: 125,
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Container(
-                                width: 125,
-                                height: 125,
+  Widget getScaffoldChild(context) {
+    return Observer(builder: (context) {
+      var user = Provider.of<UserData>(context, listen: false);
+
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              // controller: widget.scrollController,
+              children: [
+                const SizedBox(height: 20),
+                getContainer(
+                  constraints: constraints,
+                  // height: constraints.maxWidth * 0.6,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 125,
+                        height: 125,
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Container(
+                                  width: 125,
+                                  height: 125,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.primaryColor,
+                                    border: Border.all(color: AppColors.buttonColor, width: 5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.shadowColor,
+                                        offset: const Offset(0, 5),
+                                        blurRadius: 10,
+                                      ),
+                                    ],
+                                    // image: DecorationImage(
+                                    //   image: CachedNetworkImageProvider(imgUrl),
+                                    // ),
+                                  ),
+                                  child: Center(
+                                      child: Text(user.data.firstname?[0] ?? "",
+                                          style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Container(
+                                height: 40,
+                                width: 40,
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.primaryColor,
-                                  border: Border.all(color: AppColors.buttonColor, width: 5),
+                                  color: AppColors.buttonColor,
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppColors.shadowColor,
@@ -68,120 +109,102 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                       blurRadius: 10,
                                     ),
                                   ],
-                                  // image: DecorationImage(
-                                  //   image: CachedNetworkImageProvider(imgUrl),
-                                  // ),
                                 ),
-                                child: Center(child: Text("J", style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.buttonColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.shadowColor,
-                                    offset: const Offset(0, 5),
-                                    blurRadius: 10,
-                                  ),
-                                ],
+                                child: SvgPicture.asset('assets/svg/camera.svg'),
                               ),
-                              child: SvgPicture.asset('assets/svg/camera.svg'),
-                            ),
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(child: Text('Hi John Smitha', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor))),
-                  ],
+                      const SizedBox(height: 20),
+                      Center(
+                          child: Text('Hi ${user.data.firstname ?? "..."}',
+                              style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor))),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              getContainer(
-                constraints: constraints,
-                child: Column(
-                  children: [
-                    BuilProfileButtons(
-                      title: 'My Account',
-                      svgUrl: 'person',
-                      // child: const AccountInformation(),
-                      isBold: widget.currentPage == AccountInformationView.route,
-                    ),
-                    BuilProfileButtons(
-                      title: 'My Downloadable Products',
-                      svgUrl: 'downloadable',
-                      // child: const DownloadableProductsView(),
-                      isBold: widget.currentPage == 'My Downloadable Products',
-                    ),
-                    BuilProfileButtons(
-                      title: 'Address Book',
-                      svgUrl: 'location_on',
-                      // child: const AddressView(),
-                      isBold: widget.currentPage == 'Address Book',
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                getContainer(
+                  constraints: constraints,
+                  child: Column(
+                    children: [
+                      BuilProfileButtons(
+                        title: 'My Account',
+                        svgUrl: 'person',
+                        // child: const AccountInformation(),
+                        isBold: widget.currentPage == AccountInformationView.route,
+                        url: "/account/${AccountInformationView.route}",
+                      ),
+                      BuilProfileButtons(
+                        title: 'My Downloadable Products',
+                        svgUrl: 'downloadable',
+                        url: "/account/${DownloadableProductsView.route}",
+                        isBold: widget.currentPage == DownloadableProductsView.route,
+                      ),
+                      BuilProfileButtons(
+                        title: 'Address Book',
+                        svgUrl: 'location_on',
+                        isBold: widget.currentPage == AddressView.route,
+                        url: "/account/${AddressView.route}",
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              getContainer(
-                constraints: constraints,
-                child: Column(
-                  children: [
-                    BuilProfileButtons(
-                      title: 'My Orders',
-                      svgUrl: 'orders',
-                      // child: const MyOrderView(),
-                      isBold: widget.currentPage == 'My Orders',
-                    ),
-                    BuilProfileButtons(
-                      title: 'My Wish List',
-                      svgUrl: 'wishlist',
-                      // child: const WishList(),
-                      isBold: widget.currentPage == 'My Wish List',
-                    ),
-                    BuilProfileButtons(
-                      title: 'Newsletter Subscriptions',
-                      svgUrl: 'newsletter',
-                      // child: const NewsletterSubView(),
-                      isBold: widget.currentPage == 'Newsletter Subscriptions',
-                    ),
-                    BuilProfileButtons(
-                      title: 'Stored Payment Methods',
-                      svgUrl: 'payment',
-                      // child: const StoredPayment(),
-                      isBold: widget.currentPage == 'Stored Payment Methods',
-                    ),
-                    BuilProfileButtons(
-                      title: 'Billing Agreements',
-                      svgUrl: 'billing',
-                      // child: const BillingAgreementsView(),
-                      isBold: widget.currentPage == 'Billing Agreements',
-                    ),
-                    const BuilProfileButtons(
-                      title: 'Need Help',
-                      // child: ExamplePage(),
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                getContainer(
+                  constraints: constraints,
+                  child: Column(
+                    children: [
+                      BuilProfileButtons(
+                        title: 'My Orders',
+                        svgUrl: 'orders',
+                        url: "/account/${OrdersView.route}",
+                        isBold: widget.currentPage == OrdersView.route,
+                      ),
+                      BuilProfileButtons(
+                        title: 'My Wish List',
+                        svgUrl: 'wishlist',
+                        // child: const WishList(),
+                        isBold: widget.currentPage == 'My Wish List',
+                      ),
+                      BuilProfileButtons(
+                        title: 'Newsletter Subscriptions',
+                        svgUrl: 'newsletter',
+                        // child: const NewsletterSubView(),
+                        isBold: widget.currentPage == 'Newsletter Subscriptions',
+                      ),
+                      BuilProfileButtons(
+                        title: 'Stored Payment Methods',
+                        svgUrl: 'payment',
+                        // child: const StoredPayment(),
+                        isBold: widget.currentPage == 'Stored Payment Methods',
+                      ),
+                      BuilProfileButtons(
+                        title: 'Billing Agreements',
+                        svgUrl: 'billing',
+                        url: "/account/${BillingAgreementsView.route}",
+                        isBold: widget.currentPage == BillingAgreementsView.route,
+                      ),
+                      const BuilProfileButtons(
+                        title: 'Need Help',
+                        // child: ExamplePage(),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                leading: SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/sign_out.svg', color: AppColors.buttonColor)),
-                title: Text('Sign Out', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
-                onTap: signOut,
-              ),
-            ],
-          ),
-        );
-      },
-    );
+                const SizedBox(height: 20),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 5),
+                  leading: SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/sign_out.svg', color: AppColors.buttonColor)),
+                  title: Text('Sign Out', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  onTap: () => signOut(context),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 
   Container getContainer({required BoxConstraints constraints, required Widget child, double? height}) {
@@ -199,12 +222,12 @@ class _AccountSideBarState extends State<AccountSideBar> {
 }
 
 class BuilProfileButtons extends StatelessWidget {
-  const BuilProfileButtons({Key? key, required this.title, this.svgUrl, this.child, this.isBold = false}) : super(key: key);
+  const BuilProfileButtons({Key? key, required this.title, this.svgUrl, this.child, this.isBold = false, this.url}) : super(key: key);
   final String title;
   final String? svgUrl;
   final Widget? child;
   final bool isBold;
-
+  final String? url;
   @override
   Widget build(BuildContext context) {
     return ListTileTheme(
@@ -219,7 +242,9 @@ class BuilProfileButtons extends StatelessWidget {
                 ? AppStyles.getSemiBoldTextStyle(fontSize: 18, color: AppColors.fontColor)
                 : AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
         onTap: () {
-          if (!isBold) {}
+          if (!isBold && url != null) {
+            context.go(url!);
+          }
         },
       ),
     );

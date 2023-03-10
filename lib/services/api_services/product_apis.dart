@@ -334,4 +334,19 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
   }
 }
 ''';
+
+  static String reorder = r'''
+  mutation ReorderItems($orderNo: String!){
+    reorderItems(orderNumber: $orderNo) {
+      cart {
+        total_quantity
+      }
+      userInputErrors {
+        code
+        message
+        path
+      }
+    }
+  }
+  ''';
 }

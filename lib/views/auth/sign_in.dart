@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -37,99 +39,104 @@ class _SignInState extends State<SignIn> {
 
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Registered Customers',
-            style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'If you have an account, sign in with your email address.',
-            style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fadedText),
-          ),
-          const SizedBox(height: 20),
-          BuildLoginTextFormField(
-            controller: email,
-            title: 'Email*',
-            keyboardType: TextInputType.emailAddress,
-            validator: validateEmail,
-          ),
-          const SizedBox(height: 10),
-          BuildLoginTextFormField(
-            controller: password,
-            title: 'Password*',
-            keyboardType: TextInputType.visiblePassword,
-            obscureText: true,
-            validator: (value) => value != null && value.isNotEmpty ? null : "Check password",
-          ),
-          const SizedBox(height: 10),
-          if (errorData != null) Text(errorData!, style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.red)),
-          // const SizedBox(height: 10),
-          const SizedBox(height: 30),
-
-          Mutation(
-              options: MutationOptions(
-                document: gql(CustomerApis.signInWithEmail),
-                onCompleted: (data) async {
-                  print(data);
-                  try {
-                    authToken.putLoginToken(data!['generateCustomerToken']['token']);
-                    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                    sharedPreferences.setString('token', authToken.loginToken!);
-
-                    // ignore: use_build_context_synchronously
-                    await cart.getCustomerCart(context);
-                    // ignore: use_build_context_synchronously
-                    context.go(HomeView.route);
-                  } catch (e) {
-                    errorData = "Cannot authenticate";
-                  }
-                },
-                onError: (error) {
-                  try {
-                    errorData = error?.graphqlErrors[0].message;
-                    setState(() {});
-                  } catch (e) {
-                    print(e);
-                  }
+      child: Mutation(
+        options: MutationOptions(
+          document: gql(CustomerApis.signInWithEmail),
+          onCompleted: (data) async {
+            print(data);
+            try {
+              authToken.putLoginToken(data!['generateCustomerToken']['token']);
+              SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+              sharedPreferences.setString('token', authToken.loginToken!);
+              // Timer(const Duration(milliseconds: 500), () async {
+              // await cart.getCustomerCart(context, authToken);
+              context.go(HomeView.route);
+              // });
+            } catch (e) {
+              errorData = "Cannot authenticate";
+            }
+          },
+          onError: (error) {
+            try {
+              errorData = error?.graphqlErrors[0].message;
+              setState(() {});
+            } catch (e) {
+              print(e);
+            }
+          },
+        ),
+        builder: (runMutation, result) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Registered Customers',
+                style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'If you have an account, sign in with your email address.',
+                style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fadedText),
+              ),
+              const SizedBox(height: 20),
+              BuildLoginTextFormField(
+                controller: email,
+                title: 'Email*',
+                keyboardType: TextInputType.emailAddress,
+                validator: validateEmail,
+              ),
+              const SizedBox(height: 10),
+              BuildLoginTextFormField(
+                controller: password,
+                title: 'Password*',
+                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
+                validator: (value) => value != null && value.isNotEmpty ? null : "Check password",
+                onFieldSubmitted: (value) {
+                  setState(() => errorData = null);
+                  runMutation({'email': email.text, "password": password.text});
                 },
               ),
-              builder: (runMutation, result) {
-                return TextButton(
-                  style: TextButton.styleFrom(
-                      fixedSize: Size(widget.size.width, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(33.0),
-                        side: BorderSide(width: 3.0, color: AppColors.buttonColor),
-                      )),
-                  onPressed: () async {
-                    setState(() => errorData = null);
-                    runMutation({'email': email.text, "password": password.text});
-                  },
-                  child: result!.isLoading
-                      ? BuildLoadingWidget(color: AppColors.buttonColor)
-                      : Text(
-                          'SIGN IN',
-                          style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: AppColors.buttonColor),
-                        ),
-                );
-              }),
-          // ;
-          // }),
-          const SizedBox(height: 30),
-          Center(
-            child: InkWell(
-              onTap: () => context.go('/${ForgotPassword.route}'),
-              child: Text(
-                'Forgot Password?',
-                style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fontColor),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 10),
+              if (errorData != null) Text(errorData!, style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.red)),
+              // const SizedBox(height: 10),
+              const SizedBox(height: 30),
+
+              TextButton(
+                style: TextButton.styleFrom(
+                    fixedSize: Size(widget.size.width, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(33.0),
+                      side: BorderSide(width: 3.0, color: AppColors.buttonColor),
+                    )),
+                onPressed: () async {
+                  setState(() => errorData = null);
+                  runMutation({'email': email.text, "password": password.text});
+                },
+                child: result!.isLoading
+                    ? BuildLoadingWidget(color: AppColors.buttonColor)
+                    : Text(
+                        'SIGN IN',
+                        style: AppStyles.getSemiBoldTextStyle(fontSize: 14, color: AppColors.buttonColor),
+                      ),
               ),
-            ),
-          ),
-        ],
+
+              // ;
+              // }),
+              const SizedBox(height: 30),
+              Center(
+                child: InkWell(
+                  onTap: () => context.go('/${ForgotPassword.route}'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fontColor),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -145,7 +152,8 @@ class BuildLoginTextFormField extends StatefulWidget {
       this.validator,
       this.hintTextStyle,
       this.maxLines,
-      this.textCapitalization})
+      this.textCapitalization,
+      this.onFieldSubmitted})
       : super(key: key);
   final TextEditingController controller;
   final String title;
@@ -155,6 +163,7 @@ class BuildLoginTextFormField extends StatefulWidget {
   final TextStyle? hintTextStyle;
   final int? maxLines;
   final TextCapitalization? textCapitalization;
+  final Function(String value)? onFieldSubmitted;
   @override
   State<BuildLoginTextFormField> createState() => _BuildLoginTextFormFieldState();
 }
@@ -196,6 +205,7 @@ class _BuildLoginTextFormFieldState extends State<BuildLoginTextFormField> {
       ),
       maxLength: widget.maxLines,
       maxLines: widget.maxLines ?? 1,
+      onFieldSubmitted: widget.onFieldSubmitted,
     );
   }
 }

@@ -3,10 +3,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/customer_apis.dart';
 import 'package:m2/services/app_responsive.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/loading_builder.dart';
 import 'package:m2/utilities/widgets/scaffold_body.dart';
+import 'package:provider/provider.dart';
 
 class AccountInformationView extends StatefulWidget {
   const AccountInformationView({super.key});
@@ -26,8 +28,20 @@ class _AccountInformationViewState extends State<AccountInformationView> {
 
   final ScrollController scrollController = ScrollController();
 
+  late UserData userData;
+
+  getData() async {
+    userData = Provider.of<UserData>(context, listen: false);
+    fName.text = userData.data.firstname!;
+    lName.text = userData.data.lastname!;
+    email.text = userData.data.email!;
+    _gender = userData.data.gender == 1 ? Gender.male : Gender.female;
+    // print(userData.data.toJson());
+  }
+
   @override
   void initState() {
+    getData();
     super.initState();
   }
 
@@ -54,7 +68,7 @@ class _AccountInformationViewState extends State<AccountInformationView> {
                 flex: 3,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  child: AccountSideBar(currentPage: AccountInformationView.route, scrollController: scrollController),
+                  child: AccountSideBar(currentPage: AccountInformationView.route),
                 ),
               ),
               Expanded(
