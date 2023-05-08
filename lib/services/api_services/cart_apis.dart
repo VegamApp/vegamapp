@@ -123,25 +123,109 @@ class CartApis {
   ''';
 
   static String updateCart = r'''
-      mutation updateCartItems($input: UpdateCartItemsInput){
-        updateCartItems(
-          input: $input
-        ){
-          cart {
-            items {
-              uid
-              product {
-                name
-              }
-              quantity
+    mutation updateCartItems($input: UpdateCartItemsInput){
+      updateCartItems(
+        input: $input
+      ){
+        cart {
+          items {
+            uid
+            product {
+              name
             }
-            prices {
-              grand_total{
-                value
-                currency
-              }
+            quantity
+          }
+          prices {
+            grand_total{
+              value
+              currency
             }
           }
         }
-      }''';
+      }
+    }''';
+
+  static String setShippingAddressesOnCart = r'''
+  mutation setShippingAddressesOnCart($input: SetShippingAddressesOnCartInput){
+    setShippingAddressesOnCart(input:$input) {
+      cart {
+        shipping_addresses {
+          firstname
+          lastname
+          company
+          street
+          city
+          region {
+            code
+            label
+          }
+          postcode
+          telephone
+          country {
+            code
+            label
+          }
+          available_shipping_methods{
+            carrier_code
+            carrier_title
+            method_code
+            method_title
+          }
+        }
+      }
+    }
+  }
+  ''';
+  static String setBillingAddressesOnCart = r'''
+  mutation setBillingAddressOnCart($input:SetBillingAddressOnCartInput){
+    setBillingAddressOnCart(input: $input) {
+      cart {
+        billing_address {
+          firstname
+          lastname
+          company
+          street
+          city
+        }
+      }
+    }
+  }
+  ''';
+
+  static String setEmailOnGuestCart = r'''
+  mutation setGuestEmailOnCart($cart_id:String!, $email: String!){
+    setGuestEmailOnCart(input: { cart_id: $cart_id, email: $email }) {
+      cart {
+        total_quantity
+      }
+    }
+  }
+  ''';
+
+  static String setPaymentMethodOnCart = r'''
+  mutation setPaymentMethodOnCart($cartId:String!, $paymentMethod:PaymentMethodInput! ){
+    setPaymentMethodOnCart(input: {
+        cart_id: $cartId
+        payment_method: $paymentMethod
+    }) {
+      cart {
+        selected_payment_method {
+          code
+        }
+      }
+    }
+  }''';
+
+  static String setShippingMethod = r'''
+  mutation setShippingMethodsOnCart($cartId: String!, $shippingMethod: [ShippingMethodInput!]!){
+    setShippingMethodsOnCart(
+      input: { cart_id: $cartId, shipping_methods: $shippingMethod }
+    ) {
+      cart {
+        email
+    
+      }
+    }
+  }
+  ''';
 }

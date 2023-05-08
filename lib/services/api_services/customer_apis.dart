@@ -44,6 +44,7 @@ class CustomerApis {
         id
       }
       addresses {
+        id
         firstname
         lastname
         street

@@ -90,7 +90,7 @@ class _CartViewState extends State<CartView> {
                       alignment: Alignment.centerLeft,
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        width: constraints.maxWidth * 0.75 - 40,
+                        width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
                         decoration: AppResponsive.isDesktop(context)
                             ? BoxDecoration(
                                 color: AppColors.shadowColor,
@@ -101,38 +101,40 @@ class _CartViewState extends State<CartView> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    AppResponsive(
-                      mobile: Column(
-                        children: [
-                          getBody(size, cartData, result, refetch),
-                          const SizedBox(height: 20),
-                          CartSummaryWidget(
-                            buttonText: "Go to Checkout",
-                            onButtonTap: () {
-                              context.go("/${CartView.route}/${CartAddressView.route}");
-                            },
-                          ),
-                        ],
-                      ),
-                      desktop: SizedBox(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 75, child: getBody(size, cartData, result, refetch)),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              flex: 25,
-                              child: CartSummaryWidget(
-                                buttonText: "Go to Checkout",
-                                onButtonTap: () {
-                                  context.go("/${CartView.route}/${CartAddressView.route}");
-                                },
+                    cartData.cartCount == 0
+                        ? SizedBox(height: 200, child: Center(child: Text("Cart Empty", style: AppStyles.getMediumTextStyle(fontSize: 18))))
+                        : AppResponsive(
+                            mobile: Column(
+                              children: [
+                                getBody(size, cartData, result, refetch),
+                                const SizedBox(height: 20),
+                                CartSummaryWidget(
+                                  buttonText: "Next",
+                                  onButtonTap: () {
+                                    context.go("/${CartView.route}/${CartAddressView.route}");
+                                  },
+                                ),
+                              ],
+                            ),
+                            desktop: SizedBox(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(flex: 75, child: getBody(size, cartData, result, refetch)),
+                                  const SizedBox(width: 20),
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 350),
+                                    child: CartSummaryWidget(
+                                      buttonText: "Next",
+                                      onButtonTap: () {
+                                        context.go("/${CartView.route}/${CartAddressView.route}");
+                                      },
+                                    ),
+                                  )
+                                ],
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
+                            ),
+                          ),
                   ],
                 );
               });

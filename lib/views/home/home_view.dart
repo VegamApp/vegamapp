@@ -30,9 +30,10 @@ class _HomeViewState extends State<HomeView> {
     var homeData = Provider.of<HomeData>(context);
     return BuildScaffold(
       child: Observer(builder: (context) {
-        if (homeData.isLoading) {
+        if (homeData.isLoading || homeData.data.isEmpty) {
           return BuildLoadingWidget(color: AppColors.primaryColor);
         }
+        // if (homeData.data.isEmpty) return const SizedBox();
         return ListView.builder(
           controller: scrollController,
           padding: const EdgeInsets.all(20),
@@ -46,10 +47,10 @@ class _HomeViewState extends State<HomeView> {
 
   getWidgets(Map<String, dynamic> data) {
     if (AppResponsive.isMobile(context) && !data['mobile_status']) {
-      return SizedBox();
+      return const SizedBox();
     }
     if (!AppResponsive.isMobile(context) && !data['status']) {
-      return SizedBox();
+      return const SizedBox();
     }
     switch (data['__typename']) {
       case 'ProductBlock':
@@ -116,7 +117,7 @@ class _HomeViewState extends State<HomeView> {
         return CatergoryWidget(data: data);
 
       default:
-        return SizedBox();
+        return const SizedBox();
     }
   }
 }

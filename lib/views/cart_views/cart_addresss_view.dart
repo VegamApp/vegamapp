@@ -1,13 +1,20 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
+import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/cart_views/cart_payment.dart';
+import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:provider/provider.dart';
 
 class CartAddressView extends StatefulWidget {
@@ -23,9 +30,10 @@ class _CartAddressViewState extends State<CartAddressView> {
 
   bool isDefaultShipping = false;
   bool isDefaultBilling = false;
-  bool regAsUser = false;
+  bool saveAddress = false;
   // For new addresses
   TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
   TextEditingController lName = TextEditingController();
   TextEditingController appartNo = TextEditingController();
   TextEditingController street = TextEditingController();
@@ -41,10 +49,24 @@ class _CartAddressViewState extends State<CartAddressView> {
   Map<String, dynamic> countries = {};
   Map<String, dynamic> regions = {};
 
+  final _formKey = GlobalKey<FormState>();
+  bool? newAddress;
+
   @override
   void dispose() {
     super.dispose();
     scrollController.dispose();
+
+    name.dispose();
+    email.dispose();
+    lName.dispose();
+    appartNo.dispose();
+    street.dispose();
+    address.dispose();
+    city.dispose();
+    contact.dispose();
+    pin.dispose();
+    state.dispose();
   }
 
   @override
@@ -57,7 +79,8 @@ class _CartAddressViewState extends State<CartAddressView> {
             builder: (_) {
               var cartData = Provider.of<CartData>(context);
               var token = Provider.of<AuthToken>(context);
-
+              var user = Provider.of<UserData>(context);
+              log(jsonEncode(cartData.cartData));
               if (cartData.isLoading) {
                 return const BuildLoadingWidget();
               }
@@ -67,74 +90,110 @@ class _CartAddressViewState extends State<CartAddressView> {
                   onRefresh: () => cartData.getCartData(context, token),
                 );
               }
-              return ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(20),
-                children: [
-                  const SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
-                      decoration: AppResponsive.isDesktop(context)
-                          ? BoxDecoration(
-                              color: AppColors.shadowColor,
-                              borderRadius: BorderRadius.circular(30),
-                            )
-                          : null,
-                      child: const BuildCartSteps(currentCartIndex: 1),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  AppResponsive(
-                    mobile: Column(
-                      children: [
-                        // getBody(size, cartData, result, refetch),
-                        getAddressForm1(const BoxConstraints.expand()),
-                        const SizedBox(height: 20),
-                        getAddressForm2(const BoxConstraints.expand(), size),
-                        const SizedBox(height: 20),
-                        CartSummaryWidget(
-                          buttonText: "Go to Checkout",
-                          onButtonTap: () {
-                            // context.go("/${CartView.route}/${CartAddressView.route}");
-                          },
+              if (newAddress == null) {
+                newAddress = user.data.addresses == null || user.data.addresses!.isEmpty;
+                if (newAddress!) {
+                  newAddress = cartData.cartData['cart']['shipping_addresses'].isEmpty;
+                }
+              }
+              print(((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                  ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                  newAddress!));
+              return WillPopScope(
+                onWillPop: () async {
+                  if (newAddress! && (user.data.addresses != null || user.data.addresses!.isNotEmpty)) {
+                    setState(() {
+                      newAddress = false;
+                    });
+                    return false;
+                  }
+                  return true;
+                },
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                          width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
+                          decoration: AppResponsive.isDesktop(context)
+                              ? BoxDecoration(
+                                  color: AppColors.shadowColor,
+                                  borderRadius: BorderRadius.circular(30),
+                                )
+                              : null,
+                          child: const BuildCartSteps(currentCartIndex: 1),
                         ),
-                      ],
-                    ),
-                    desktop: SizedBox(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 75,
-                            // child: getBody(size, cartData, result, refetch),
-                            child: Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 20,
-                              runSpacing: 20,
-                              children: [
-                                getAddressForm1(constraints),
-                                getAddressForm2(constraints, size),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 350),
-                            child: CartSummaryWidget(
+                      ),
+                      const SizedBox(height: 20),
+                      AppResponsive(
+                        mobile: Column(
+                          children: [
+                            ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                    ((user.data.addresses == null || user.data.addresses!.isEmpty) &&
+                                        cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                    newAddress!)
+                                ? Column(
+                                    children: [
+                                      getAddressForm1(const BoxConstraints.expand(), token),
+                                      const SizedBox(height: 20),
+                                      getAddressForm2(const BoxConstraints.expand(), size, token, cartData),
+                                    ],
+                                  )
+                                : getExistingAddress(user, size, token, cartData),
+                            const SizedBox(height: 20),
+                            CartSummaryWidget(
                               buttonText: "Go to Checkout",
                               onButtonTap: () {
-                                // context.go("/${CartView.route}/${CartAddressView.route}");
+                                context.go("/${CartView.route}/${CartPayment.route}");
                               },
                             ),
-                          )
-                        ],
+                          ],
+                        ),
+                        desktop: SizedBox(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 75,
+                                // child: getBody(size, cartData, result, refetch),
+                                child: ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                        ((user.data.addresses == null || user.data.addresses!.isEmpty) &&
+                                            cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                        newAddress!)
+                                    ? Wrap(
+                                        alignment: WrapAlignment.center,
+                                        spacing: 20,
+                                        runSpacing: 20,
+                                        children: [
+                                          getAddressForm1(constraints, token),
+                                          getAddressForm2(constraints, size, token, cartData),
+                                        ],
+                                      )
+                                    : getExistingAddress(user, size, token, cartData),
+                              ),
+                              const SizedBox(width: 20),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 350),
+                                child: CartSummaryWidget(
+                                  buttonText: "Go to Checkout",
+                                  onButtonTap: () {
+                                    context.go("/${CartView.route}/${CartPayment.route}");
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               );
             },
           );
@@ -143,7 +202,7 @@ class _CartAddressViewState extends State<CartAddressView> {
     );
   }
 
-  getAddressForm1(BoxConstraints constraints) {
+  getAddressForm1(BoxConstraints constraints, AuthToken authToken) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: constraints.maxWidth < 800 ? constraints.maxWidth * 0.4 : 450),
       child: Column(
@@ -172,18 +231,23 @@ class _CartAddressViewState extends State<CartAddressView> {
             validator: (value) => value != null && value != '' ? null : 'Enter a valid street name',
           ),
           const SizedBox(height: 20),
-          BuildTextField(controller: address, hint: 'Adrress'),
+          BuildTextField(
+            controller: address,
+            hint: 'Adrress',
+            maxLines: authToken.loginToken != null ? 10 : 7,
+            padding: const EdgeInsets.all(20),
+          ),
         ],
       ),
     );
   }
 
-  getAddressForm2(BoxConstraints constraints, Size size) {
+  getAddressForm2(BoxConstraints constraints, Size size, AuthToken authToken, CartData cartData) {
     TextEditingController countrySearch = TextEditingController();
-
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: constraints.maxWidth < 800 ? constraints.maxWidth * 0.4 : 450),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           BuildTextField(
             controller: city,
@@ -368,9 +432,296 @@ class _CartAddressViewState extends State<CartAddressView> {
                 );
               },
             ),
+          const SizedBox(height: 20),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            hoverColor: Colors.transparent,
+            onTap: () {
+              isDefaultShipping = !isDefaultShipping;
+              setState(() {});
+            },
+            leading: Checkbox(
+              activeColor: AppColors.primaryColor,
+              checkColor: Colors.white,
+              value: isDefaultShipping,
+              onChanged: (bool? value) {
+                isDefaultShipping = !isDefaultShipping;
+                setState(() {});
+              },
+            ),
+            title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            hoverColor: Colors.transparent,
+            onTap: () {
+              isDefaultBilling = !isDefaultBilling;
+              setState(() {});
+            },
+            leading: Checkbox(
+              activeColor: AppColors.primaryColor,
+              checkColor: Colors.white,
+              value: isDefaultBilling,
+              onChanged: (bool? value) {
+                isDefaultBilling = !isDefaultBilling;
+                setState(() {});
+              },
+            ),
+            title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+          ),
+          if (authToken.loginToken != null)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              hoverColor: Colors.transparent,
+              onTap: () {
+                saveAddress = !saveAddress;
+                setState(() {});
+              },
+              leading: Checkbox(
+                activeColor: AppColors.primaryColor,
+                checkColor: Colors.white,
+                value: saveAddress,
+                onChanged: (bool? value) {
+                  saveAddress = !saveAddress;
+                  setState(() {});
+                },
+              ),
+              title: Text('Save in address book', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+            ),
+          const SizedBox(height: 10),
+          Mutation(
+            options: MutationOptions(
+                document: gql(CartApis.setEmailOnGuestCart),
+                onCompleted: (result) {
+                  newAddress = false;
+                  setState(() {});
+                  cartData.getCartData(context, authToken);
+                },
+                onError: (error) {
+                  //print(error);
+                }),
+            builder: (RunMutation runMutationEmail, QueryResult? resultEmail) {
+              return Mutation(
+                options: MutationOptions(
+                    document: gql(CartApis.setBillingAddressesOnCart),
+                    onCompleted: (result) {
+                      log('billing result :$result');
+                      // navigate(context, const GuestPayment());
+                      if (authToken.loginToken == null) {
+                        runMutationEmail({'cart_id': cartData.cartId, 'email': email.text});
+                      } else {
+                        context.go("/${CartView.route}/${CartPayment.route}");
+                      }
+                    },
+                    onError: (error) {
+                      log('billing error $error');
+                    }),
+                builder: (RunMutation runMutation, QueryResult? result) {
+                  return Mutation(
+                      options: MutationOptions(
+                          document: gql(CartApis.setShippingAddressesOnCart),
+                          onCompleted: (result) {
+                            newAddress = false;
+                            setState(() {});
+
+                            runMutation({
+                              "input": {
+                                "cart_id": cartData.cartId,
+                                "billing_address": {
+                                  "address": {
+                                    "street": [street.text],
+                                    "house_name": appartNo.text,
+                                    "landmark": address.text,
+                                    "address_label": "Home",
+                                    'save_in_address_book': saveAddress,
+                                    'firstname': name.text,
+                                    'lastname': lName.text,
+                                    'city': city.text,
+                                    'postcode': pin.text,
+                                    'telephone': contact.text,
+                                    'region': selectedRegion['code'],
+                                    'region_id': selectedRegion['id'],
+                                    'country_code': selectedCountry['id'],
+                                  },
+                                }
+                              }
+                            });
+                          },
+                          onError: (error) {
+                            log('shipping: $error');
+                          }),
+                      builder: (RunMutation runMutation2, QueryResult? result) {
+                        return TextButton(
+                          onPressed: () {
+                            final FormState? form = _formKey.currentState;
+                            List addressList = [];
+                            if (appartNo.text != '') addressList.add(appartNo.text);
+                            if (street.text != '') addressList.add(street.text);
+                            if (address.text != '') addressList.add(address.text);
+                            if (form!.validate()) {
+                              if (selectedCountry.isNotEmpty && selectedRegion.isNotEmpty) {
+                                runMutation2({
+                                  "input": {
+                                    "cart_id": cartData.cartId,
+                                    "shipping_addresses": [
+                                      {
+                                        "address": {
+                                          "street": [street.text],
+                                          "house_name": appartNo.text,
+                                          "landmark": address.text,
+                                          "address_label": "Home",
+                                          'save_in_address_book': saveAddress,
+                                          'firstname': name.text,
+                                          'lastname': lName.text,
+                                          'city': city.text,
+                                          'postcode': pin.text,
+                                          'telephone': contact.text,
+                                          'region': selectedRegion['code'],
+                                          'region_id': selectedRegion['id'],
+                                          'country_code': selectedCountry['id'],
+                                        },
+                                      }
+                                    ]
+                                  }
+                                });
+                              } else {
+                                showSnackBar(context: context, message: "Please select country and state", backgroundColor: Colors.red);
+                              }
+                            } else {
+                              final node = _formKey.currentContext!.findRenderObject();
+                              final offset = node!.getTransformTo(null).getTranslation().y;
+                              //print(offset);
+                              // listScrollController.animateTo(-offset, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            // maximumSize: AppResponsive.isDesktop(context) ? Size(size.width, 50) : null,
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            // fixedSize: Size(size.width * 0.9, size.width * 0.075),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                            backgroundColor: Colors.black,
+                            shadowColor: AppColors.shadowColor,
+                          ),
+                          child: result!.isLoading || resultEmail!.isLoading
+                              ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                              : Text('SUBMIT', style: AppStyles.getSemiBoldTextStyle(fontSize: 20, color: Colors.white)),
+                        );
+                      });
+                },
+              );
+            },
+          ),
         ],
       ),
     );
+  }
+
+  getExistingAddress(UserData userData, Size size, AuthToken authToken, CartData cartData) {
+    return Mutation(
+        options: MutationOptions(
+            document: gql(CartApis.setBillingAddressesOnCart),
+            onCompleted: (result) {
+              print('complete $result');
+              cartData.getCartData(context, authToken);
+
+              if (result != null) {
+                context.go("/${CartView.route}/${CartPayment.route}");
+              }
+            },
+            onError: (error) {
+              print('error billing $error');
+            }),
+        builder: (RunMutation runMutationBilling, QueryResult? billingResult) {
+          return Mutation(
+              options: MutationOptions(
+                  document: gql(CartApis.setShippingAddressesOnCart),
+                  onCompleted: (result) {
+                    print(result);
+                    //print(user.addresses![index].region!.regionId);
+
+                    runMutationBilling({
+                      'input': {
+                        'cart_id': cartData.cartId,
+                        'billing_address': {'same_as_shipping': true}
+                      }
+                    });
+                    // refetch!();
+                  },
+                  onError: (error) {
+                    print('error shipping $error');
+                  }),
+              builder: (RunMutation runMutationShipping, QueryResult? shippingResult) {
+                if (billingResult!.isLoading || shippingResult!.isLoading) {
+                  return Container(
+                    constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffffffff),
+                      borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                      border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x0a000000),
+                          offset: Offset(0, 10),
+                          blurRadius: 40,
+                        ),
+                      ],
+                    ),
+                    child: Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                  );
+                }
+                return Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: [
+                    InkWell(
+                      onTap: () => setState(() => newAddress = true),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffffffff),
+                          borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                          border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x0a000000),
+                              offset: Offset(0, 10),
+                              blurRadius: 40,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.add_circle_outline,
+                                color: AppColors.primaryColor,
+                                size: 50,
+                              ),
+                              Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    ...userData.data.addresses!
+                        .map((e) => InkWell(
+                              onTap: () {
+                                runMutationShipping({
+                                  "input": {
+                                    "cart_id": cartData.cartId,
+                                    "shipping_addresses": [
+                                      {"customer_address_id": e.id, "customer_notes": ""}
+                                    ]
+                                  }
+                                });
+                              },
+                              child: BuildAddressContainer(addressModel: e, size: size),
+                            ))
+                        .toList(),
+                  ],
+                );
+              });
+        });
   }
 
   getCountryList(String text) {

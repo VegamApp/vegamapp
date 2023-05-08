@@ -26,6 +26,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
   @override
   void initState() {
     productModel = ProductModel.fromJson(widget.data['products']);
+    print(productModel.toString());
     price = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff.toString();

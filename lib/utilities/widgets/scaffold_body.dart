@@ -10,9 +10,9 @@ import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class BuildScaffold extends StatefulWidget {
-  const BuildScaffold({super.key, required this.child});
+  const BuildScaffold({super.key, required this.child, this.currentIndex = -1});
   final Widget child;
-
+  final int currentIndex;
   @override
   State<BuildScaffold> createState() => _BuildScaffoldState();
 }
@@ -70,6 +70,7 @@ class _BuildScaffoldState extends State<BuildScaffold> {
       appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
       body: Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 1400, minHeight: size.height), child: widget.child)),
       endDrawer: DrawerContainer(size: size),
+      bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),
     );
   }
 }

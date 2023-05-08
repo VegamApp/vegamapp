@@ -1,6 +1,7 @@
 export 'address_container.dart';
 export 'appbar.dart';
 export 'banner_widget.dart';
+export 'bottom_navigation_bar.dart';
 export 'buttons.dart';
 export 'carousel.dart';
 export 'cart/cart_amount_listing.dart';

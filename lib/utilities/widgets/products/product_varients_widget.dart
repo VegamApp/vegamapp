@@ -251,7 +251,9 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                     ),
                     Expanded(
                       child: InkWell(
-                        onTap: () => setState(() => quantity--),
+                        onTap: () => setState(() {
+                          if (quantity > 1) quantity--;
+                        }),
                         child: SizedBox(
                           width: 30,
                           child: Center(child: Icon(Icons.expand_more, size: 17.5, color: AppColors.evenFadedText)),

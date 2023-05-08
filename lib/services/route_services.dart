@@ -10,7 +10,9 @@ import 'package:m2/views/account_view/orders_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/auth/forgot_password.dart';
 import 'package:m2/views/cart_views/cart_addresss_view.dart';
+import 'package:m2/views/cart_views/cart_payment.dart';
 import 'package:m2/views/cart_views/cart_view.dart';
+import 'package:m2/views/cart_views/payment_complete_view.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
@@ -113,6 +115,18 @@ final router = GoRouter(
                 path: CartAddressView.route,
                 pageBuilder: (context, state) {
                   return getCustomTransition(state, const CartAddressView());
+                },
+              ),
+              GoRoute(
+                path: CartPayment.route,
+                pageBuilder: (context, state) {
+                  return getCustomTransition(state, const CartPayment());
+                },
+              ),
+              GoRoute(
+                path: OrderPlacedView.route,
+                pageBuilder: (context, state) {
+                  return getCustomTransition(state, const OrderPlacedView());
                 },
               ),
             ]),

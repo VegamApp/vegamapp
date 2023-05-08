@@ -42,6 +42,7 @@ class User {
 }
 
 class Addresses {
+  String? id;
   String? firstname;
   String? lastname;
   List<String>? street;
@@ -51,9 +52,10 @@ class Addresses {
   String? countryCode;
   String? telephone;
 
-  Addresses({this.firstname, this.lastname, this.street, this.city, this.region, this.postcode, this.countryCode, this.telephone});
+  Addresses({this.id, this.firstname, this.lastname, this.street, this.city, this.region, this.postcode, this.countryCode, this.telephone});
 
   Addresses.fromJson(Map<String, dynamic> json) {
+    id = json['id'].toString();
     firstname = json['firstname'];
     lastname = json['lastname'];
     street = json['street'].cast<String>();
