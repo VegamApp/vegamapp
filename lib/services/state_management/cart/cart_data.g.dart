@@ -57,22 +57,6 @@ mixin _$CartData on _CartDataBase, Store {
     });
   }
 
-  late final _$_hasExceptionsAtom =
-      Atom(name: '_CartDataBase._hasExceptions', context: context);
-
-  @override
-  bool get _hasExceptions {
-    _$_hasExceptionsAtom.reportRead();
-    return super._hasExceptions;
-  }
-
-  @override
-  set _hasExceptions(bool value) {
-    _$_hasExceptionsAtom.reportWrite(value, super._hasExceptions, () {
-      super._hasExceptions = value;
-    });
-  }
-
   late final _$_cartDataAtom =
       Atom(name: '_CartDataBase._cartData', context: context);
 

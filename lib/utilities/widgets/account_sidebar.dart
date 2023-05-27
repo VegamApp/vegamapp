@@ -25,7 +25,7 @@ class AccountSideBar extends StatefulWidget {
 
 class _AccountSideBarState extends State<AccountSideBar> {
   // final ScrollController _sidebarScroller = ScrollController();
-
+  late UserData user;
   signOut(BuildContext context) async {
     // clear all data of the logged in user and show logout screen
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -43,14 +43,21 @@ class _AccountSideBarState extends State<AccountSideBar> {
   }
 
   @override
+  void didChangeDependencies() {
+    user = Provider.of<UserData>(context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AppResponsive(mobile: Scaffold(body: getScaffoldChild(context)), desktop: getScaffoldChild(context));
+    return AppResponsive(
+      mobile: Scaffold(body: getScaffoldChild(context)),
+      desktop: getScaffoldChild(context),
+    );
   }
 
   Widget getScaffoldChild(context) {
     return Observer(builder: (context) {
-      var user = Provider.of<UserData>(context, listen: false);
-
       return LayoutBuilder(
         builder: (context, constraints) {
           return Padding(

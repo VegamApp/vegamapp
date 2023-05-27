@@ -6,11 +6,9 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:m2/services/api_services/customer_apis.dart';
 import 'package:m2/services/app_responsive.dart';
-import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
-import 'package:provider/provider.dart';
 
 class BillingAgreementsView extends StatefulWidget {
   const BillingAgreementsView({super.key});
@@ -63,7 +61,6 @@ class _BillingAgreementsViewState extends State<BillingAgreementsView> {
   }
 
   Padding getBody(BuildContext context, Size size) {
-    var userData = Provider.of<UserData>(context);
     return Padding(
       padding: AppResponsive.isDesktop(context)
           ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50)

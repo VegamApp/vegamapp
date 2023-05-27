@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
-import 'package:m2/utilities/utilities.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class BannerBlock extends StatelessWidget {

@@ -4,8 +4,6 @@ import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/utilities/utilities.dart';
-import 'package:m2/utilities/widgets/loading_builder.dart';
-import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 

@@ -48,20 +48,20 @@ final router = GoRouter(
         GoRoute(
           path: '${ProductView.route}/:url',
           pageBuilder: (context, state) {
-            return getCustomTransition(state, ProductView(urlKey: state.params['url']));
+            return getCustomTransition(state, ProductView(urlKey: state.pathParameters['url']));
           },
         ),
         GoRoute(
           path: ProductView.route,
           pageBuilder: (context, state) {
-            print(state.queryParams);
+            print(state.queryParameters);
             return getCustomTransition(
               state,
               ProductView(
-                categoryId: state.queryParams['categoryId'],
-                categoryUid: state.queryParams['categoryUid'],
-                viewAll: state.queryParams['viewAll'] == 'true',
-                searchQuery: state.queryParams['search'],
+                categoryId: state.queryParameters['categoryId'],
+                categoryUid: state.queryParameters['categoryUid'],
+                viewAll: state.queryParameters['viewAll'] == 'true',
+                searchQuery: state.queryParameters['search'],
               ),
             );
           },
@@ -75,7 +75,7 @@ final router = GoRouter(
             GoRoute(
               path: AccountInformationView.route,
               pageBuilder: (context, state) {
-                print(state.fullpath);
+                print(state.fullPath);
                 return getCustomTransition(state, const AccountInformationView());
               },
             ),

@@ -1,10 +1,7 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:m2/main.dart';
-import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/api_services/customer_apis.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 
@@ -15,7 +12,6 @@ import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/loading_builder.dart';
 import 'package:m2/views/auth/forgot_password.dart';
 import 'package:m2/views/home/home_view.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

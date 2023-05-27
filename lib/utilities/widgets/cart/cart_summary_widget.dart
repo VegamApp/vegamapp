@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:intl/intl.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/utilities/utilities.dart';

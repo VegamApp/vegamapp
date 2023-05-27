@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:m2/services/api_services/fragments.dart';
 import 'package:m2/services/models/search_model.dart';
-import 'package:m2/utilities/utilities.dart';
 
 class ApiServices {
   static Map<String, String> header = {'Content-Type': 'application/json'};

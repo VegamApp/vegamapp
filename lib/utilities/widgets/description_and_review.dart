@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -199,7 +198,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
     TextEditingController summary = TextEditingController();
     TextEditingController text = TextEditingController();
     String? errorData;
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     return showDialog(
       context: context,
       builder: (context3) {
@@ -231,7 +230,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
                         }
                       }
                       return Form(
-                        key: _formKey,
+                        key: formKey,
                         child: ListView(
                           shrinkWrap: true,
                           padding: EdgeInsets.symmetric(
@@ -245,7 +244,6 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
                               physics: const NeverScrollableScrollPhysics(),
                               separatorBuilder: (context, index) => const SizedBox(height: 10),
                               itemBuilder: (context, index) {
-                                var data = result.data!['productReviewRatingsMetadata']['items'][index];
                                 return Wrap(
                                   // crossAxisAlignment: CrossAxisAlignment.start,
                                   crossAxisAlignment: WrapCrossAlignment.center,
@@ -344,7 +342,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
                                       backgroundColor: AppColors.buttonColor,
                                     ),
                                     onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
+                                      if (formKey.currentState!.validate()) {
                                         setState(() => errorData = null);
                                         for (var i in ratings) {
                                           if (i == 0) {

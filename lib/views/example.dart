@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ExPage extends StatefulWidget {
   const ExPage({super.key});
@@ -25,7 +24,7 @@ class _ExPageState extends State<ExPage> {
             // print(graphqlToken.);
             // await SharedPreferences.getInstance().then((value) => value.clear());
           },
-          child: Text("hi"),
+          child: const Text("hi"),
         ),
       ),
     );

@@ -112,7 +112,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> with SingleTi
 
   void _handleTap() {
     _changeState(!_isExpanded);
-    widget.expandedItem.value = _isExpanded ? widget.key : ValueKey(-1);
+    widget.expandedItem.value = _isExpanded ? widget.key : const ValueKey(-1);
   }
 
   Widget _buildChildren(BuildContext context, Widget? child) {
@@ -158,14 +158,14 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> with SingleTi
   @override
   void didChangeDependencies() {
     final ThemeData theme = Theme.of(context);
-    _borderColorTween..end = theme.dividerColor;
+    _borderColorTween.end = theme.dividerColor;
     _headerColorTween
-      ..begin = theme.textTheme.subtitle1?.color
+      ..begin = theme.textTheme.titleMedium?.color
       ..end = theme.colorScheme.secondary;
     _iconColorTween
       ..begin = theme.unselectedWidgetColor
       ..end = theme.colorScheme.secondary;
-    _backgroundColorTween..end = widget.backgroundColor;
+    _backgroundColorTween.end = widget.backgroundColor;
     super.didChangeDependencies();
   }
 

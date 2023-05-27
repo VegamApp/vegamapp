@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
-import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:mobx/mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 part 'cart_data.g.dart';
 
@@ -24,10 +22,6 @@ abstract class _CartDataBase with Store {
   @observable
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
-  @observable
-  bool _hasExceptions = false;
-  bool get hasExceptions => _hasExceptions;
 
   @observable
   Map<String, dynamic> _cartData = {};

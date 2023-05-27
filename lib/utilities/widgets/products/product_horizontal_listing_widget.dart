@@ -102,7 +102,7 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                 shrinkWrap: true,
                 itemCount: widget.children.length + 1,
                 scrollDirection: Axis.horizontal,
-                separatorBuilder: (context, index) => SizedBox(width: 20),
+                separatorBuilder: (context, index) => const SizedBox(width: 20),
                 itemBuilder: (context, index) {
                   if (index != widget.children.length) {
                     return Container(

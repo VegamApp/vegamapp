@@ -5,7 +5,6 @@ import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
-import 'package:m2/utilities/widgets/drawer.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -68,7 +67,7 @@ class _BuildScaffoldState extends State<BuildScaffold> {
     return Scaffold(
       key: key,
       appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
-      body: Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 1400, minHeight: size.height), child: widget.child)),
+      body: widget.child,
       endDrawer: DrawerContainer(size: size),
       bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),
     );

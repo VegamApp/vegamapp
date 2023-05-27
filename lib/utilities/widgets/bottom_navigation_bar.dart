@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
@@ -45,8 +44,6 @@ class BuildBottomNavBar extends StatelessWidget {
 
   navigate(int index, BuildContext context) {
     switch (index) {
-      case 0:
-        return context.go("/");
       case 0:
         return context.go("/");
       case 2:

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/views/auth/sign_in.dart';
 // import 'package:m2/views/home.dart';

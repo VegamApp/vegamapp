@@ -59,33 +59,36 @@ class _AccountInformationViewState extends State<AccountInformationView> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return BuildScaffold(
-      child: SingleChildScrollView(
-        child: AppResponsive(
-          desktop: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                flex: 3,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: AccountSideBar(currentPage: AccountInformationView.route),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+          child: AppResponsive(
+            desktop: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: AccountSideBar(currentPage: AccountInformationView.route),
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 7,
-                child: Container(
-                    margin: EdgeInsets.only(top: 40),
-                    decoration: BoxDecoration(
-                      color: AppColors.scaffoldColor,
-                      boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
-                    ),
-                    child: getBody(context, size)),
-              ),
-            ],
+                Expanded(
+                  flex: 7,
+                  child: Container(
+                      margin: const EdgeInsets.only(top: 40),
+                      decoration: BoxDecoration(
+                        color: AppColors.scaffoldColor,
+                        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+                      ),
+                      child: getBody(context, size)),
+                ),
+              ],
+            ),
+            mobile: getBody(context, size),
           ),
-          mobile: getBody(context, size),
-        ),
-      ),
+        );
+      }),
     );
   }
 

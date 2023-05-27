@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:developer';
 
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:m2/services/models/product_model.dart';
-import 'package:m2/utilities/text_style.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 
@@ -114,7 +110,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                 child: Container(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     // border: Border.all(color: Colors.amber),
                   ),

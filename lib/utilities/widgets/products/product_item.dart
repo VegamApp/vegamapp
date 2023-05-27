@@ -82,7 +82,7 @@ class _ProductItemState extends State<ProductItem> {
                 offerSize: widget.offerSize ?? 13,
               ),
             ),
-            // const SizedBox(height: 5),
+            const SizedBox(height: 5),
             AppResponsive.isMobile(context)
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
