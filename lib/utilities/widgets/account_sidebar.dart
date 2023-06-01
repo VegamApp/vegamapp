@@ -11,6 +11,7 @@ import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/address_view.dart';
 import 'package:m2/views/account_view/billing_agreement_view.dart';
 import 'package:m2/views/account_view/downloadable_products_view.dart';
+import 'package:m2/views/account_view/newsletter_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:provider/provider.dart';
@@ -96,9 +97,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                     //   image: CachedNetworkImageProvider(imgUrl),
                                     // ),
                                   ),
-                                  child: Center(
-                                      child: Text(user.data.firstname?[0] ?? "",
-                                          style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
+                                  child: Center(child: Text(user.data.firstname?[0] ?? "", style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
                             ),
                             Align(
                               alignment: Alignment.bottomRight,
@@ -124,9 +123,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Center(
-                          child: Text('Hi ${user.data.firstname ?? "..."}',
-                              style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor))),
+                      Center(child: Text('Hi ${user.data.firstname ?? "..."}', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor))),
                     ],
                   ),
                 ),
@@ -178,7 +175,8 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'Newsletter Subscriptions',
                         svgUrl: 'newsletter',
                         // child: const NewsletterSubView(),
-                        isBold: widget.currentPage == 'Newsletter Subscriptions',
+                        url: "/account/${NewsletterView.route}",
+                        isBold: widget.currentPage == NewsletterView.route,
                       ),
                       BuilProfileButtons(
                         title: 'Stored Payment Methods',
@@ -241,13 +239,9 @@ class BuilProfileButtons extends StatelessWidget {
       selectedColor: Colors.white,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 5),
-        leading: svgUrl != null
-            ? SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/$svgUrl.svg', color: AppColors.buttonColor))
-            : const SizedBox(width: 30),
+        leading: svgUrl != null ? SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/$svgUrl.svg', color: AppColors.buttonColor)) : const SizedBox(width: 30),
         title: Text(title,
-            style: isBold
-                ? AppStyles.getSemiBoldTextStyle(fontSize: 18, color: AppColors.fontColor)
-                : AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
+            style: isBold ? AppStyles.getSemiBoldTextStyle(fontSize: 18, color: AppColors.fontColor) : AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
         onTap: () {
           if (!isBold && url != null) {
             context.go(url!);

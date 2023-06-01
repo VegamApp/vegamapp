@@ -35,11 +35,12 @@ class _ProductGridWidgetState extends State<ProductGridWidget> {
             itemCount: widget.children.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCountAndFixedHeight(
-              crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 250).floor(),
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 400,
+              // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 250).floor(),
               crossAxisSpacing: constraints.maxWidth < 800 ? 10 : 30,
               mainAxisSpacing: constraints.maxWidth < 800 ? 10 : 30,
-              height: 400,
+              mainAxisExtent: 400,
             ),
             itemBuilder: (context, index) {
               return Container(

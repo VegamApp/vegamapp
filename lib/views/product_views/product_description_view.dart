@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
@@ -18,11 +20,17 @@ class _ProductDescriptionState extends State<ProductDescription> {
   String price = '';
   String? originalPrice;
   String? offer;
-
+  List<Map<String, dynamic>> originalMedia = [];
+  List<Map<String, dynamic>> mediaGallery = [];
   @override
   void initState() {
     productModel = ProductModel.fromJson(widget.data['products']);
-    print(productModel.toString());
+    originalMedia = List<Map<String, dynamic>>.from(widget.data['products']['items'][0]['media_gallery']);
+    mediaGallery = originalMedia;
+    if (productModel.items![0].variants != null && productModel.items![0].variants!.isNotEmpty) {
+      mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
+    }
+    // print(jsonEncode(widget.data));
     price = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff.toString();
@@ -41,7 +49,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
       children: [
         MiniAppBar(screenWidth: size.width, navigationChild: widget.data['products']['items'][0]['categories']),
         const SizedBox(height: 10),
-        ProductMediaContainer(width: size.width, data: List<Map<String, dynamic>>.from(widget.data['products']['items'][0]['media_gallery'])),
+        ProductMediaContainer(width: size.width, data: mediaGallery),
         const SizedBox(height: 30),
         Text(
           "${productModel.items?[0].name}",
@@ -65,7 +73,12 @@ class _ProductDescriptionState extends State<ProductDescription> {
         const SizedBox(height: 30),
         Divider(height: 1, color: AppColors.dividerColor),
         const SizedBox(height: 20),
-        ProductVarientWidget(productModel: productModel),
+        ProductVarientWidget(
+          productModel: productModel,
+          onUpdated: (newMedia) {
+            if (newMedia != null) setState(() => mediaGallery = newMedia);
+          },
+        ),
         const SizedBox(height: 30),
         BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
       ],
@@ -73,7 +86,6 @@ class _ProductDescriptionState extends State<ProductDescription> {
   }
 
   Widget getDesktopChildren(Size size) {
-    print(productModel.items![0].relatedProducts!.length);
     return LayoutBuilder(builder: (context, constraints) {
       return ListView(
         padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
@@ -94,7 +106,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
               Expanded(
                 child: ProductMediaContainer(
                   width: size.width,
-                  data: List<Map<String, dynamic>>.from(widget.data['products']['items'][0]['media_gallery']),
+                  data: mediaGallery,
                 ),
               ),
               const SizedBox(width: 50),
@@ -128,7 +140,12 @@ class _ProductDescriptionState extends State<ProductDescription> {
                       const SizedBox(height: 20),
                       Divider(height: 1, color: AppColors.dividerColor),
                       const SizedBox(height: 20),
-                      ProductVarientWidget(productModel: productModel),
+                      ProductVarientWidget(
+                        productModel: productModel,
+                        onUpdated: (newMedia) {
+                          if (newMedia != null) setState(() => mediaGallery = newMedia);
+                        },
+                      ),
                     ],
                   );
                 }),
@@ -139,8 +156,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
           BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
           const SizedBox(height: 20),
           if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
-            TwoColoredTitle(
-                firstHead: 'Related', secondHead: "Products", firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
+            TwoColoredTitle(firstHead: 'Related', secondHead: "Products", firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
           if (productModel.items![0].relatedProducts != null)
             LayoutBuilder(builder: (context, constraints) {
               return GridView.builder(
@@ -148,11 +164,11 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 itemCount: productModel.items![0].relatedProducts!.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCountAndFixedHeight(
-                  crossAxisCount: (constraints.maxWidth / 250).floor(),
-                  crossAxisSpacing: 40,
-                  mainAxisSpacing: 40,
-                  height: 400.0,
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 400,
+                  crossAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                  mainAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                  mainAxisExtent: 400,
                 ),
                 itemBuilder: (context, index) {
                   var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();

@@ -114,6 +114,7 @@ class ProductApi {
             use_default
             attribute_code
             values {
+              uid
               value_index
               label
               swatch_data{
@@ -128,6 +129,10 @@ class ProductApi {
               name
               sku
               attribute_set_id
+              media_gallery {
+                url
+                label
+              }
               ... on PhysicalProductInterface {
                 weight
               }

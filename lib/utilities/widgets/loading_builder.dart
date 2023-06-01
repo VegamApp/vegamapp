@@ -12,7 +12,7 @@ class BuildLoadingWidget extends StatelessWidget {
   final Color? color;
   @override
   Widget build(BuildContext context) {
-    return Center(child: SizedBox(height: size ?? 20, width: size ?? 20, child: CircularProgressIndicator(color: color ?? AppColors.primaryColor)));
+    return Center(child: SizedBox(height: size ?? 20, width: size ?? 20, child: CircularProgressIndicator(color: color)));
   }
 }
 

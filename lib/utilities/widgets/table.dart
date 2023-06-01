@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/product_apis.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/account_view/orders_view.dart';
 import 'package:provider/provider.dart';
 // Show orders and product in a table
 
 class BuildTableWidget extends StatelessWidget {
-  const BuildTableWidget({Key? key, required this.size, required this.headers, required this.cells, this.onTap, this.urls, this.id})
-      : super(key: key);
+  const BuildTableWidget({Key? key, required this.size, required this.headers, required this.cells, this.onTap, this.urls, this.id}) : super(key: key);
   final List<String> headers; // Table headers
   final List<Map<String, dynamic>> cells; // Table cells
   final List<String>? urls; // on click divert to the url
@@ -74,6 +75,9 @@ class BuildTableWidget extends StatelessWidget {
 
   onTapNavigate(BuildContext context, String orderNo, int index) {
     // TODO: orderDetails
+    context.push(
+      "/account/${OrdersView.route}/$orderNo",
+    );
     // navigate(context, MyOrderDetailView.route, arguments: {'data': cells[index]['data'], 'orderNo': orderNo});
   }
 

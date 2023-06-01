@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -51,33 +50,36 @@ class _AddressViewState extends State<AddressView> {
 
     return BuildScaffold(
       child: Observer(builder: (_) {
-        return SingleChildScrollView(
-          child: AppResponsive(
-            desktop: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  flex: 3,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: AccountSideBar(currentPage: AddressView.route),
+        return LayoutBuilder(builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+            child: AppResponsive(
+              desktop: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    flex: 3,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: AccountSideBar(currentPage: AddressView.route),
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 7,
-                  child: Container(
-                      margin: const EdgeInsets.only(top: 40),
-                      decoration: BoxDecoration(
-                        color: AppColors.scaffoldColor,
-                        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
-                      ),
-                      child: getBody(context, size)),
-                ),
-              ],
+                  Expanded(
+                    flex: 7,
+                    child: Container(
+                        margin: const EdgeInsets.only(top: 40),
+                        decoration: BoxDecoration(
+                          color: AppColors.scaffoldColor,
+                          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+                        ),
+                        child: getBody(context, size)),
+                  ),
+                ],
+              ),
+              mobile: getBody(context, size),
             ),
-            mobile: getBody(context, size),
-          ),
-        );
+          );
+        });
       }),
     );
   }
@@ -85,9 +87,7 @@ class _AddressViewState extends State<AddressView> {
   Padding getBody(BuildContext context, Size size) {
     var userData = Provider.of<UserData>(context);
     return Padding(
-      padding: AppResponsive.isDesktop(context)
-          ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50)
-          : EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -189,8 +189,7 @@ class _AddressViewState extends State<AddressView> {
                             setState(() {});
                           },
                         ),
-                        title:
-                            Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+                        title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -212,8 +211,7 @@ class _AddressViewState extends State<AddressView> {
                             setState(() {});
                           },
                         ),
-                        title:
-                            Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+                        title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -255,8 +253,7 @@ class _AddressViewState extends State<AddressView> {
                         // }
                         if (result.isLoading) return const SizedBox();
                         if (selectedRegion.isEmpty && addressModel != null) {
-                          selectedRegion = result.data!['countries'][0]['available_regions']
-                              .firstWhere((element) => element['code'] == addressModel.region?.regionCode);
+                          selectedRegion = result.data!['countries'][0]['available_regions'].firstWhere((element) => element['code'] == addressModel.region?.regionCode);
                           // //print(selectedRegion);
                         }
                         countries = result.data!;

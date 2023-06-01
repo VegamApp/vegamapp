@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -145,6 +146,8 @@ class _ProductViewState extends State<ProductView> {
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
               body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
         }
+
+        // log(jsonEncode(result.data));
         if (result.data!['products']['items'].length == 1) {
           return Scaffold(
               key: key,
@@ -176,10 +179,7 @@ class _ProductViewState extends State<ProductView> {
             // //print(queryString);
             // //print(fetchMoreResultData);
             if (widget.viewAll != true) {
-              final List<dynamic> repos = [
-                ...previousResultData!['products']['items'] as List<dynamic>,
-                ...fetchMoreResultData!['products']['items'] as List<dynamic>
-              ];
+              final List<dynamic> repos = [...previousResultData!['products']['items'] as List<dynamic>, ...fetchMoreResultData!['products']['items'] as List<dynamic>];
 
               // to avoid a lot of work, lets just update the list of repos in returned
               // data with new data, this also ensures we have the endCursor already set
@@ -262,10 +262,8 @@ class _ProductViewState extends State<ProductView> {
                             children: [
                               const SizedBox(height: 20),
                               widget.searchQuery != null
-                                  ? Text('Search result for "${widget.searchQuery}"',
-                                      style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
-                                  : MiniAppBar(
-                                      navigationChild: result.data!['products']['items'][0]['categories'], screenWidth: constraints.maxWidth),
+                                  ? Text('Search result for "${widget.searchQuery}"', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
+                                  : MiniAppBar(navigationChild: result.data!['products']['items'][0]['categories'], screenWidth: constraints.maxWidth),
                               const SizedBox(height: 10),
                               GridView.builder(
                                 // padding: const EdgeInsets.all(20),
@@ -548,9 +546,7 @@ class _ProductViewState extends State<ProductView> {
                 : ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: SizedBox(height: 30, width: 30, child: Image.asset('assets/images/categoryicon.png')),
-                    trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']]
-                        ? Icon(Icons.check, color: AppColors.primaryColor)
-                        : null,
+                    trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']] ? Icon(Icons.check, color: AppColors.primaryColor) : null,
                     // value: data['options'][index]['value'].toString(),
                     // groupValue: filterKeys[data['attribute_code']],
                     onTap: () {
@@ -607,11 +603,8 @@ class _ProductViewState extends State<ProductView> {
   getPriceSlider(var data) {
     // //print(jsonEncode(data));
     if (rangeValues == null ||
-        rangeValues !=
-            RangeValues(double.parse(data['options'][0]['value'].split('_')[0]),
-                double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]))) {
-      rangeValues = RangeValues(
-          double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]));
+        rangeValues != RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]))) {
+      rangeValues = RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]));
     }
     return StatefulBuilder(builder: (context, setState) {
       return Column(

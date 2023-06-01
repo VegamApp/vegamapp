@@ -11,13 +11,14 @@ class ProductMediaContainer extends StatefulWidget {
 }
 
 class _ProductMediaContainerState extends State<ProductMediaContainer> {
-  late Widget _currentDisplayWidget = CachedNetworkImage(
-    key: const ValueKey<int>(0),
-    imageUrl: widget.data[0]['url'],
-  );
+  late Widget _currentDisplayWidget;
 
   @override
   void initState() {
+    _currentDisplayWidget = CachedNetworkImage(
+      key: const ValueKey<int>(0),
+      imageUrl: widget.data[0]['url'],
+    );
     super.initState();
   }
 
@@ -48,10 +49,7 @@ class _ProductMediaContainerState extends State<ProductMediaContainer> {
                   return InkWell(
                     onTap: () {
                       setState(() {
-                        _currentDisplayWidget = CachedNetworkImage(
-                          key: ValueKey<int>(index),
-                          imageUrl: widget.data[index]['url'],
-                        );
+                        _currentDisplayWidget = CachedNetworkImage(key: ValueKey<int>(index), imageUrl: widget.data[index]['url']);
                       });
                     },
                     child: Container(
@@ -73,7 +71,7 @@ class _ProductMediaContainerState extends State<ProductMediaContainer> {
           Expanded(
             flex: 8,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 200),
               child: _currentDisplayWidget,
             ),
           )

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gql/ast.dart';
 
 String logoUrl = 'assets/images/logo.png';
-String currency = '₹';
+String currency = '\$';
 
 enum Gender { male, female }
 
@@ -53,23 +55,25 @@ Future<void> openUrl(String link) async {
   }
 }
 
-showSnackBar(
-    {required context, required String message, required Color backgroundColor, Color? textColor, Duration? duration, SnackBarBehavior? behavior}) {
+showSnackBar({required context, required String message, required Color backgroundColor, Color? textColor, Duration? duration, SnackBarBehavior? behavior}) {
   String? msg;
   if (message.contains("sku:")) {
     msg = "The requested qty is not available in this store.";
   } else {
     msg = message;
   }
-  return ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: behavior,
-      duration: duration ?? const Duration(milliseconds: 3000),
-      content: Text(msg, style: AppStyles.getRegularTextStyle(fontSize: 14, color: textColor ?? Colors.white)),
-      backgroundColor: backgroundColor,
-      dismissDirection: DismissDirection.startToEnd,
-    ),
-  );
+  if (AppResponsive.isMobile(context)) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: behavior,
+        duration: duration ?? const Duration(milliseconds: 3000),
+        content: Text(msg, style: AppStyles.getRegularTextStyle(fontSize: 14, color: textColor ?? Colors.white)),
+        backgroundColor: backgroundColor,
+        dismissDirection: DismissDirection.startToEnd,
+      ),
+    );
+  }
+  return Fluttertoast.showToast(msg: msg, gravity: ToastGravity.BOTTOM_RIGHT, backgroundColor: backgroundColor, textColor: textColor);
 }
 
 extension Ex on double {

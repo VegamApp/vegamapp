@@ -93,8 +93,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               try {
                 if (data!.graphqlErrors[0].extensions!['category'] == "graphql-authorization") {
                   cart.getCartData(context, token);
-                  showSnackBar(
-                      context: context, message: "Error occured, please try again.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
+                  showSnackBar(context: context, message: "Error occured, please try again.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
                 }
               } catch (e) {}
             }),
@@ -173,6 +172,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                         child: SvgPicture.asset(
                           widget.svg,
                           width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
+                          color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor,
                         ),
                       )
                     ],

@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -160,29 +159,34 @@ class _CartViewState extends State<CartView> {
             child: Row(
               children: [
                 Expanded(
-                    flex: 4,
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Item', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
-                    )),
+                  flex: 4,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Item', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  ),
+                ),
                 Expanded(
-                    flex: 2,
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Price', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
-                    )),
+                  flex: 2,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Price', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  ),
+                ),
                 Expanded(
-                    flex: 2,
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Qty', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
-                    )),
+                  flex: 2,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Qty', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  ),
+                ),
                 Expanded(
-                    flex: 2,
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Subtotal', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
-                    )),
+                  flex: 2,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Subtotal', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  ),
+                ),
+                const Expanded(flex: 1, child: SizedBox()),
               ],
             ),
           ),
@@ -239,13 +243,8 @@ class _CartViewState extends State<CartView> {
                         child: Container(
                           height: 50,
                           alignment: Alignment.topLeft,
-                          child: getItemNoChanger(
-                              size: const Size(500, 50),
-                              item: item,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              height: 30,
-                              cartData: cartData,
-                              refetch: refetch),
+                          child:
+                              getItemNoChanger(size: const Size(500, 50), item: item, mainAxisAlignment: MainAxisAlignment.start, height: 30, cartData: cartData, refetch: refetch),
                         ),
                       ),
                       Expanded(
@@ -253,11 +252,76 @@ class _CartViewState extends State<CartView> {
                         child: Container(
                           alignment: Alignment.centerLeft,
                           child: BuildPriceWithOffer(
-                            price:
-                                (f.format(item['product']['price_range']['minimum_price']['regular_price']['value'] * item['quantity'])).toString(),
+                            price: (f.format(item['product']['price_range']['minimum_price']['regular_price']['value'] * item['quantity'])).toString(),
                             priceSize: 17,
                             currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
                           ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: Mutation(
+                              options: MutationOptions(
+                                document: gql(CartApis.removeProductsFromCart),
+                                onCompleted: (data) async {
+                                  print(data); // cartData.checkVirtualCart();
+                                  showSnackBar(
+                                      context: context,
+                                      message: "Removed item from cart",
+                                      backgroundColor: AppColors.snackbarSuccessBackgroundColor,
+                                      textColor: AppColors.snackbarSuccessTextColor);
+                                  await cartData.getCartData(context, Provider.of<AuthToken>(context, listen: false));
+                                  refetch!();
+                                },
+                                onError: (error) {
+                                  showSnackBar(
+                                    context: context,
+                                    message: error!.graphqlErrors[0].message,
+                                    backgroundColor: AppColors.snackbarErrorBackgroundColor,
+                                    textColor: AppColors.snackbarErrorTextColor,
+                                  );
+
+                                  print(error);
+                                },
+                              ),
+                              builder: (runMutation, result) {
+                                return IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text("Delete?", style: AppStyles.getMediumTextStyle(fontSize: 16)),
+                                        content: Text(
+                                          "Are you sure you want to delete this item from cart?",
+                                          style: AppStyles.getRegularTextStyle(fontSize: 14),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: Text(
+                                              'Cancel',
+                                              style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              //print(item);
+                                              Navigator.pop(context);
+                                              runMutation({'cartId': cartData.cartId, 'itemId': item['id']});
+                                            },
+                                            child: Text(
+                                              'OK',
+                                              style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  icon: Icon(Icons.delete_outline, color: AppColors.primaryColor),
+                                );
+                              }),
                         ),
                       ),
                     ],
@@ -372,9 +436,7 @@ class _CartViewState extends State<CartView> {
           alignment: Alignment.center,
           width: size.width * 0.1,
           height: height ?? 50,
-          child: FittedBox(
-              child:
-                  Text(item['quantity'].toString().padLeft(2, '0'), style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText))),
+          child: FittedBox(child: Text(item['quantity'].toString().padLeft(2, '0'), style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText))),
         ),
         Container(
           decoration: BoxDecoration(
@@ -419,10 +481,8 @@ class _CartViewState extends State<CartView> {
                           });
                           setState(() {});
                         },
-                        child: SizedBox(
-                            width: size.width * 0.1,
-                            height: height != null ? height * 0.5 : 24,
-                            child: Icon(Icons.expand_less, size: height != null ? height * 0.5 : 24)),
+                        child:
+                            SizedBox(width: size.width * 0.1, height: height != null ? height * 0.5 : 24, child: Icon(Icons.expand_less, size: height != null ? height * 0.5 : 24)),
                       ),
                       InkWell(
                         onTap: () {
@@ -445,10 +505,8 @@ class _CartViewState extends State<CartView> {
                           }
                           setState(() {});
                         },
-                        child: SizedBox(
-                            height: height != null ? height * 0.5 : 24,
-                            width: size.width * 0.1,
-                            child: Icon(Icons.expand_more, size: height != null ? height * 0.5 : 24)),
+                        child:
+                            SizedBox(height: height != null ? height * 0.5 : 24, width: size.width * 0.1, child: Icon(Icons.expand_more, size: height != null ? height * 0.5 : 24)),
                       )
                     ],
                   );

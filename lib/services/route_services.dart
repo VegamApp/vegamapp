@@ -6,6 +6,8 @@ import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/address_view.dart';
 import 'package:m2/views/account_view/billing_agreement_view.dart';
 import 'package:m2/views/account_view/downloadable_products_view.dart';
+import 'package:m2/views/account_view/my_order_detail_view.dart';
+import 'package:m2/views/account_view/newsletter_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/auth/forgot_password.dart';
@@ -98,6 +100,18 @@ final router = GoRouter(
               },
             ),
             GoRoute(
+              path: NewsletterView.route,
+              pageBuilder: (context, state) {
+                return getCustomTransition(state, const NewsletterView());
+              },
+            ),
+            GoRoute(
+              path: '${OrdersView.route}/:id',
+              pageBuilder: (context, state) {
+                return getCustomTransition(state, MyOrderDetailView(orderId: state.pathParameters['id']!));
+              },
+            ),
+            GoRoute(
               path: BillingAgreementsView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const BillingAgreementsView());
@@ -126,7 +140,11 @@ final router = GoRouter(
               GoRoute(
                 path: OrderPlacedView.route,
                 pageBuilder: (context, state) {
-                  return getCustomTransition(state, const OrderPlacedView());
+                  return getCustomTransition(
+                      state,
+                      OrderPlacedView(
+                        orderId: state.queryParameters['orderid'],
+                      ));
                 },
               ),
             ]),

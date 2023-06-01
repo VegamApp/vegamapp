@@ -478,14 +478,16 @@ class Values {
   int? valueIndex;
   String? label;
   String? swatchData;
+  String? uid;
 
-  Values({this.sTypename, this.valueIndex, this.label, this.swatchData});
+  Values({this.sTypename, this.valueIndex, this.label, this.swatchData, this.uid});
 
   Values.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
     valueIndex = json['value_index'];
     label = json['label'];
     swatchData = json['swatch_data']?['value'];
+    uid = json['uid'];
   }
 
   Map<String, dynamic> toJson() {
@@ -493,6 +495,7 @@ class Values {
     data['__typename'] = sTypename;
     data['value_index'] = valueIndex;
     data['label'] = label;
+    data['uid'] = uid;
     return data;
   }
 }
@@ -535,8 +538,9 @@ class Product {
   String? sku;
   int? attributeSetId;
   PriceRange? priceRange;
+  List<Map<String, dynamic>>? mediaGallery;
 
-  Product({this.sTypename, this.id, this.name, this.sku, this.attributeSetId, this.priceRange});
+  Product({this.sTypename, this.id, this.name, this.sku, this.attributeSetId, this.priceRange, this.mediaGallery});
 
   Product.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
@@ -545,6 +549,7 @@ class Product {
     sku = json['sku'];
     attributeSetId = json['attribute_set_id'];
     priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
+    mediaGallery = json['media_gallery'] != null ? List<Map<String, dynamic>>.from(json['media_gallery']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -557,6 +562,7 @@ class Product {
     if (priceRange != null) {
       data['price_range'] = priceRange!.toJson();
     }
+    data['media_gallery'] = mediaGallery;
     return data;
   }
 }

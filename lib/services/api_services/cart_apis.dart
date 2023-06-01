@@ -228,4 +228,15 @@ class CartApis {
     }
   }
   ''';
+
+  static String removeProductsFromCart = r'''
+    mutation removeItemFromCart($cartId: String!,$itemId: Int!){
+      removeItemFromCart(input: { cart_id: $cartId ,cart_item_id:$itemId}) {
+        cart {
+          
+          total_quantity
+        }
+      }
+    }
+    ''';
 }

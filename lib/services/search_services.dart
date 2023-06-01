@@ -85,7 +85,7 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
   }
 
   void setLoading() {
-    if (!loading) {
+    if (!loading && mounted) {
       setState(() {
         loading = true;
       });
@@ -93,13 +93,15 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
   }
 
   void resetState(List<SearchModel> tempList) {
-    setState(() {
-      // after loop is done, set the filteredList state from the tempList
-      filteredList = tempList;
-      loading = false;
-      // if no items are found, add message none found
-      itemsFound = tempList.isEmpty && widget.controller.text.isNotEmpty ? false : true;
-    });
+    if (mounted) {
+      setState(() {
+        // after loop is done, set the filteredList state from the tempList
+        filteredList = tempList;
+        loading = false;
+        // if no items are found, add message none found
+        itemsFound = tempList.isEmpty && widget.controller.text.isNotEmpty ? false : true;
+      });
+    }
     // mark that the overlay widget needs to be rebuilt so results can show
     _overlayEntry.markNeedsBuild();
   }
@@ -157,7 +159,7 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
     if (widget.initialList == null && widget.future == null) {
       throw ('Error: Missing required initial list or future that returns list');
     }
-    if (widget.future != null) {
+    if (widget.future != null && mounted) {
       setState(() {
         hasFuture = true;
       });
@@ -204,9 +206,11 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
             onTap: () {
               // clear the text field controller to reset it
               widget.controller.clear();
-              setState(() {
-                itemsFound = false;
-              });
+              if (mounted) {
+                setState(() {
+                  itemsFound = false;
+                });
+              }
               // reset the list so it's empty and not visible
               resetList();
               // remove the focus node so we aren't editing the text
@@ -360,13 +364,15 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
         onChanged: (String value) {
           // every time we make a change to the input, update the list
           _debouncer.run(() {
-            setState(() {
-              if (hasFuture) {
-                updateGetItems();
-              } else {
-                updateList();
-              }
-            });
+            if (mounted) {
+              setState(() {
+                if (hasFuture) {
+                  updateGetItems();
+                } else {
+                  updateList();
+                }
+              });
+            }
           });
         },
       ),

@@ -6,10 +6,11 @@ import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
 class CartSummaryWidget extends StatefulWidget {
-  const CartSummaryWidget({super.key, this.estimatedDelivery, this.onButtonTap, required this.buttonText});
+  const CartSummaryWidget({super.key, this.estimatedDelivery, this.onButtonTap, required this.buttonText, this.isLoading = false});
   final int? estimatedDelivery;
   final void Function()? onButtonTap;
   final String buttonText;
+  final bool isLoading;
   @override
   State<CartSummaryWidget> createState() => _CartSummaryWidgetState();
 }
@@ -42,8 +43,7 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (widget.estimatedDelivery != null)
-            Text('Expected Delivery By: ${widget.estimatedDelivery} days',
-                style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.buttonColor)),
+            Text('Expected Delivery By: ${widget.estimatedDelivery} days', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.buttonColor)),
           if (widget.estimatedDelivery != null) const SizedBox(height: 20),
           Text(
             'Summary',
@@ -122,11 +122,8 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
                   children: [
                     if (cart.cartData['cart']['prices']['grand_total']['currency'] != null)
                       TextSpan(
-                          text: '${cart.cartData['cart']['prices']['grand_total']['currency']} ',
-                          style: AppStyles.getSemiBoldTextStyle(fontSize: 20, color: AppColors.fontColor)),
-                    TextSpan(
-                        text: f.format(cart.cartData['cart']['prices']['grand_total']['value']),
-                        style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fontColor))
+                          text: '${cart.cartData['cart']['prices']['grand_total']['currency']} ', style: AppStyles.getSemiBoldTextStyle(fontSize: 20, color: AppColors.fontColor)),
+                    TextSpan(text: f.format(cart.cartData['cart']['prices']['grand_total']['value']), style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fontColor))
                   ],
                 ),
               ),
@@ -149,12 +146,14 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
             ),
             statesController: buttonStateController,
             onPressed: widget.onButtonTap,
-            child: Text(
-              widget.buttonText,
-              style: AppStyles.getRegularTextStyle(
-                fontSize: 20,
-              ),
-            ),
+            child: widget.isLoading
+                ? const BuildLoadingWidget()
+                : Text(
+                    widget.buttonText,
+                    style: AppStyles.getRegularTextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
           ),
           // const SizedBox(height: 40),
         ],

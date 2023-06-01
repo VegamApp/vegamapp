@@ -107,8 +107,8 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                   if (index != widget.children.length) {
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      width: AppResponsive.isMobile(context) ? size.width * 0.4 : 240,
-                      constraints: const BoxConstraints(maxWidth: 280),
+                      width: AppResponsive.isMobile(context) ? size.width * 0.4 : 400,
+                      constraints: const BoxConstraints(maxWidth: 400),
                       child: widget.children[index],
                     );
                   }
@@ -167,9 +167,7 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
         // margin: EdgeInsets.only(bottom: 200),
         decoration: BoxDecoration(
           color: AppColors.primaryColor,
-          borderRadius: icon == Icons.chevron_right
-              ? const BorderRadius.horizontal(left: Radius.circular(5))
-              : const BorderRadius.horizontal(right: Radius.circular(5)),
+          borderRadius: icon == Icons.chevron_right ? const BorderRadius.horizontal(left: Radius.circular(5)) : const BorderRadius.horizontal(right: Radius.circular(5)),
         ),
         child: Center(child: Icon(icon, color: Colors.white)),
       );

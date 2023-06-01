@@ -3,8 +3,10 @@ import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/scaffold_body.dart';
 
 class OrderPlacedView extends StatefulWidget {
-  const OrderPlacedView({super.key});
+  const OrderPlacedView({super.key, this.orderId});
   static String route = 'ordersucess';
+  final String? orderId;
+
   @override
   State<OrderPlacedView> createState() => _OrderPlacedViewState();
 }
@@ -21,7 +23,7 @@ class _OrderPlacedViewState extends State<OrderPlacedView> {
         ConstrainedBox(constraints: const BoxConstraints(maxHeight: 400), child: Image.asset('assets/images/thankyou.png')),
         const SizedBox(height: 20),
         Text(
-          'Your order was successfully placed.\nPlease check your email for further instructions.',
+          "${widget.orderId == null ? 'Thank you for your order!' : "Your order number ${widget.orderId} has been placed"} .\nWe’ll let you know as soon as it ships.",
           style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor),
           textAlign: TextAlign.center,
         ),

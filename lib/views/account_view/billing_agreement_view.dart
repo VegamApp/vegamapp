@@ -30,41 +30,42 @@ class _BillingAgreementsViewState extends State<BillingAgreementsView> {
     Size size = MediaQuery.of(context).size;
 
     return BuildScaffold(
-      child: SingleChildScrollView(
-        child: AppResponsive(
-          desktop: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                flex: 3,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: AccountSideBar(currentPage: BillingAgreementsView.route),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+          child: AppResponsive(
+            desktop: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: AccountSideBar(currentPage: BillingAgreementsView.route),
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 7,
-                child: Container(
-                    margin: const EdgeInsets.only(top: 40),
-                    decoration: BoxDecoration(
-                      color: AppColors.scaffoldColor,
-                      boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
-                    ),
-                    child: getBody(context, size)),
-              ),
-            ],
+                Expanded(
+                  flex: 7,
+                  child: Container(
+                      margin: const EdgeInsets.only(top: 40),
+                      decoration: BoxDecoration(
+                        color: AppColors.scaffoldColor,
+                        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+                      ),
+                      child: getBody(context, size)),
+                ),
+              ],
+            ),
+            mobile: getBody(context, size),
           ),
-          mobile: getBody(context, size),
-        ),
-      ),
+        );
+      }),
     );
   }
 
   Padding getBody(BuildContext context, Size size) {
     return Padding(
-      padding: AppResponsive.isDesktop(context)
-          ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50)
-          : EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -133,8 +134,7 @@ class _BillingAgreementsViewState extends State<BillingAgreementsView> {
               BuildTableWidget(
                 size: size,
                 headers: headers,
-                id: List.generate(result.data!['customer']['orders']['items'].length,
-                    (index) => result.data!['customer']['orders']['items'][index]['number'].toString()),
+                id: List.generate(result.data!['customer']['orders']['items'].length, (index) => result.data!['customer']['orders']['items'][index]['number'].toString()),
                 cells: List<Map<String, dynamic>>.generate(
                     result.data!['customer']['orders']['items'].length,
                     (index) => {
@@ -142,8 +142,7 @@ class _BillingAgreementsViewState extends State<BillingAgreementsView> {
                           'list': [
                             result.data!['customer']['orders']['items'][index]['number'],
                             dateFormat.format(DateTime.parse(result.data!['customer']['orders']['items'][index]['order_date'])),
-                            double.parse(result.data!['customer']['orders']['items'][index]['total']['grand_total']['value'].toString())
-                                .toStringAsFixed(2),
+                            double.parse(result.data!['customer']['orders']['items'][index]['total']['grand_total']['value'].toString()).toStringAsFixed(2),
                             result.data!['customer']['orders']['items'][index]['status'],
                             'View Order'
                           ],

@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,8 +7,9 @@ import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 
 class ProductVarientWidget extends StatefulWidget {
-  const ProductVarientWidget({super.key, required this.productModel});
+  const ProductVarientWidget({super.key, required this.productModel, required this.onUpdated});
   final ProductModel productModel;
+  final Function(List<Map<String, dynamic>>? newMedia) onUpdated;
   @override
   State<ProductVarientWidget> createState() => _ProductVarientWidgetState();
 }
@@ -98,6 +100,11 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
               itemBuilder: (context, index) => InkWell(
                 borderRadius: BorderRadius.circular(40), radius: 40,
                 onTap: () {
+                  // print(jsonEncode(widget.productModel.items![0].configurableOptions![i].toJson()));
+                  print(widget.productModel.items![0].configurableOptions![i].values![index].swatchData);
+                  setState(() => varientData[i] = widget.productModel.items![0].configurableOptions![i].values![index].uid!);
+
+                  setSku();
                   setState(() {});
                 },
                 // child: Text(
@@ -108,18 +115,19 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                 //   ),
                 // ),
                 child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(
+                  width: 33,
+                  height: 33,
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    // border: Border.all(color: Colors.amber),
+                    border: varientData.contains(widget.productModel.items![0].configurableOptions![i].values![index].uid)
+                        ? Border.all(color: AppColors.kPrimaryColor, width: 3)
+                        : null,
                   ),
                   alignment: Alignment.center,
                   child: CircleAvatar(
                     radius: 15,
                     backgroundColor: Color(
-                      int.parse('ff${widget.productModel.items![0].configurableOptions![i].values![index].swatchData!.replaceAll('#', '')}',
-                          radix: 16),
+                      int.parse('ff${widget.productModel.items![0].configurableOptions![i].values![index].swatchData!.replaceAll('#', '')}', radix: 16),
                     ),
                   ),
                 ),
@@ -136,11 +144,12 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
       height: 25,
       child: Row(children: <Widget>[
         SizedBox(
-            width: 100,
-            child: Text(
-              title,
-              style: AppStyles.getRegularTextStyle(fontSize: 13, color: AppColors.fadedText),
-            )),
+          width: 100,
+          child: Text(
+            title,
+            style: AppStyles.getRegularTextStyle(fontSize: 13, color: AppColors.fadedText),
+          ),
+        ),
         Expanded(
           child: ListView.separated(
             addAutomaticKeepAlives: true,
@@ -150,6 +159,10 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
             separatorBuilder: (context, index) => const SizedBox(width: 10),
             itemBuilder: (context, index) => InkWell(
               onTap: () {
+                setState(() => varientData[i] = widget.productModel.items![0].configurableOptions![i].values![index].uid!);
+
+                setSku();
+
                 setState(() {});
               },
               child: Container(
@@ -161,15 +174,15 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                   decoration:
                       //  checkAvailable
                       BoxDecoration(
-                    border: Border.all(
-                      width: 1.0,
-                      color:
-                          // selectedVarient![i] == widget.productModel.items![0].configurableOptions![i].values![index].label
-                          // ?
-                          // AppColors.buttonColor
-                          // :
-                          AppColors.evenFadedText,
-                    ),
+                    border: varientData.contains(widget.productModel.items![0].configurableOptions![i].values![index].uid)
+                        ? Border.all(
+                            width: 2.0,
+                            color: AppColors.buttonColor,
+                          )
+                        : Border.all(
+                            width: 1.0,
+                            color: AppColors.evenFadedText,
+                          ),
                   ),
                   // : null,
                   alignment: Alignment.center,
@@ -205,6 +218,40 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
         )
       ]),
     );
+  }
+
+  late List<String> varientData =
+      List.generate(widget.productModel.items![0].configurableOptions!.length, (index) => widget.productModel.items![0].configurableOptions![index].values![0].uid!);
+
+  setSku() {
+    if (varientData.contains(null)) return;
+    // print(jsonEncode(widget.productModel.items![0].variants!.map((e) => e.toJson()).toList()));
+    // List<Map<String, dynamic>> varients = List<Map<String, dynamic>>.from(productData['variants']);
+    //
+    print(varientData);
+    for (var element in widget.productModel.items![0].variants!) {
+      bool broken = false;
+      for (int i = 0; i < varientData.length; i++) {
+        if (!varientData.contains(element.attributes![i].uid)) {
+          broken = true;
+          break;
+        }
+      }
+      if (broken) {
+        print("broken");
+        continue;
+      }
+      print("Not broken");
+      selectedSku = element.product!.sku;
+      List<Map<String, dynamic>>? mediaGallery =
+          element.product!.mediaGallery != null && element.product!.mediaGallery!.isNotEmpty ? List<Map<String, dynamic>>.from(element.product!.mediaGallery!) : null;
+      widget.onUpdated(mediaGallery);
+      // productData['media_gallery'] =
+      //     element['product']['media_gallery'] != null && element['product']['media_gallery'].isNotEmpty ? element['product']['media_gallery'] : productData['media_gallery'];
+      // productData['special_price'] = element['product']['special_price'];
+      // productData['price_range'] = element['product']['price_range'];
+      setState(() {});
+    }
   }
 
   Widget buildQuantityChanger() {
