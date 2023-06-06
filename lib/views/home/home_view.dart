@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
+import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
+import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -24,21 +26,33 @@ class _HomeViewState extends State<HomeView> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    var cartData = Provider.of<CartData>(context);
+    var authToken = Provider.of<AuthToken>(context);
+
+    cartData.getCartData(context, authToken);
+  }
+
+  @override
   Widget build(BuildContext context) {
     var homeData = Provider.of<HomeData>(context);
     return BuildScaffold(
-      child: Observer(builder: (context) {
-        if (homeData.isLoading || homeData.data.isEmpty) {
-          return BuildLoadingWidget(color: AppColors.primaryColor);
-        }
-        // if (homeData.data.isEmpty) return const SizedBox();
-        return ListView.builder(
-          controller: scrollController,
-          padding: const EdgeInsets.all(20),
-          itemCount: homeData.data['homepage']['blocks']['data'].length,
-          // separatorBuilder: (context, index) => const SizedBox(height: 20),
-          itemBuilder: (context, index) => getWidgets(homeData.data['homepage']['blocks']['data'][index]),
-        );
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Observer(builder: (context) {
+          if (homeData.isLoading || homeData.data.isEmpty) {
+            return BuildLoadingWidget(color: AppColors.primaryColor);
+          }
+          // if (homeData.data.isEmpty) return const SizedBox();
+          return ListView.builder(
+            controller: scrollController,
+            padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+            itemCount: homeData.data['homepage']['blocks']['data'].length,
+            // separatorBuilder: (context, index) => const SizedBox(height: 20),
+            itemBuilder: (context, index) => getWidgets(homeData.data['homepage']['blocks']['data'][index]),
+          );
+        });
       }),
     );
   }

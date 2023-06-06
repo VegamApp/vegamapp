@@ -39,6 +39,14 @@ class _CartViewState extends State<CartView> {
     WidgetsBinding.instance.addPostFrameCallback((_) => getCart());
   }
 
+  functionOnException(Function()? refetch) async {
+    var cartData = Provider.of<CartData>(context, listen: false);
+    var token = Provider.of<AuthToken>(context, listen: false);
+
+    await cartData.getCartData(context, token);
+    refetch!();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -71,6 +79,7 @@ class _CartViewState extends State<CartView> {
                   return const BuildLoadingWidget();
                 }
                 if (result.hasException) {
+                  functionOnException(refetch);
                   return BuildErrorWidget(
                     errorMsg: result.exception?.graphqlErrors[0].message,
                     onRefresh: refetch,
@@ -80,7 +89,7 @@ class _CartViewState extends State<CartView> {
                 cartData.putCartCount(result.data!['cart']['total_quantity']);
                 return ListView(
                   controller: scrollController,
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
                   children: [
                     const SizedBox(height: 20),
                     Align(

@@ -113,7 +113,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                   key: _formKey,
                   child: ListView(
                     controller: scrollController,
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
                     children: [
                       const SizedBox(height: 20),
                       Align(
@@ -135,8 +135,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                         mobile: Column(
                           children: [
                             ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                                    ((user.data.addresses == null || user.data.addresses!.isEmpty) &&
-                                        cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                    ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
                                     newAddress!)
                                 ? Column(
                                     children: [
@@ -163,8 +162,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                                 flex: 75,
                                 // child: getBody(size, cartData, result, refetch),
                                 child: ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                                        ((user.data.addresses == null || user.data.addresses!.isEmpty) &&
-                                            cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                        ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
                                         newAddress!)
                                     ? Wrap(
                                         alignment: WrapAlignment.center,
@@ -426,8 +424,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(width: 1, color: AppColors.evenFadedText),
                     ),
-                    child: Text(selectedRegion.isEmpty ? 'Select region' : selectedRegion['name'],
-                        style: AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.fadedText)),
+                    child: Text(selectedRegion.isEmpty ? 'Select region' : selectedRegion['name'], style: AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.fadedText)),
                   ),
                 );
               },

@@ -31,6 +31,14 @@ class CustomerApis {
       }
     }''';
 
+  static String requestPasswordResetEmail = r'''
+    mutation resetPasswordEmail($email: String!){
+      requestPasswordResetEmail(
+        email: $email
+      )
+    }
+  ''';
+
   static String requestUserData = '''
   {
     customer {

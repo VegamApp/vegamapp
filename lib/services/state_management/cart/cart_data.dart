@@ -64,6 +64,7 @@ abstract class _CartDataBase with Store {
     // print("cartResult $result");
     if (result.hasException) {
       // var token = Provider.of<AuthToken>(context, listen: false);
+      _cartData.clear();
       if (token.loginToken == null) {
         await getGuestCart(context);
       } else {

@@ -11,28 +11,30 @@ class BuildErrorWidget extends StatelessWidget {
   final String? errorMsg;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 300,
-      width: 300,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            errorMsg ?? 'An error occured please try again.',
-            style: AppStyles.getRegularTextStyle(fontSize: 14, color: textColor),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              backgroundColor: buttonColor ?? AppColors.primaryColor,
+    return Center(
+      child: SizedBox(
+        height: 300,
+        width: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              errorMsg ?? 'An error occured please try again.',
+              style: AppStyles.getRegularTextStyle(fontSize: 14, color: textColor),
+              textAlign: TextAlign.center,
             ),
-            onPressed: onRefresh,
-            child: Text('Try again', style: AppStyles.getRegularTextStyle(fontSize: 14, color: buttonColor ?? Colors.white)),
-          ),
-        ],
+            const SizedBox(height: 20),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                backgroundColor: buttonColor ?? AppColors.primaryColor,
+              ),
+              onPressed: onRefresh,
+              child: Text('Try again', style: AppStyles.getRegularTextStyle(fontSize: 14, color: buttonColor ?? Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }

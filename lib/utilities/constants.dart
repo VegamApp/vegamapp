@@ -73,7 +73,14 @@ showSnackBar({required context, required String message, required Color backgrou
       ),
     );
   }
-  return Fluttertoast.showToast(msg: msg, gravity: ToastGravity.BOTTOM_RIGHT, backgroundColor: backgroundColor, textColor: textColor);
+  return Fluttertoast.showToast(
+    msg: msg,
+    gravity: ToastGravity.BOTTOM_RIGHT,
+    backgroundColor: backgroundColor,
+    textColor: textColor,
+    timeInSecForIosWeb: 2,
+    webBgColor: "linear-gradient(to right, #31ACA0, #187B71)",
+  );
 }
 
 extension Ex on double {

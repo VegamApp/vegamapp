@@ -160,7 +160,7 @@ class _CartPaymentState extends State<CartPayment> {
 
                 return ListView(
                   controller: scrollController,
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
                   children: [
                     const SizedBox(height: 20),
                     Align(
