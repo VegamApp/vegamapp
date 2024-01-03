@@ -7,19 +7,22 @@ class ProductMediaContainer extends StatefulWidget {
   final double width;
   final List<Map<String, dynamic>> data;
   @override
-  State<ProductMediaContainer> createState() => _ProductMediaContainerState();
+  State<ProductMediaContainer> createState() => ProductMediaContainerState();
 }
 
-class _ProductMediaContainerState extends State<ProductMediaContainer> {
-  late Widget _currentDisplayWidget;
+class ProductMediaContainerState extends State<ProductMediaContainer> {
+  static late Widget _currentDisplayWidget;
+  static refreshCurrentDisplayWidget(String child) {
+    _currentDisplayWidget = CachedNetworkImage(
+      key: const ValueKey<int>(0),
+      imageUrl: child,
+    );
+  }
 
   @override
   void initState() {
-    _currentDisplayWidget = CachedNetworkImage(
-      key: const ValueKey<int>(0),
-      imageUrl: widget.data[0]['url'],
-    );
     super.initState();
+    refreshCurrentDisplayWidget(widget.data[0]['url']);
   }
 
   @override

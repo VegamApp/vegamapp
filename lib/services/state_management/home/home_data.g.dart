@@ -9,6 +9,28 @@ part of 'home_data.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$HomeData on _HomeDataBase, Store {
+  Computed<Map<String, dynamic>>? _$dataComputed;
+
+  @override
+  Map<String, dynamic> get data =>
+      (_$dataComputed ??= Computed<Map<String, dynamic>>(() => super.data,
+              name: '_HomeDataBase.data'))
+          .value;
+  Computed<bool>? _$isLoadingComputed;
+
+  @override
+  bool get isLoading =>
+      (_$isLoadingComputed ??= Computed<bool>(() => super.isLoading,
+              name: '_HomeDataBase.isLoading'))
+          .value;
+  Computed<double>? _$homeCarouselAspectRatioComputed;
+
+  @override
+  double get homeCarouselAspectRatio => (_$homeCarouselAspectRatioComputed ??=
+          Computed<double>(() => super.homeCarouselAspectRatio,
+              name: '_HomeDataBase.homeCarouselAspectRatio'))
+      .value;
+
   late final _$_dataAtom = Atom(name: '_HomeDataBase._data', context: context);
 
   @override
@@ -40,6 +62,23 @@ mixin _$HomeData on _HomeDataBase, Store {
     });
   }
 
+  late final _$_homeCarouselAspectRatioAtom =
+      Atom(name: '_HomeDataBase._homeCarouselAspectRatio', context: context);
+
+  @override
+  double get _homeCarouselAspectRatio {
+    _$_homeCarouselAspectRatioAtom.reportRead();
+    return super._homeCarouselAspectRatio;
+  }
+
+  @override
+  set _homeCarouselAspectRatio(double value) {
+    _$_homeCarouselAspectRatioAtom
+        .reportWrite(value, super._homeCarouselAspectRatio, () {
+      super._homeCarouselAspectRatio = value;
+    });
+  }
+
   late final _$getHomeDataAsyncAction =
       AsyncAction('_HomeDataBase.getHomeData', context: context);
 
@@ -50,6 +89,17 @@ mixin _$HomeData on _HomeDataBase, Store {
 
   late final _$_HomeDataBaseActionController =
       ActionController(name: '_HomeDataBase', context: context);
+
+  @override
+  dynamic putAspectRatio(double aspectRatio) {
+    final _$actionInfo = _$_HomeDataBaseActionController.startAction(
+        name: '_HomeDataBase.putAspectRatio');
+    try {
+      return super.putAspectRatio(aspectRatio);
+    } finally {
+      _$_HomeDataBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setLoading(bool value) {
@@ -65,7 +115,9 @@ mixin _$HomeData on _HomeDataBase, Store {
   @override
   String toString() {
     return '''
-
+data: ${data},
+isLoading: ${isLoading},
+homeCarouselAspectRatio: ${homeCarouselAspectRatio}
     ''';
   }
 }

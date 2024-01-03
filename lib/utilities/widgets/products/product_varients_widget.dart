@@ -51,7 +51,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
           children: [
             Expanded(
               child: BuildButtonSingle(
-                typeName: widget.productModel.sTypename!,
+                typeName: widget.productModel.items![0].sTypename!,
                 parentSku: widget.productModel.items![0].sku!,
                 selectedSku: selectedSku,
                 width: size.width,
@@ -65,7 +65,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
             SizedBox(width: size.width * 0.05 > 20 ? 20 : size.width * 0.05),
             Expanded(
               child: BuildButtonSingle(
-                typeName: "typeName",
+                typeName: widget.productModel.items![0].sTypename!,
                 width: size.width,
                 title: 'BUY NOW',
                 buttonColor: AppColors.fontColor,

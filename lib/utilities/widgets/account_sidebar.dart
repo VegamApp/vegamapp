@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AccountSideBar extends StatefulWidget {
   const AccountSideBar({super.key, required this.currentPage});
   final String currentPage;
+  static String route = 'profile';
   @override
   State<AccountSideBar> createState() => _AccountSideBarState();
 }
@@ -52,7 +53,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
   @override
   Widget build(BuildContext context) {
     return AppResponsive(
-      mobile: Scaffold(body: getScaffoldChild(context)),
+      mobile: Scaffold(body: SingleChildScrollView(child: getScaffoldChild(context))),
       desktop: getScaffoldChild(context),
     );
   }
@@ -136,19 +137,19 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'My Account',
                         svgUrl: 'person',
                         // child: const AccountInformation(),
-                        isBold: widget.currentPage == AccountInformationView.route,
+                        isBold: widget.currentPage == AccountInformationView.route && !AppResponsive.isMobile(context),
                         url: "/account/${AccountInformationView.route}",
                       ),
                       BuilProfileButtons(
                         title: 'My Downloadable Products',
                         svgUrl: 'downloadable',
                         url: "/account/${DownloadableProductsView.route}",
-                        isBold: widget.currentPage == DownloadableProductsView.route,
+                        isBold: widget.currentPage == DownloadableProductsView.route && !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'Address Book',
                         svgUrl: 'location_on',
-                        isBold: widget.currentPage == AddressView.route,
+                        isBold: widget.currentPage == AddressView.route && !AppResponsive.isMobile(context),
                         url: "/account/${AddressView.route}",
                       ),
                     ],
@@ -163,32 +164,32 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'My Orders',
                         svgUrl: 'orders',
                         url: "/account/${OrdersView.route}",
-                        isBold: widget.currentPage == OrdersView.route,
+                        isBold: widget.currentPage == OrdersView.route && !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'My Wish List',
                         svgUrl: 'wishlist',
                         // child: const WishList(),
-                        isBold: widget.currentPage == 'My Wish List',
+                        isBold: widget.currentPage == 'My Wish List' && !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'Newsletter Subscriptions',
                         svgUrl: 'newsletter',
                         // child: const NewsletterSubView(),
                         url: "/account/${NewsletterView.route}",
-                        isBold: widget.currentPage == NewsletterView.route,
+                        isBold: widget.currentPage == NewsletterView.route && !AppResponsive.isMobile(context),
                       ),
-                      BuilProfileButtons(
-                        title: 'Stored Payment Methods',
-                        svgUrl: 'payment',
-                        // child: const StoredPayment(),
-                        isBold: widget.currentPage == 'Stored Payment Methods',
-                      ),
+                      // BuilProfileButtons(
+                      //   title: 'Stored Payment Methods',
+                      //   svgUrl: 'payment',
+                      //   // child: const StoredPayment(),
+                      //   isBold: widget.currentPage == 'Stored Payment Methods' && !AppResponsive.isMobile(context),
+                      // ),
                       BuilProfileButtons(
                         title: 'Billing Agreements',
                         svgUrl: 'billing',
                         url: "/account/${BillingAgreementsView.route}",
-                        isBold: widget.currentPage == BillingAgreementsView.route,
+                        isBold: widget.currentPage == BillingAgreementsView.route && !AppResponsive.isMobile(context),
                       ),
                       const BuilProfileButtons(
                         title: 'Need Help',
@@ -244,7 +245,7 @@ class BuilProfileButtons extends StatelessWidget {
             style: isBold ? AppStyles.getSemiBoldTextStyle(fontSize: 18, color: AppColors.fontColor) : AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
         onTap: () {
           if (!isBold && url != null) {
-            context.go(url!);
+            context.push(url!);
           }
         },
       ),

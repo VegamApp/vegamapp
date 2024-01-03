@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:m2/services/app_responsive.dart';
@@ -62,6 +64,8 @@ showSnackBar({required context, required String message, required Color backgrou
   } else {
     msg = message;
   }
+  print(message);
+
   if (AppResponsive.isMobile(context)) {
     return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -79,7 +83,7 @@ showSnackBar({required context, required String message, required Color backgrou
     backgroundColor: backgroundColor,
     textColor: textColor,
     timeInSecForIosWeb: 2,
-    webBgColor: "linear-gradient(to right, #31ACA0, #187B71)",
+    // webBgColor: "linear-gradient(to right, #31ACA0, #187B71)",
   );
 }
 

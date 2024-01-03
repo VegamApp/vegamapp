@@ -23,7 +23,7 @@ void main() async {
 
   runApp(
     MultiProvider(providers: [
-      Provider<AuthToken>(create: (context) => AuthToken()),
+      Provider<AuthToken>(create: (context) => AuthToken(key)),
       Provider<CartData>(create: (context) => CartData(cart)),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
       Provider<HomeData>(create: (context) => HomeData()),
@@ -94,7 +94,8 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             title: 'M Ecommerce',
             theme: ThemeData(
-              primarySwatch: AppColors.primaryColor,
+              // primarySwatch: AppColors.primaryColor,
+              colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
               drawerTheme: DrawerThemeData(scrimColor: AppColors.fadedText),
               scaffoldBackgroundColor: AppColors.scaffoldColor,
               hoverColor: Colors.transparent,

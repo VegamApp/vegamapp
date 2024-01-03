@@ -6,6 +6,7 @@ import 'package:m2/utilities/utilities.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/cart_views/cart_view.dart';
+import 'package:m2/views/home/search_view.dart';
 import 'package:provider/provider.dart';
 
 class BuildBottomNavBar extends StatelessWidget {
@@ -31,6 +32,7 @@ class BuildBottomNavBar extends StatelessWidget {
   SizedBox getIcon(Size size, Widget child, int index, BuildContext context) {
     return SizedBox(
       width: size.width * 0.25,
+      height: 40,
       child: IconButton(
         onPressed: () {
           if (currentIndex != index) {
@@ -45,15 +47,17 @@ class BuildBottomNavBar extends StatelessWidget {
   navigate(int index, BuildContext context) {
     switch (index) {
       case 0:
-        return context.go("/");
+        return context.push("/");
+      case 1:
+        return context.push('/${SearchView.route}');
       case 2:
-        return context.go("/${CartView.route}");
+        return context.push("/${CartView.route}");
       case 3:
         final authToken = Provider.of<AuthToken>(context, listen: false);
         if (authToken.loginToken == null) {
-          return context.go('/${Auth.route}');
+          return context.push('/${Auth.route}');
         } else {
-          return context.go('/account/${AccountInformationView.route}');
+          return context.push('/account');
         }
 
       default:

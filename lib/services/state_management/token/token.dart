@@ -4,6 +4,8 @@ part 'token.g.dart';
 class AuthToken = _AuthTokenBase with _$AuthToken;
 
 abstract class _AuthTokenBase with Store {
+  _AuthTokenBase(this._loginToken);
+
   @observable
   String? _loginToken;
   String? get loginToken => _loginToken;

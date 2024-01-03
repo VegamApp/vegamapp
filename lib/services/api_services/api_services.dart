@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/models/search_model.dart';
@@ -81,151 +83,190 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
 
   static String queryHome = '''
   {
-    homepage{
-      blocks{
-        data{
-          status
+  homepage{
+    blocks {
+      data{
+        id
+        desktop_status
+        desktop_status
+        title
+        mobile_status
+        title
+        show_title
+        store
+        store_label
+        __typename
+        ... on SliderBlock{
+          templateType
+          slider_width
+          autoplay
+          show_slider_title
+          autoplay_timeout
+          autoplay_hover_pause
+          show_dots
+          banners {
+            image
+            layout
+            link_info {
+              category_id
+              external_url
+              link_type
+              link_url
+              open_tab
+              page_id
+              product_id
+              product_sku
+            }
+          }
+          sliders {
+            position
+            description
+            start_date
+            end_date
+            slider_image
+            link_info{
+              link_type
+              category_id
+              link_url
+              external_url
+              product_id
+              product_sku
+            }
+          } 
+        }
+        ...on BannerBlock{
+          banner_template
+          banneritems {
+            image
+            layout
+            title
+            position
+            link_info {
+              category_id
+              external_url
+              link_type
+              link_url
+              open_tab
+              page_id
+              product_id
+              product_sku
+            }
+          }
+        }
+        ...on ContentBlock{
+          content
+          
+        }
+        ...on ProductBlock{
+          show_title
+          product_type
+          products {
+            __typename
+            type_id
+            name
+            url_suffix
+            url_key
+            sku
+            id
+            stock_status
+            rating_summary
+            review_count
+            categories {
+              image
+              name
+              __typename
+            }
+            image {
+              url
+              label
+              __typename
+            }
+            small_image {
+              url
+              label
+              __typename
+            }
+            special_price
+            price_range{
+              minimum_price{
+                regular_price{
+                  value
+                  currency
+                }
+                discount {
+                  amount_off
+                  percent_off
+                }
+              }
+              maximum_price {
+                regular_price {
+                  value
+                  currency
+                }
+                discount {
+                  amount_off
+                  percent_off
+                }
+              }
+            }
+          }
+          __typename
+        }
+        ... on CategoryBlock{
+          title
+          category_info{
+            category_id
+            url_key
+            image
+            name
+          }
+          id
           mobile_status
-          name
+          desktop_status
+          show_title
           store
           store_label
-          show_title
-          __typename
-          ... on SliderBlock{
-            autoplay
-            autoplay_hover_pause
-            autoplay_timeout
-            banners{
-              image
-              layout
-              link
-              position
-              title
-              link_info {
-                  category_id
-                  external_url
-                  link_type
-                  link_url
-                  open_tab
-                  page_id
-                  product_id
-                  product_sku
-                }  
-            }
-            mobile_status
-            name
-            show_dots
-            templateType
-            slider_width
-            sliders{
-              description
-              start_date
-              end_date
-              position
-              link{
-                category_id
-                external_url
-                link_type
-                link_url
-                page_id
-                product_id
-                product_sku  
-              }
-                slider_image
-              }
-            store
-            store_label
-            templateType
-          }
-          ...on BannerBlock{
-            banneritems{
-              image
-              layout
-              link
-                link_info{
-                  category_id
-                  external_url
-                  link_type
-                  link_url
-                  page_id
-                  product_id
-                  product_sku
-                  open_tab
-                }
-              position
-              title
-            }
-            banner_template
-            }
-          ...on CategoryBlock{
-            category_info{
-              name
-              category_id
-              url_path
-              url_key
-              image
-            }
-          }
-          ...on ContentBlock{
-            content
-            mobile_status
-            name
-            store
-            store_label
-          }
-          ...on ProductBlock{
-            mobile_status
-            name
-            product_type
-            products{
-              name
-              sku
-              special_price
-              image {
-                url
-                label
-              }
-              price_range {
-                maximum_price {
-                  discount {
-                      amount_off
-                      percent_off
-                  }
-                }
-                minimum_price {
-                  regular_price {
-                    value
-                    currency
-                  }
-                }
-                maximum_price {
-                  regular_price {
-                    value
-                    currency
-                  }
-                  discount {
-                      amount_off
-                      percent_off
-                  }
-                }
-              } 
-              wishlistData{
-                wishlistItem
-              }       
-            }
-            store
-            store_label
-            
-          }
-          ...on CustomBlock{
+          
+        }
+        ...on CustomBlock{
           description
+          viewall_status
           image
-          link
+          link_info {
+            category_id
+            external_url
+            link_type
+            link_url
+            open_tab
+            page_id
+            product_id
+            product_sku
+          }
           products{
             name
           }
         }
-        }
+        ...on PopUp{
+            popup_type
+            popup_image
+            click_url{
+              link_type
+              link_url
+              external_url
+              category_id
+              page_id
+              product_id
+              product_sku
+              page_id
+            }
+            video_thumbnail
+            video_link
+            block_identifier
+            start_date
+            end_date
+          }
+
+        } 
         page_info{
           current_page
           page_size
@@ -235,8 +276,9 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
         total_count
         __typename
       }
-      }
-    }''';
+    }
+  }
+''';
 
   static String getCountries = '''
     query {
@@ -268,4 +310,10 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
         }
       }
     }''';
+
+  Future<bool> sendNewsLetter(String email) async {
+    Random random = Random();
+    await Future.delayed(Duration(seconds: 3));
+    return (random.nextInt(3) % 2 == 0);
+  }
 }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -53,9 +52,44 @@ class _ProductViewState extends State<ProductView> {
     });
     getQueryString();
     _scrollController.addListener(() {
+      print('pixel ${_scrollController.position.pixels == _scrollController.position.maxScrollExtent}');
+      print('page ${page <= totalPages}');
+      print('isLoading $isLoading \n');
       if ((_scrollController.position.pixels == _scrollController.position.maxScrollExtent && page <= totalPages && !isLoading)) {
         //print('hi');
         page++;
+        opts = FetchMoreOptions(
+          document: gql(queryString),
+          variables: {'page': page},
+          updateQuery: (previousResultData, fetchMoreResultData) {
+            //print(fetchMoreResultData);
+            // this function will be called so as to combine both the original and fetchMore results
+            // it allows you to combine them as you would like
+            // //print(queryString);
+            // //print(fetchMoreResultData);
+            if (widget.viewAll != true) {
+              final List<dynamic> repos = [...previousResultData!['products']['items'] as List<dynamic>, ...fetchMoreResultData!['products']['items'] as List<dynamic>];
+
+              // to avoid a lot of work, lets just update the list of repos in returned
+              // data with new data, this also ensures we have the endCursor already set
+              // correctly
+              fetchMoreResultData['products']['items'] = repos;
+              //print(fetchMoreResultData['products']['page_info']);
+            } else {
+              final List<dynamic> repos = [
+                ...previousResultData!['viewallProducts']['products'] as List<dynamic>,
+                ...fetchMoreResultData!['viewallProducts']['products'] as List<dynamic>
+              ];
+
+              // to avoid a lot of work, lets just update the list of repos in returned
+              // data with new data, this also ensures we have the endCursor already set
+              // correctly
+              fetchMoreResultData['viewallProducts']['products'] = repos;
+            }
+
+            return fetchMoreResultData;
+          },
+        );
         fetchMore!(opts!);
       }
     });
@@ -111,214 +145,194 @@ class _ProductViewState extends State<ProductView> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Query(
-      options: QueryOptions(document: gql(queryString), variables: variables),
-      builder: (result, {fetchMore, refetch}) {
-        // WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
+    return SafeArea(
+      child: Query(
+        options: QueryOptions(document: gql(queryString), variables: variables),
+        builder: (result, {fetchMore, refetch}) {
+          // WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
 
-        if ((result.isLoading && result.data == null) || isLoading) {
-          return Scaffold(
-            key: key,
-            appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
-            endDrawer: DrawerContainer(size: size),
-            bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-            body: const BuildLoadingWidget(),
-          );
-        }
-        if (result.hasException) {
-          log(result.exception.toString());
-          return Scaffold(
-            key: key,
-            appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
-            endDrawer: DrawerContainer(size: size),
-            bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-            body: BuildErrorWidget(
-              onRefresh: refetch,
-              errorMsg: result.exception!.graphqlErrors.isEmpty ? "Server error" : result.exception?.graphqlErrors[0].message,
-            ),
-          );
-        }
-        if (result.data!['products']['items'].isEmpty) {
-          return Scaffold(
+          if ((result.isLoading && result.data == null) || isLoading) {
+            return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
               endDrawer: DrawerContainer(size: size),
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-              body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
-        }
-
-        // log(jsonEncode(result.data));
-        if (result.data!['products']['items'].length == 1) {
-          return Scaffold(
+              body: const BuildLoadingWidget(),
+            );
+          }
+          // log(result.data.toString());
+          if (result.hasException) {
+            log(result.exception.toString());
+            return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
               endDrawer: DrawerContainer(size: size),
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-              body: ProductDescription(data: result.data!, refetch: refetch));
-        }
-        productModel = ProductModel.fromJson(result.data!['products']);
-        // log(jsonEncode(result.data));
-        // print(productModel.pageInfo!.toJson());
-        page = productModel.pageInfo!.currentPage!;
-        totalPages = productModel.pageInfo!.totalPages!;
-        // print(totalPages);
-        // print(page);
+              body: BuildErrorWidget(
+                onRefresh: refetch,
+                errorMsg: result.exception!.graphqlErrors.isEmpty ? "Server error" : result.exception?.graphqlErrors[0].message,
+              ),
+            );
+          }
+          if ((widget.viewAll != true && result.data!['products']['items'].isEmpty) || (widget.viewAll == true && result.data!['viewallProducts']['products'].isEmpty)) {
+            return Scaffold(
+                key: key,
+                appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
+                endDrawer: DrawerContainer(size: size),
+                bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
+                body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
+          }
 
-        // if (result.isConcrete) {
-        //   isLoading = false;
-        // }
+          // log(jsonEncode(result.data));
+          if (((widget.viewAll != true && result.data!['products']['items'].length == 1) || (widget.viewAll == true && result.data!['viewallProducts']['products'].length == 1))) {
+            return Scaffold(
+                key: key,
+                appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
+                endDrawer: DrawerContainer(size: size),
+                bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
+                body: ProductDescription(data: result.data!, refetch: refetch));
+          }
+          productModel = widget.viewAll != true
+              ? ProductModel.fromJson(result.data!['products'])
+              : ProductModel.fromJson(Map<String, dynamic>.from(result.data!['viewallProducts']['products']));
+          // log(jsonEncode(result.data));
+          // print(productModel.pageInfo!.toJson());
+          // page = productModel.pageInfo!.currentPage!;
+          // totalPages = productModel.pageInfo!.totalPages!;
+          if (widget.viewAll != true) {
+            final Map pageInfo = result.data!['products']['page_info'];
+            page = pageInfo['current_page'];
+            totalPages = pageInfo['total_pages'];
+          } else {
+            totalPages = (result.data!['viewallProducts']['total_count'] / 20).ceil();
+          }
+          print('totalPages $totalPages');
+          print('page $page');
 
-        this.fetchMore = fetchMore;
-        opts = FetchMoreOptions(
-          document: gql(queryString),
-          variables: {'page': ++page},
-          updateQuery: (previousResultData, fetchMoreResultData) {
-            //print(fetchMoreResultData);
-            // this function will be called so as to combine both the original and fetchMore results
-            // it allows you to combine them as you would like
-            // //print(queryString);
-            // //print(fetchMoreResultData);
-            if (widget.viewAll != true) {
-              final List<dynamic> repos = [...previousResultData!['products']['items'] as List<dynamic>, ...fetchMoreResultData!['products']['items'] as List<dynamic>];
+          // if (result.isConcrete) {
+          //   isLoading = false;
+          // }
 
-              // to avoid a lot of work, lets just update the list of repos in returned
-              // data with new data, this also ensures we have the endCursor already set
-              // correctly
-              fetchMoreResultData['products']['items'] = repos;
-              //print(fetchMoreResultData['products']['page_info']);
-            } else {
-              final List<dynamic> repos = [
-                ...previousResultData!['viewallProducts']['products'] as List<dynamic>,
-                ...fetchMoreResultData!['viewallProducts']['products'] as List<dynamic>
-              ];
+          this.fetchMore = fetchMore;
 
-              // to avoid a lot of work, lets just update the list of repos in returned
-              // data with new data, this also ensures we have the endCursor already set
-              // correctly
-              fetchMoreResultData['viewallProducts']['products'] = repos;
-            }
-
-            return fetchMoreResultData;
-          },
-        );
-
-        return WillPopScope(
-          onWillPop: () async {
-            // //print(dController.size);
-            if (widget.viewAll != true && dController.size > 0.075) {
-              dController.animateTo(0.075, curve: Curves.decelerate, duration: const Duration(milliseconds: 200));
-              return false;
-            }
-            return true;
-          },
-          child: Scaffold(
-            key: key,
-            appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
-            endDrawer: DrawerContainer(size: size),
-            bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-            floatingActionButton: AppResponsive.isDesktop(context)
-                ? null
-                : dController.isAttached && dController.pixels == 0
-                    ? FloatingActionButton.extended(
-                        onPressed: () async {
-                          await dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
-                          setState(() {});
-                        },
-                        backgroundColor: AppColors.primaryColor,
-                        isExtended: true,
-                        label: Text('Filters', style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.scaffoldColor)),
-                      )
-                    : FloatingActionButton(
-                        onPressed: () async {
-                          await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
-                          setState(() {});
-                        },
-                        backgroundColor: AppColors.primaryColor,
-                        isExtended: true,
-                        child: Icon(Icons.close, color: AppColors.scaffoldColor, size: 20),
+          return WillPopScope(
+            onWillPop: () async {
+              // //print(dController.size);
+              if (widget.viewAll != true && dController.size > 0.075) {
+                dController.animateTo(0.075, curve: Curves.decelerate, duration: const Duration(milliseconds: 200));
+                return false;
+              }
+              return true;
+            },
+            child: Scaffold(
+              key: key,
+              appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
+              endDrawer: DrawerContainer(size: size),
+              bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
+              floatingActionButton: AppResponsive.isDesktop(context)
+                  ? null
+                  : dController.isAttached && dController.pixels == 0
+                      ? FloatingActionButton.extended(
+                          onPressed: () async {
+                            await dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                            setState(() {});
+                          },
+                          backgroundColor: AppColors.primaryColor,
+                          isExtended: true,
+                          label: Text('Filters', style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.scaffoldColor)),
+                        )
+                      : FloatingActionButton(
+                          onPressed: () async {
+                            await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
+                            setState(() {});
+                          },
+                          backgroundColor: AppColors.primaryColor,
+                          isExtended: true,
+                          child: Icon(Icons.close, color: AppColors.scaffoldColor, size: 20),
+                        ),
+              body: Row(
+                children: [
+                  if (AppResponsive.isDesktop(context))
+                    Flexible(
+                      flex: 2,
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 20),
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        child: getFilter(size, result, refetch),
                       ),
-            body: Row(
-              children: [
-                if (AppResponsive.isDesktop(context))
-                  Flexible(
-                    flex: 2,
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      child: getFilter(size, result, refetch),
                     ),
-                  ),
-                const VerticalDivider(),
-                Expanded(
-                  flex: 8,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Stack(
-                        children: [
-                          ListView(
-                            padding: const EdgeInsets.all(20.0),
-                            controller: _scrollController,
-                            // crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 20),
-                              widget.searchQuery != null
-                                  ? Text('Search result for "${widget.searchQuery}"', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
-                                  : MiniAppBar(navigationChild: result.data!['products']['items'][0]['categories'], screenWidth: constraints.maxWidth),
-                              const SizedBox(height: 10),
-                              GridView.builder(
-                                // padding: const EdgeInsets.all(20),
-                                itemCount: productModel.items!.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent: 400,
-                                    // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
-                                    crossAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
-                                    mainAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
-                                    mainAxisExtent: 400
-                                    // height: getGridViewHeight(constraints.maxWidth),
-                                    ),
-                                itemBuilder: (context, index) {
-                                  var price = productModel.items![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
-                                  var originalPrice = productModel.items![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
-                                  var offer = productModel.items![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
-                                  return ProductItem(
-                                    productModel: productModel.items![index],
-                                    price: price,
-                                    originalPrice: originalPrice,
-                                    offer: offer,
-                                    sku: productModel.items![index].sku!,
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                              if (isLoading || totalPages >= page) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                          if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
-                            DraggableScrollableActuator(
-                              child: DraggableScrollableSheet(
-                                controller: dController,
-                                initialChildSize: 0,
-                                minChildSize: 0,
-                                maxChildSize: 1,
-                                snap: true,
-                                builder: (context, scrollController) {
-                                  return getFilter(size, result, refetch, scrollController: scrollController);
-                                },
-                              ),
-                            )
-                        ],
-                      );
-                    },
-                  ),
-                )
-              ],
+                  const VerticalDivider(),
+                  Expanded(
+                    flex: 8,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Stack(
+                          children: [
+                            ListView(
+                              padding: const EdgeInsets.all(20.0),
+                              controller: _scrollController,
+                              // crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 20),
+                                widget.searchQuery != null
+                                    ? Text('Search result for "${widget.searchQuery}"', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
+                                    : MiniAppBar(navigationChild: result.data!['products']['items'][0]['categories'], screenWidth: constraints.maxWidth),
+                                const SizedBox(height: 10),
+                                GridView.builder(
+                                  // padding: const EdgeInsets.all(20),
+                                  itemCount: productModel.items!.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 400,
+                                      // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
+                                      crossAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
+                                      mainAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
+                                      mainAxisExtent: 400
+                                      // height: getGridViewHeight(constraints.maxWidth),
+                                      ),
+                                  itemBuilder: (context, index) {
+                                    var price = productModel.items![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                                    var originalPrice = productModel.items![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
+                                    var offer = productModel.items![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
+                                    return ProductItem(
+                                      productModel: productModel.items![index],
+                                      price: price,
+                                      originalPrice: originalPrice,
+                                      offer: offer,
+                                      sku: productModel.items![index].sku!,
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                if (result.isLoading || totalPages >= page) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                            if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
+                              DraggableScrollableActuator(
+                                child: DraggableScrollableSheet(
+                                  controller: dController,
+                                  initialChildSize: 0,
+                                  minChildSize: 0,
+                                  maxChildSize: 1,
+                                  snap: true,
+                                  builder: (context, scrollController) {
+                                    return getFilter(size, result, refetch, scrollController: scrollController);
+                                  },
+                                ),
+                              )
+                          ],
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

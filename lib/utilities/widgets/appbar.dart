@@ -137,7 +137,8 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               categories.data['categories']['items'][0]['children'][index]['children'].isEmpty
                           ? InkWell(
                               onTap: () {
-                                context.go(
+                                print(categories.data['categories']['items'][0]['children'][index]);
+                                context.push(
                                     '/${ProductView.route}/${categories.data['categories']['items'][0]['children'][index]['url_key']}${categories.data['categories']['items'][0]['children'][index]['url_suffix']}');
                               },
                               child: Container(
@@ -189,7 +190,7 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                                               ? ListTile(
                                                   onTap: () {
                                                     setState(() => categories.portalTargets[index] = false);
-
+                                                    print(categories.data['categories']['items'][0]['children'][index]);
                                                     context.go(
                                                         '/${ProductView.route}/${categories.data['categories']['items'][0]['children'][index]['children'][index2]['url_key']}${categories.data['categories']['items'][0]['children'][index]['children'][index2]['url_suffix']}');
                                                     // print(categories.data['categories']['items'][0]['children'][index]['children'][index2]);

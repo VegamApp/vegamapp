@@ -18,15 +18,14 @@ class _SliderBlockState extends State<SliderBlock> {
     }
     return AppResponsive(
       mobile: widget.data['mobile_status'] ? getChild(size) : const SizedBox(),
-      tablet: widget.data['status'] ? getChild(size) : const SizedBox(),
-      desktop: widget.data['status'] ? getChild(size) : const SizedBox(),
+      tablet: widget.data['desktop_status'] ? getChild(size) : const SizedBox(),
+      desktop: widget.data['desktop_status'] ? getChild(size) : const SizedBox(),
     );
   }
 
   Widget getChild(Size size) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      // height: AppResponsive.isMobile(context) ? 550 : 500,
       child: CarouselContainer(
         width: size.width,
         data: widget.data,

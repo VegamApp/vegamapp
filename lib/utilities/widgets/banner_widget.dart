@@ -1,67 +1,136 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:m2/services/app_responsive.dart';
+import 'package:m2/utilities/app_colors.dart';
+import 'package:m2/utilities/text_style.dart';
+import 'package:m2/utilities/widgets/two_colored_title.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
-class BannerBlock extends StatelessWidget {
-  const BannerBlock({Key? key, required this.data}) : super(key: key);
-  final Map<String, dynamic> data;
+class BannerBlock extends StatefulWidget {
+  const BannerBlock({super.key, required this.backimage, this.maintext, this.moreimage, this.color, required this.data, this.title});
+  final List<Map<String, dynamic>> backimage;
+  final String? maintext;
+  final String? moreimage;
+  final Color? color;
+  final Map data;
+  final String? title;
   @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return AppResponsive(
-      mobile: data['mobile_status'] ? getChild(size, context) : const SizedBox(),
-      tablet: data['status'] ? getChild(size, context) : const SizedBox(),
-      desktop: data['status'] ? getChild(size, context) : const SizedBox(),
-    );
+  State<BannerBlock> createState() => _BannerBlockState();
+}
+
+class _BannerBlockState extends State<BannerBlock> {
+  Color? textColor;
+  // getImageColor(String url) async {
+  //   imageP.Image image = imageP.decodeImage((await _fileFromImageUrl(url)).readAsBytesSync())!;
+  //   var data = image.getBytes();
+  //   var colorSum = 0;
+  //   for (var x = 0; x < data.length; x += 4) {
+  //     int r = data[x];
+  //     int g = data[x + 1];
+  //     int b = data[x + 2];
+  //     int avg = ((r + g + b) / 3).floor();
+  //     colorSum += avg;
+  //   }
+  //   var brightness = (colorSum / (image.width * image.height)).floor();
+  //   return brightness;
+  // }
+
+  // Future<File> _fileFromImageUrl(String url) async {
+  //   final response = await http.get(Uri.parse(url));
+
+  //   File file = File('/imagetest.png');
+
+  //   file.writeAsBytesSync(response.bodyBytes);
+
+  //   return file;
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    // getImageColor(widget.backimage);
   }
 
-  Widget getChild(Size size, BuildContext context) {
-    return SizedBox(
-      height: size.width * 0.5,
-      child: Row(
-        children: List.generate(
-          data['banneritems'].length,
-          (index) => Expanded(
-            child: InkWell(
-              onTap: () {
-                // //print(data['banneritems'][index]);
-                try {
-                  switch (data['banneritems'][index]['link_info']['link_type']) {
-                    case 'category':
-                      if (data['banneritems'][index]['link_info']['category_id'] != null) {
-                        context.go('/${ProductView.route}?categoryId=${data['banneritems'][index]['link_info']['category_id']}');
-                        // navigate(context, ProductView.route, arguments: {"categoryId": data['banneritems'][index]['link_info']['category_id']});
-                      }
-                      break;
-                    case 'product':
-                      if (data['banneritems'][index]['link_info']['product_sku'] != null) {
-                        context.go('/${ProductView.route}/${data['banneritems'][index]['link_info']['product_sku']}');
-
-                        // navigate(context, ProductView.route,(sku: data['banneritems'][index]['link_info']['product_sku']));
-                      }
-                      break;
-                    default:
-                      break;
-                  }
-                } catch (e) {
-                  //print(e);
-                }
-              },
-              child: Container(
-                // width: constraints.maxWidth * data['banneritems'][index]['layout'],
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(data['banneritems'][index]['image']),
-                    fit: BoxFit.contain,
-                  ),
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            if (widget.title != null) const SizedBox(height: 20),
+            if (widget.title != null) TwoColoredTitle(title: widget.title!, firstHeadColor: AppColors.primaryColor, secondHeadColor: Colors.black),
+            Container(
+              // height: 130,
+              // margin: const EdgeInsets.only(top: 13),
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
+                // image: DecorationImage(image: CachedNetworkImageProvider(widget.backimage), fit: BoxFit.contain),
+              ),
+              child: AppResponsive(
+                mobile: Column(
+                  children: widget.backimage
+                      .map((e) => InkWell(
+                            onTap: () {
+                              String path = '';
+                              if (e['link_info']['category_id'] != null) {
+                                path = 'categoryId=${e['link_info']['category_id']}';
+                              }
+                              context.push('/${ProductView.route}?$path');
+                            },
+                            child: IntrinsicHeight(
+                              child: Stack(
+                                children: [
+                                  CachedNetworkImage(imageUrl: e['image']),
+                                  if (widget.maintext != null)
+                                    Center(child: Text(e['title'], textAlign: TextAlign.center, style: AppStyles.getMediumTextStyle(fontSize: 14, color: widget.color))),
+                                ],
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
+                desktop: Row(
+                  children: widget.backimage
+                      .map((e) => InkWell(
+                            onTap: () {
+                              print(e);
+                              String path = '';
+                              if (e['link_info']['category_id'] != null) {
+                                path = 'categoryId=${e['link_info']['category_id']}';
+                              }
+                              context.push('/${ProductView.route}?$path');
+                            },
+                            child: SizedBox(
+                              width: e['layout'] != null ? (MediaQuery.sizeOf(context).width / 12) * double.parse(e['layout']) : MediaQuery.sizeOf(context).width,
+                              child: IntrinsicHeight(
+                                child: Stack(
+                                  children: [
+                                    CachedNetworkImage(imageUrl: e['image']),
+                                    if (widget.maintext != null)
+                                      Center(child: Text(e['title'], textAlign: TextAlign.center, style: AppStyles.getMediumTextStyle(fontSize: 14, color: widget.color))),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ))
+                      .toList(),
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      ),
+        // Align(
+        //   alignment: Alignment.topCenter,
+        //   child: Container(
+        //     height: 50,
+        //     width: 150,
+        //     decoration: const BoxDecoration(
+        //       image: DecorationImage(image: AssetImage("assets/images/more1.png"), fit: BoxFit.cover),
+        //     ),
+        //   ),
+        // ),
+      ],
     );
   }
 }

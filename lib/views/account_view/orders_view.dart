@@ -34,7 +34,13 @@ class _OrdersViewState extends State<OrdersView> {
     return BuildScaffold(
       child: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+          padding: EdgeInsets.symmetric(
+              horizontal: AppResponsive.isMobile(context)
+                  ? 20
+                  : constraints.maxWidth > 1400
+                      ? (constraints.maxWidth - 1400) / 2
+                      : 60,
+              vertical: 20),
           child: AppResponsive(
             desktop: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

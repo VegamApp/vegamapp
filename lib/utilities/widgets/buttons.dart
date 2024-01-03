@@ -70,6 +70,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                     message: result['addProductsToCart']['user_errors'][0]['message'],
                   );
                 } catch (e) {
+                  print(e);
                   showSnackBar(
                     backgroundColor: AppColors.snackbarSuccessBackgroundColor,
                     textColor: AppColors.snackbarSuccessTextColor,
@@ -125,8 +126,9 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
             ),
             statesController: statesController,
+            onHover: (value) => setState(() {}),
             onPressed: () {
-              // print(widget.typeName);
+              print(widget.typeName);
               // print(widget.parentSku);
               // print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
@@ -158,7 +160,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               }
             },
             child: result!.isLoading
-                ? BuildLoadingWidget(color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor)
+                ? BuildLoadingWidget(color: getTextColor(statesController.value))
                 : Stack(
                     children: [
                       Center(
@@ -172,7 +174,8 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                         child: SvgPicture.asset(
                           widget.svg,
                           width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
-                          color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor,
+                          color: getTextColor(statesController.value),
+                          // color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor,
                         ),
                       )
                     ],

@@ -1,3 +1,9 @@
+import 'dart:convert';
+
+import 'package:m2/services/api_services/api_services.dart';
+import 'package:m2/services/models/search_model.dart';
+import 'package:http/http.dart' as http;
+
 class ProductApi {
   static String products = r'''
   query products( $pageSize: Int!, $page: Int!,  $filter: ProductAttributeFilterInput!,$searchQuery: String){
@@ -18,10 +24,6 @@ class ProductApi {
         }
       }
       items {
-        # additional_info{
-        #   label
-        #   value
-        # }
         name
         sku
         url_key
@@ -70,40 +72,9 @@ class ProductApi {
             }
           }
         }
-        # productLabel{
-        #   items {
-        #     customers_group_ids
-        #     end_date
-        #     image
-        #     image_data
-        #     label_text
-        #     label_text_data
-        #     labelname
-        #     priority
-        #     productlabel_id
-        #     start_date
-        #     status
-        #     store_ids
-        #   }
-        #   totalCount
-        # }
-        # ruleLabel {
-        #   items {
-        #     display_category
-        #     display_product
-        #     label_image
-        #     rule_id
-        #   }
-        # }
-        # product_inventory{
-        #   enable_qty_increments
-        #   is_qty_decimal
-        #   max_sale_qty
-        #   min_sale_qty
-        #   qty_increments
-        # }
         categories {
-          id
+          uid
+          name
         }
         ... on ConfigurableProduct {
           configurable_options {
@@ -248,71 +219,57 @@ class ProductApi {
   {
     products {
       name
-        sku
-        categories {
-          uid
-          name
-        }
-        wishlistData{
-          wishlistItem
-        }
-        rating_summary
-        review_count
-        image {
-            url
-            label
-          }
-        special_price
-        productLabel{
-          items {
-            customers_group_ids
-            end_date
-            image
-            image_data
-            label_text
-            label_text_data
-            labelname
-            priority
-            productlabel_id
-            start_date
-            status
-            store_ids
-          }
-          totalCount
-        }
-        ruleLabel {
-          items {
-            display_category
-            display_product
-            label_image
-            rule_id
+      sku
+      url_key
+      url_suffix
+      image{
+        url
+      }
+      rating_summary
+      review_count
+      stock_status
+      
+      categories{
+        name
+        uid
+        path
+      }
+      ... on PhysicalProductInterface{
+        weight
+      }
+      # wishlistData{
+      #   wishlistItem
+      # }
+      description {
+        html
+      }
+      short_description	{
+        html
+      }
+      __typename
+      special_price
+      price_range{
+        minimum_price{
+          regular_price{
+            value
+            currency
           }
         }
-        price_range {
-          minimum_price {
-            regular_price {
-              value
-              currency
-            }
+        maximum_price {
+          regular_price {
+            value
+            currency
           }
-          maximum_price {
-            regular_price {
-              value
-              currency
-            }
-            discount {
-                amount_off
-                percent_off
-            }
+          discount {
+              amount_off
+              percent_off
           }
         }
-        product_inventory{
-          enable_qty_increments
-          is_qty_decimal
-          max_sale_qty
-          min_sale_qty
-          qty_increments
-        }
+      }
+      categories {
+        uid
+        name
+      }
     }
     total_count
   }

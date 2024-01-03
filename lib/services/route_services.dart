@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/address_view.dart';
 import 'package:m2/views/account_view/billing_agreement_view.dart';
@@ -17,6 +18,7 @@ import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:m2/views/cart_views/payment_complete_view.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/home/home_view.dart';
+import 'package:m2/views/home/search_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 // GoRouter configuration
@@ -35,6 +37,12 @@ final router = GoRouter(
         return getCustomTransition(state, const HomeView());
       },
       routes: [
+        GoRoute(
+          path: SearchView.route,
+          pageBuilder: (context, state) {
+            return getCustomTransition(state, const SearchView());
+          },
+        ),
         GoRoute(
           path: Auth.route,
           pageBuilder: (context, state) {
@@ -71,7 +79,7 @@ final router = GoRouter(
         GoRoute(
           path: 'account',
           pageBuilder: (context, state) {
-            return getCustomTransition(state, const AccountInformationView());
+            return getCustomTransition(state, AccountSideBar(currentPage: AccountInformationView.route));
           },
           routes: [
             GoRoute(

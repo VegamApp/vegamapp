@@ -56,20 +56,22 @@ class _BuildScaffoldState extends State<BuildScaffold> {
   void initState() {
     super.initState();
     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) =>);
-    // WidgetsBinding.instance.addPostFrameCallback((_) => getData(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => getData(context));
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    getData(context);
+    // getData(context);
 
-    return Scaffold(
-      key: key,
-      appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
-      body: widget.child,
-      endDrawer: DrawerContainer(size: size),
-      bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),
+    return SafeArea(
+      child: Scaffold(
+        key: key,
+        appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
+        body: widget.child,
+        endDrawer: DrawerContainer(size: size),
+        bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),
+      ),
     );
   }
 }

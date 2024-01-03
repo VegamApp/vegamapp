@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/custom_expanded_tile.dart';
+import 'package:m2/views/product_views/product_view.dart';
 import 'package:provider/provider.dart';
 
 // Build drawer side bar for mobile view
@@ -31,8 +33,7 @@ class DrawerContainer extends StatelessWidget {
                   ? Container(
                       margin: const EdgeInsets.all(20),
                       alignment: Alignment.center,
-                      decoration:
-                          BoxDecoration(border: Border.all(width: 2, color: AppColors.evenFadedText), borderRadius: BorderRadius.circular(20)),
+                      decoration: BoxDecoration(border: Border.all(width: 2, color: AppColors.evenFadedText), borderRadius: BorderRadius.circular(20)),
                       height: double.infinity,
                       child: Text('No items to show', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)))
                   : ListView(
@@ -45,8 +46,7 @@ class DrawerContainer extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: categories.data['categories']['items'].length,
                           itemBuilder: (context, index) {
-                            if (categories.data['categories']['items'][index]['children'] == null ||
-                                categories.data['categories']['items'][index]['children'].isEmpty) {
+                            if (categories.data['categories']['items'][index]['children'] == null || categories.data['categories']['items'][index]['children'].isEmpty) {
                               return ListTile(
                                 //TODO: Ontap
                                 contentPadding: EdgeInsets.zero,
@@ -79,9 +79,10 @@ class DrawerContainer extends StatelessWidget {
                                       categories.data['categories']['items'][index]['children'][index2]['children'].isEmpty) {
                                     return ListTile(
                                       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                      //TODO: Ontap
                                       onTap: () {
-                                        print(categories.data['categories']['items'][index]['children'][index2]);
+                                        var data = categories.data['categories']['items'][index]['children'][index2];
+                                        print("hi ${categories.data['categories']['items'][index]['children'][index2]}");
+                                        context.push('/${ProductView.route}/${data['url_key']}${data['url_suffix']}');
                                       },
                                       title: Text(
                                         categories.data['categories']['items'][index]['children'][index2]['name'],
@@ -105,7 +106,7 @@ class DrawerContainer extends StatelessWidget {
                                             style: TextButton.styleFrom(padding: EdgeInsets.zero),
                                             onPressed: () {
                                               print(data);
-                                              // navigate(context, ProductListingPage.route, arguments: {'catergoryId': data['id'], 'title': data['name']});
+                                              context.push('/${ProductView.route}/${data['url_key']}${data['url_suffix']}');
                                             },
                                             child: Align(
                                               alignment: Alignment.centerLeft,

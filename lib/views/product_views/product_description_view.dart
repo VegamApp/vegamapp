@@ -30,7 +30,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
     if (productModel.items![0].variants != null && productModel.items![0].variants!.isNotEmpty) {
       mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
     }
-    // print(jsonEncode(widget.data));
+    print(jsonEncode(widget.data));
     price = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff.toString();
@@ -76,11 +76,43 @@ class _ProductDescriptionState extends State<ProductDescription> {
         ProductVarientWidget(
           productModel: productModel,
           onUpdated: (newMedia) {
-            if (newMedia != null) setState(() => mediaGallery = newMedia);
+            if (newMedia != null) {
+              setState(() => mediaGallery = newMedia);
+              ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
+            }
           },
         ),
         const SizedBox(height: 30),
-        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
+        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!), const SizedBox(height: 20),
+        if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
+          TwoColoredTitle(title: 'Related Products', firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
+        if (productModel.items![0].relatedProducts != null)
+          LayoutBuilder(builder: (context, constraints) {
+            return GridView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: productModel.items![0].relatedProducts!.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 400,
+                crossAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                mainAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                mainAxisExtent: 400,
+              ),
+              itemBuilder: (context, index) {
+                var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
+                var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
+                return ProductItem(
+                  productModel: productModel.items![0].relatedProducts![index],
+                  price: price,
+                  originalPrice: originalPrice,
+                  offer: offer,
+                  sku: productModel.items![0].relatedProducts![index].sku!,
+                );
+              },
+            );
+          }),
       ],
     );
   }
@@ -143,7 +175,10 @@ class _ProductDescriptionState extends State<ProductDescription> {
                       ProductVarientWidget(
                         productModel: productModel,
                         onUpdated: (newMedia) {
-                          if (newMedia != null) setState(() => mediaGallery = newMedia);
+                          if (newMedia != null) {
+                            setState(() => mediaGallery = newMedia);
+                            ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
+                          }
                         },
                       ),
                     ],
@@ -156,7 +191,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
           BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
           const SizedBox(height: 20),
           if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
-            TwoColoredTitle(firstHead: 'Related', secondHead: "Products", firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
+            TwoColoredTitle(title: 'Related Products', firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
           if (productModel.items![0].relatedProducts != null)
             LayoutBuilder(builder: (context, constraints) {
               return GridView.builder(

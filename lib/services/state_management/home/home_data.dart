@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
@@ -10,11 +12,26 @@ class HomeData = _HomeDataBase with _$HomeData;
 abstract class _HomeDataBase with Store {
   @observable
   Map<String, dynamic> _data = {};
+
+  @computed
   Map<String, dynamic> get data => _data;
 
   @observable
   bool _isLoading = false;
+
+  @computed
   bool get isLoading => _isLoading;
+
+  @observable
+  double _homeCarouselAspectRatio = 0.77;
+
+  @computed
+  double get homeCarouselAspectRatio => _homeCarouselAspectRatio;
+
+  @action
+  putAspectRatio(double aspectRatio) {
+    _homeCarouselAspectRatio = aspectRatio;
+  }
 
   @action
   void setLoading(bool value) => _isLoading = value;
@@ -22,19 +39,10 @@ abstract class _HomeDataBase with Store {
   @action
   getHomeData(BuildContext context) async {
     setLoading(true);
-    Link link;
-    final HttpLink httpLink = HttpLink("https://api.routestoroots.in/graphql", defaultHeaders: {'Content-Type': 'application/json'});
-    link = httpLink;
-    ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
-      GraphQLClient(
-        link: link,
-        cache: GraphQLCache(
-          store: InMemoryStore(),
-        ),
-      ),
-    );
+    var client = GraphQLProvider.of(context);
     QueryResult? result = await client.value.query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
-    // log(jsonEncode(result.data));
+    // print(result);
+    log(jsonEncode(result.data));
     _data = result.data!;
     setLoading(false);
   }
