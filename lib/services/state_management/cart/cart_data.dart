@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/cart_apis.dart';
@@ -36,7 +38,8 @@ abstract class _CartDataBase with Store {
   putCartId(String? newCartId) async {
     _cartId = newCartId;
     if (newCartId != null) {
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
       sharedPreferences.setString('cart', newCartId);
     }
   }
@@ -60,7 +63,8 @@ abstract class _CartDataBase with Store {
   getCartData(BuildContext context, AuthToken token) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: CartApis.cart, variables: {'id': _cartId}));
+    QueryResult? result = await graphqlClient.value.query(
+        WatchQueryOptions(document: CartApis.cart, variables: {'id': _cartId}));
     // print("cartResult $result");
     if (result.hasException) {
       // var token = Provider.of<AuthToken>(context, listen: false);
@@ -115,7 +119,9 @@ abstract class _CartDataBase with Store {
   @action
   mergeCarts(ValueNotifier<GraphQLClient> graphqlClient, String newCart) async {
     QueryResult? result = await graphqlClient.value.mutate(
-      MutationOptions(document: gql(CartApis.mergeCart), variables: {'oldCart': _cartId, 'newCart': newCart}),
+      MutationOptions(
+          document: gql(CartApis.mergeCart),
+          variables: {'oldCart': _cartId, 'newCart': newCart}),
     );
     // print(result.data);
     setToken(newCart);

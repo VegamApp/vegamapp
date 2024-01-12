@@ -1,9 +1,3 @@
-import 'dart:convert';
-
-import 'package:m2/services/api_services/api_services.dart';
-import 'package:m2/services/models/search_model.dart';
-import 'package:http/http.dart' as http;
-
 class ProductApi {
   static String products = r'''
   query products( $pageSize: Int!, $page: Int!,  $filter: ProductAttributeFilterInput!,$searchQuery: String){

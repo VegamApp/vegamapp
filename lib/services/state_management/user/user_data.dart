@@ -16,6 +16,9 @@ abstract class _UserDataBase with Store {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  @observable
+  ObservableList<Addresses> addressesList = ObservableList<Addresses>();
+
   @action
   void setLoading(bool value) => _isLoading = value;
 
@@ -23,12 +26,15 @@ abstract class _UserDataBase with Store {
   Future<bool> getUserData(BuildContext context) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: gql(CustomerApis.requestUserData)));
+    QueryResult? result = await graphqlClient.value
+        .query(WatchQueryOptions(document: gql(CustomerApis.requestUserData)));
     if (result.hasException) {
       setLoading(false);
       return false;
     } else {
       _data = User.fromJson(result.data!['customer']);
+      addressesList.addAll(
+          ObservableList<Addresses>.of(_data.addresses ?? <Addresses>[]));
     }
     setLoading(false);
     return true;
@@ -37,5 +43,9 @@ abstract class _UserDataBase with Store {
   @action
   clearUserData() {
     // _data.clear();
+  }
+  @action
+  removeAddress(Addresses address) {
+    addressesList.removeWhere((element) => element == address);
   }
 }

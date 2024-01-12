@@ -5,7 +5,12 @@ class ProductModel {
   SortFields? sortFields;
   PageInfo? pageInfo;
 
-  ProductModel({this.sTypename, this.aggregations, this.items, this.sortFields, this.pageInfo});
+  ProductModel(
+      {this.sTypename,
+      this.aggregations,
+      this.items,
+      this.sortFields,
+      this.pageInfo});
 
   ProductModel.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
@@ -21,8 +26,11 @@ class ProductModel {
         items!.add(Items.fromJson(v));
       });
     }
-    sortFields = json['sort_fields'] != null ? SortFields.fromJson(json['sort_fields']) : null;
-    pageInfo = json['page_info'] != null ? PageInfo.fromJson(json['page_info']) : null;
+    sortFields = json['sort_fields'] != null
+        ? SortFields.fromJson(json['sort_fields'])
+        : null;
+    pageInfo =
+        json['page_info'] != null ? PageInfo.fromJson(json['page_info']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -51,7 +59,12 @@ class Aggregations {
   String? label;
   List<AggregationOptions>? options;
 
-  Aggregations({this.sTypename, this.attributeCode, this.count, this.label, this.options});
+  Aggregations(
+      {this.sTypename,
+      this.attributeCode,
+      this.count,
+      this.label,
+      this.options});
 
   Aggregations.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
@@ -160,11 +173,17 @@ class Items {
         categories!.add(Categories.fromJson(v));
       });
     }
-    description = json['description'] != null ? Description.fromJson(json['description']) : null;
-    shortDescription = json['short_description'] != null ? Description.fromJson(json['short_description']) : null;
+    description = json['description'] != null
+        ? Description.fromJson(json['description'])
+        : null;
+    shortDescription = json['short_description'] != null
+        ? Description.fromJson(json['short_description'])
+        : null;
     sTypename = json['__typename'];
     specialPrice = json['special_price'].toString();
-    priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
+    priceRange = json['price_range'] != null
+        ? PriceRange.fromJson(json['price_range'])
+        : null;
 
     if (json['configurable_options'] != null) {
       configurableOptions = <ConfigurableOptions>[];
@@ -218,7 +237,8 @@ class Items {
       data['price_range'] = priceRange!.toJson();
     }
     if (configurableOptions != null) {
-      data['configurable_options'] = configurableOptions!.map((v) => v.toJson()).toList();
+      data['configurable_options'] =
+          configurableOptions!.map((v) => v.toJson()).toList();
     }
     if (variants != null) {
       data['variants'] = variants!.map((v) => v.toJson()).toList();
@@ -227,7 +247,8 @@ class Items {
       data['media_gallery'] = mediaGallery!.map((v) => v.toJson()).toList();
     }
     if (relatedProducts != null) {
-      data['related_products'] = relatedProducts!.map((v) => v.toJson()).toList();
+      data['related_products'] =
+          relatedProducts!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -308,8 +329,12 @@ class PriceRange {
 
   PriceRange.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    minimumPrice = json['minimum_price'] != null ? MinimumPrice.fromJson(json['minimum_price']) : null;
-    maximumPrice = json['maximum_price'] != null ? MaximumPrice.fromJson(json['maximum_price']) : null;
+    minimumPrice = json['minimum_price'] != null
+        ? MinimumPrice.fromJson(json['minimum_price'])
+        : null;
+    maximumPrice = json['maximum_price'] != null
+        ? MaximumPrice.fromJson(json['maximum_price'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -333,7 +358,9 @@ class MinimumPrice {
 
   MinimumPrice.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    regularPrice = json['regular_price'] != null ? RegularPrice.fromJson(json['regular_price']) : null;
+    regularPrice = json['regular_price'] != null
+        ? RegularPrice.fromJson(json['regular_price'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -377,8 +404,11 @@ class MaximumPrice {
 
   MaximumPrice.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    regularPrice = json['regular_price'] != null ? RegularPrice.fromJson(json['regular_price']) : null;
-    discount = json['discount'] != null ? Discount.fromJson(json['discount']) : null;
+    regularPrice = json['regular_price'] != null
+        ? RegularPrice.fromJson(json['regular_price'])
+        : null;
+    discount =
+        json['discount'] != null ? Discount.fromJson(json['discount']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -480,7 +510,8 @@ class Values {
   String? swatchData;
   String? uid;
 
-  Values({this.sTypename, this.valueIndex, this.label, this.swatchData, this.uid});
+  Values(
+      {this.sTypename, this.valueIndex, this.label, this.swatchData, this.uid});
 
   Values.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
@@ -509,7 +540,8 @@ class Variants {
 
   Variants.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
-    product = json['product'] != null ? Product.fromJson(json['product']) : null;
+    product =
+        json['product'] != null ? Product.fromJson(json['product']) : null;
     if (json['attributes'] != null) {
       attributes = <Attributes>[];
       json['attributes'].forEach((v) {
@@ -540,7 +572,14 @@ class Product {
   PriceRange? priceRange;
   List<Map<String, dynamic>>? mediaGallery;
 
-  Product({this.sTypename, this.id, this.name, this.sku, this.attributeSetId, this.priceRange, this.mediaGallery});
+  Product(
+      {this.sTypename,
+      this.id,
+      this.name,
+      this.sku,
+      this.attributeSetId,
+      this.priceRange,
+      this.mediaGallery});
 
   Product.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
@@ -548,8 +587,12 @@ class Product {
     name = json['name'];
     sku = json['sku'];
     attributeSetId = json['attribute_set_id'];
-    priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
-    mediaGallery = json['media_gallery'] != null ? List<Map<String, dynamic>>.from(json['media_gallery']) : null;
+    priceRange = json['price_range'] != null
+        ? PriceRange.fromJson(json['price_range'])
+        : null;
+    mediaGallery = json['media_gallery'] != null
+        ? List<Map<String, dynamic>>.from(json['media_gallery'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -574,7 +617,8 @@ class Attributes {
   String? code;
   int? valueIndex;
 
-  Attributes({this.sTypename, this.uid, this.label, this.code, this.valueIndex});
+  Attributes(
+      {this.sTypename, this.uid, this.label, this.code, this.valueIndex});
 
   Attributes.fromJson(Map<String, dynamic> json) {
     sTypename = json['__typename'];
