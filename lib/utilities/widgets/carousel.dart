@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart'
-    show CarouselController, CarouselOptions, CarouselSlider;
+import 'package:carousel_slider/carousel_slider.dart' show CarouselController, CarouselOptions, CarouselSlider;
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
@@ -32,9 +31,7 @@ class _CarouselContainerState extends State<CarouselContainer> {
   getAspectRatio() async {
     Image image = Image.network(widget.data['sliders'][0]['slider_image']);
     Completer<ui.Image> completer = Completer<ui.Image>();
-    image.image
-        .resolve(const ImageConfiguration())
-        .addListener(ImageStreamListener((ImageInfo info, bool _) {
+    image.image.resolve(const ImageConfiguration()).addListener(ImageStreamListener((ImageInfo info, bool _) {
       completer.complete(info.image);
     }));
     var data = await completer.future;
@@ -55,10 +52,7 @@ class _CarouselContainerState extends State<CarouselContainer> {
     getAspectRatio();
     super.didChangeDependencies();
     for (int index = 0; index < widget.data['sliders'].length; index++) {
-      precacheImage(
-          CachedNetworkImageProvider(
-              widget.data['sliders'][index]['slider_image']),
-          context);
+      precacheImage(CachedNetworkImageProvider(widget.data['sliders'][index]['slider_image']), context);
     }
   }
 
@@ -88,16 +82,12 @@ class _CarouselContainerState extends State<CarouselContainer> {
               //print(widget.data['sliders'][index]);
               switch (widget.data['sliders'][index]['link_info']['link_type']) {
                 case 'product':
-                  if (widget.data['sliders'][index]['link_info']
-                          ['product_sku'] !=
-                      null) {
+                  if (widget.data['sliders'][index]['link_info']['product_sku'] != null) {
                     // navigate(context, ProductDetail(sku: widget.data['sliders'][index]['link']['product_sku']));
                   }
                   break;
                 case 'category':
-                  if (widget.data['sliders'][index]['link_info']
-                          ['category_id'] !=
-                      null) {
+                  if (widget.data['sliders'][index]['link_info']['category_id'] != null) {
                     // navigate(context, ProductListing(catergoryId: widget.data['sliders'][index]['link']['category_id']));
                   }
                   break;
@@ -106,10 +96,8 @@ class _CarouselContainerState extends State<CarouselContainer> {
               }
             },
             child: SizedBox(
-                height: AppResponsive.isMobile(context) ? size.width : 450,
-                child: CachedNetworkImage(
-                    imageUrl: widget.data['sliders'][index]['slider_image'],
-                    fit: BoxFit.contain)),
+                // height: AppResponsive.isMobile(context) ? size.width : 450,
+                child: CachedNetworkImage(imageUrl: widget.data['sliders'][index]['slider_image'], fit: BoxFit.contain)),
           ),
         ),
         options: CarouselOptions(

@@ -246,7 +246,6 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
               ListTile(
                 onTap: () {
                   print(filteredList![i].name);
-                  //TODO  navigate(context, ProductDetails.route, arguments: filteredList![i].sku);
                   context.go('/${ProductView.route}/${filteredList![i].urlKey}.${filteredList![i].urlSuffix}');
 
                   resetList();

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,14 +10,7 @@ import 'package:m2/utilities/widgets/two_colored_title.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class BannerBlock extends StatefulWidget {
-  const BannerBlock(
-      {super.key,
-      required this.backimage,
-      this.maintext,
-      this.moreimage,
-      this.color,
-      required this.data,
-      this.title});
+  const BannerBlock({super.key, required this.backimage, this.maintext, this.moreimage, this.color, required this.data, this.title});
   final List<Map<String, dynamic>> backimage;
   final String? maintext;
   final String? moreimage;
@@ -28,6 +23,7 @@ class BannerBlock extends StatefulWidget {
 
 class _BannerBlockState extends State<BannerBlock> {
   Color? textColor;
+  int height = 0;
   // getImageColor(String url) async {
   //   imageP.Image image = imageP.decodeImage((await _fileFromImageUrl(url)).readAsBytesSync())!;
   //   var data = image.getBytes();
@@ -52,10 +48,23 @@ class _BannerBlockState extends State<BannerBlock> {
 
   //   return file;
   // }
+  getHeight() async {
+    Completer<ui.Image> completer = Completer<ui.Image>();
+    for (var i in widget.backimage) {
+      Image image = Image.network(i['image']);
+      image.image.resolve(const ImageConfiguration()).addListener(ImageStreamListener((ImageInfo info, bool _) {
+        completer.complete(info.image);
+      }));
+      var data = await completer.future;
+      height = height < data.height ? data.height : height;
+    }
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+    getHeight();
     // getImageColor(widget.backimage);
   }
 
@@ -66,12 +75,9 @@ class _BannerBlockState extends State<BannerBlock> {
         Column(
           children: [
             if (widget.title != null) const SizedBox(height: 20),
-            if (widget.title != null)
-              TwoColoredTitle(
-                  title: widget.title!,
-                  firstHeadColor: AppColors.primaryColor,
-                  secondHeadColor: Colors.black),
+            if (widget.title != null) TwoColoredTitle(title: widget.title!, firstHeadColor: AppColors.primaryColor, secondHeadColor: Colors.black),
             Container(
+              height: height * 1.0,
               // height: 130,
               // margin: const EdgeInsets.only(top: 13),
               decoration: const BoxDecoration(
@@ -85,8 +91,7 @@ class _BannerBlockState extends State<BannerBlock> {
                             onTap: () {
                               String path = '';
                               if (e['link_info']['category_id'] != null) {
-                                path =
-                                    'categoryId=${e['link_info']['category_id']}';
+                                path = 'categoryId=${e['link_info']['category_id']}';
                               }
                               context.push('/${ProductView.route}?$path');
                             },
@@ -95,54 +100,45 @@ class _BannerBlockState extends State<BannerBlock> {
                                 children: [
                                   CachedNetworkImage(imageUrl: e['image']),
                                   if (widget.maintext != null)
-                                    Center(
-                                        child: Text(e['title'],
-                                            textAlign: TextAlign.center,
-                                            style: AppStyles.getMediumTextStyle(
-                                                fontSize: 14,
-                                                color: widget.color))),
+                                    Center(child: Text(e['title'], textAlign: TextAlign.center, style: AppStyles.getMediumTextStyle(fontSize: 14, color: widget.color))),
                                 ],
                               ),
                             ),
                           ))
                       .toList(),
                 ),
-                desktop: Row(
-                  children: widget.backimage
-                      .map((e) => InkWell(
-                            onTap: () {
-                              print(e);
-                              String path = '';
-                              if (e['link_info']['category_id'] != null) {
-                                path =
-                                    'categoryId=${e['link_info']['category_id']}';
-                              }
-                              context.push('/${ProductView.route}?$path');
-                            },
-                            child: SizedBox(
-                              width: e['layout'] != null
-                                  ? (MediaQuery.sizeOf(context).width / 12) *
-                                      double.parse(e['layout'])
-                                  : MediaQuery.sizeOf(context).width,
-                              child: IntrinsicHeight(
-                                child: Stack(
-                                  children: [
-                                    CachedNetworkImage(imageUrl: e['image']),
-                                    if (widget.maintext != null)
-                                      Center(
-                                          child: Text(e['title'],
-                                              textAlign: TextAlign.center,
-                                              style:
-                                                  AppStyles.getMediumTextStyle(
-                                                      fontSize: 14,
-                                                      color: widget.color))),
-                                  ],
+                desktop: LayoutBuilder(builder: (context, constraints) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.backimage
+                        .map((e) => InkWell(
+                              onTap: () {
+                                print(e);
+                                String path = '';
+                                if (e['link_info']['category_id'] != null) {
+                                  path = 'categoryId=${e['link_info']['category_id']}';
+                                }
+                                context.push('/${ProductView.route}?$path');
+                              },
+                              child: SizedBox(
+                                width: e['layout'] != null ? (constraints.maxWidth / 12) * double.parse(e['layout']) : constraints.maxWidth,
+                                child: IntrinsicHeight(
+                                  child: Stack(
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl: e['image'],
+                                        fit: BoxFit.cover,
+                                      ),
+                                      if (widget.maintext != null)
+                                        Center(child: Text(e['title'], textAlign: TextAlign.center, style: AppStyles.getMediumTextStyle(fontSize: 14, color: widget.color))),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ))
-                      .toList(),
-                ),
+                            ))
+                        .toList(),
+                  );
+                }),
               ),
             ),
           ],
