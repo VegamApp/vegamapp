@@ -96,7 +96,7 @@ class _CarouselContainerState extends State<CarouselContainer> {
               }
             },
             child: SizedBox(
-                height: AppResponsive.isMobile(context) ? size.width : 450,
+                // height: AppResponsive.isMobile(context) ? size.width : 450,
                 child: CachedNetworkImage(imageUrl: widget.data['sliders'][index]['slider_image'], fit: BoxFit.contain)),
           ),
         ),

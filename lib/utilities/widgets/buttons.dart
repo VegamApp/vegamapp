@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -58,10 +60,12 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
             document: gql(CartApis.addProductToCart),
             onCompleted: (result) {
               print("cartId ${cart.cartId}");
-              // print("addProductToCart: $result");
+              print(result!['addProductsToCart']['cart']['total_quantity']);
+              print("addProductToCart: ${jsonEncode(result)}");
+              cart.putCartCount(result['addProductsToCart']['cart']['total_quantity']);
+              cart.getCartData(context, token);
+              setState(() {});
               try {
-                cart.putCartCount(result!['addProductsToCart']['cart']['total_quantity']);
-                cart.getCartData(context, token);
                 try {
                   showSnackBar(
                     backgroundColor: AppColors.snackbarErrorBackgroundColor,

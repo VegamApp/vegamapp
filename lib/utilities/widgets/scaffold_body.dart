@@ -67,7 +67,7 @@ class _BuildScaffoldState extends State<BuildScaffold> {
     return SafeArea(
       child: Scaffold(
         key: key,
-        appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
+        appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
         body: widget.child,
         endDrawer: DrawerContainer(size: size),
         bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),

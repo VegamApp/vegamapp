@@ -118,11 +118,11 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                   width: 33,
                   height: 33,
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: varientData.contains(widget.productModel.items![0].configurableOptions![i].values![index].uid)
-                        ? Border.all(color: AppColors.kPrimaryColor, width: 3)
-                        : null,
-                  ),
+                      shape: BoxShape.circle,
+                      border: varientData.contains(widget.productModel.items![0].configurableOptions![i].values![index].uid)
+                          ? Border.all(color: AppColors.kPrimaryColor, width: 3)
+                          : null,
+                      boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 5, offset: const Offset(0, 3))]),
                   alignment: Alignment.center,
                   child: CircleAvatar(
                     radius: 15,

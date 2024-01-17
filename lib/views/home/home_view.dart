@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
@@ -48,6 +51,7 @@ class _HomeViewState extends State<HomeView> {
             return BuildLoadingWidget(color: AppColors.primaryColor);
           }
           if (homeData.data.isEmpty) return const SizedBox();
+          Clipboard.setData(ClipboardData(text: jsonEncode(homeData.data)));
           return ListView(
             children: [
               ListView.builder(
