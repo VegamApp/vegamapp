@@ -80,14 +80,14 @@ class _CarouselContainerState extends State<CarouselContainer> {
           (index) => InkWell(
             onTap: () {
               //print(widget.data['sliders'][index]);
-              switch (widget.data['sliders'][index]['link']['link_type']) {
+              switch (widget.data['sliders'][index]['link_info']['link_type']) {
                 case 'product':
-                  if (widget.data['sliders'][index]['link']['product_sku'] != null) {
+                  if (widget.data['sliders'][index]['link_info']['product_sku'] != null) {
                     // navigate(context, ProductDetail(sku: widget.data['sliders'][index]['link']['product_sku']));
                   }
                   break;
                 case 'category':
-                  if (widget.data['sliders'][index]['link']['category_id'] != null) {
+                  if (widget.data['sliders'][index]['link_info']['category_id'] != null) {
                     // navigate(context, ProductListing(catergoryId: widget.data['sliders'][index]['link']['category_id']));
                   }
                   break;

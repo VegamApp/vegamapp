@@ -26,19 +26,32 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   ScrollController scrollController = ScrollController();
   HomeData homeData = HomeData();
-  @override
-  void dispose() {
-    super.dispose();
-    scrollController.dispose();
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    var cartData = Provider.of<CartData>(context);
-    var authToken = Provider.of<AuthToken>(context);
-    homeData.getHomeData(context);
-    cartData.getCartData(context, authToken);
+
+    final currentContext = context;
+
+    // Check if the widget is still mounted
+    if (mounted) {
+      var cartData = Provider.of<CartData>(currentContext, listen: false);
+      var authToken = Provider.of<AuthToken>(currentContext, listen: false);
+
+      homeData.getHomeData(currentContext).then((_) {
+        // Check if the widget is still mounted before updating state
+        if (mounted) {
+          // Update state or trigger rebuild
+        }
+      });
+
+      cartData.getCartData(currentContext, authToken).then((_) {
+        // Check if the widget is still mounted before updating state
+        if (mounted) {
+          // Update state or trigger rebuild
+        }
+      });
+    }
   }
 
   @override
@@ -173,6 +186,12 @@ class _HomeViewState extends State<HomeView> {
       default:
         return const SizedBox();
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    scrollController.dispose();
   }
 }
 

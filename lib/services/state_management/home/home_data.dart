@@ -40,7 +40,8 @@ abstract class _HomeDataBase with Store {
   getHomeData(BuildContext context) async {
     setLoading(true);
     var client = GraphQLProvider.of(context);
-    QueryResult? result = await client.value.query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
+    QueryResult? result = await client.value
+        .query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
     // print(result);
     log(jsonEncode(result.data));
     _data = result.data!;

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,14 +48,15 @@ class _AccountSideBarState extends State<AccountSideBar> {
 
   @override
   void didChangeDependencies() {
-    user = Provider.of<UserData>(context);
     super.didChangeDependencies();
+    user = Provider.of<UserData>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return AppResponsive(
-      mobile: Scaffold(body: SingleChildScrollView(child: getScaffoldChild(context))),
+      mobile: Scaffold(
+          body: SingleChildScrollView(child: getScaffoldChild(context))),
       desktop: getScaffoldChild(context),
     );
   }
@@ -86,7 +89,8 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppColors.primaryColor,
-                                    border: Border.all(color: AppColors.buttonColor, width: 5),
+                                    border: Border.all(
+                                        color: AppColors.buttonColor, width: 5),
                                     boxShadow: [
                                       BoxShadow(
                                         color: AppColors.shadowColor,
@@ -98,7 +102,11 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                     //   image: CachedNetworkImageProvider(imgUrl),
                                     // ),
                                   ),
-                                  child: Center(child: Text(user.data.firstname?[0] ?? "", style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
+                                  child: Center(
+                                      child: Text(user.data.firstname?[0] ?? "",
+                                          style: AppStyles.getMediumTextStyle(
+                                              fontSize: 50,
+                                              color: Colors.white)))),
                             ),
                             Align(
                               alignment: Alignment.bottomRight,
@@ -117,14 +125,18 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                     ),
                                   ],
                                 ),
-                                child: SvgPicture.asset('assets/svg/camera.svg'),
+                                child:
+                                    SvgPicture.asset('assets/svg/camera.svg'),
                               ),
                             )
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Center(child: Text('Hi ${user.data.firstname ?? "..."}', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.fontColor))),
+                      Center(
+                          child: Text('Hi ${user.data.firstname ?? "..."}',
+                              style: AppStyles.getMediumTextStyle(
+                                  fontSize: 18, color: AppColors.fontColor))),
                     ],
                   ),
                 ),
@@ -137,19 +149,24 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'My Account',
                         svgUrl: 'person',
                         // child: const AccountInformation(),
-                        isBold: widget.currentPage == AccountInformationView.route && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage ==
+                                AccountInformationView.route &&
+                            !AppResponsive.isMobile(context),
                         url: "/account/${AccountInformationView.route}",
                       ),
                       BuilProfileButtons(
                         title: 'My Downloadable Products',
                         svgUrl: 'downloadable',
                         url: "/account/${DownloadableProductsView.route}",
-                        isBold: widget.currentPage == DownloadableProductsView.route && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage ==
+                                DownloadableProductsView.route &&
+                            !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'Address Book',
                         svgUrl: 'location_on',
-                        isBold: widget.currentPage == AddressView.route && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage == AddressView.route &&
+                            !AppResponsive.isMobile(context),
                         url: "/account/${AddressView.route}",
                       ),
                     ],
@@ -164,20 +181,23 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'My Orders',
                         svgUrl: 'orders',
                         url: "/account/${OrdersView.route}",
-                        isBold: widget.currentPage == OrdersView.route && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage == OrdersView.route &&
+                            !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'My Wish List',
                         svgUrl: 'wishlist',
                         // child: const WishList(),
-                        isBold: widget.currentPage == 'My Wish List' && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage == 'My Wish List' &&
+                            !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(
                         title: 'Newsletter Subscriptions',
                         svgUrl: 'newsletter',
                         // child: const NewsletterSubView(),
                         url: "/account/${NewsletterView.route}",
-                        isBold: widget.currentPage == NewsletterView.route && !AppResponsive.isMobile(context),
+                        isBold: widget.currentPage == NewsletterView.route &&
+                            !AppResponsive.isMobile(context),
                       ),
                       // BuilProfileButtons(
                       //   title: 'Stored Payment Methods',
@@ -189,7 +209,9 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         title: 'Billing Agreements',
                         svgUrl: 'billing',
                         url: "/account/${BillingAgreementsView.route}",
-                        isBold: widget.currentPage == BillingAgreementsView.route && !AppResponsive.isMobile(context),
+                        isBold:
+                            widget.currentPage == BillingAgreementsView.route &&
+                                !AppResponsive.isMobile(context),
                       ),
                       const BuilProfileButtons(
                         title: 'Need Help',
@@ -201,8 +223,14 @@ class _AccountSideBarState extends State<AccountSideBar> {
                 const SizedBox(height: 20),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                  leading: SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/sign_out.svg', color: AppColors.buttonColor)),
-                  title: Text('Sign Out', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
+                  leading: SizedBox(
+                      height: 30,
+                      width: 30,
+                      child: SvgPicture.asset('assets/svg/sign_out.svg',
+                          color: AppColors.buttonColor)),
+                  title: Text('Sign Out',
+                      style: AppStyles.getRegularTextStyle(
+                          fontSize: 18, color: AppColors.fontColor)),
                   onTap: () => signOut(context),
                 ),
               ],
@@ -213,14 +241,22 @@ class _AccountSideBarState extends State<AccountSideBar> {
     });
   }
 
-  Container getContainer({required BoxConstraints constraints, required Widget child, double? height}) {
+  Container getContainer(
+      {required BoxConstraints constraints,
+      required Widget child,
+      double? height}) {
     return Container(
       width: constraints.maxWidth,
       height: height,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.scaffoldColor,
-        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+        boxShadow: [
+          BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 50,
+              offset: const Offset(0, 10))
+        ],
       ),
       child: child,
     );
@@ -228,7 +264,14 @@ class _AccountSideBarState extends State<AccountSideBar> {
 }
 
 class BuilProfileButtons extends StatelessWidget {
-  const BuilProfileButtons({Key? key, required this.title, this.svgUrl, this.child, this.isBold = false, this.url}) : super(key: key);
+  const BuilProfileButtons(
+      {Key? key,
+      required this.title,
+      this.svgUrl,
+      this.child,
+      this.isBold = false,
+      this.url})
+      : super(key: key);
   final String title;
   final String? svgUrl;
   final Widget? child;
@@ -240,10 +283,21 @@ class BuilProfileButtons extends StatelessWidget {
       selectedColor: Colors.white,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 5),
-        leading: svgUrl != null ? SizedBox(height: 30, width: 30, child: SvgPicture.asset('assets/svg/$svgUrl.svg', color: AppColors.buttonColor)) : const SizedBox(width: 30),
+        leading: svgUrl != null
+            ? SizedBox(
+                height: 30,
+                width: 30,
+                child: SvgPicture.asset('assets/svg/$svgUrl.svg',
+                    color: AppColors.buttonColor))
+            : const SizedBox(width: 30),
         title: Text(title,
-            style: isBold ? AppStyles.getSemiBoldTextStyle(fontSize: 18, color: AppColors.fontColor) : AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
+            style: isBold
+                ? AppStyles.getSemiBoldTextStyle(
+                    fontSize: 18, color: AppColors.fontColor)
+                : AppStyles.getRegularTextStyle(
+                    fontSize: 18, color: AppColors.fontColor)),
         onTap: () {
+          log(url.toString());
           if (!isBold && url != null) {
             context.push(url!);
           }

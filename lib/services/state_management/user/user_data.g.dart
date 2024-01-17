@@ -40,6 +40,22 @@ mixin _$UserData on _UserDataBase, Store {
     });
   }
 
+  late final _$addressesAtom =
+      Atom(name: '_UserDataBase.addresses', context: context);
+
+  @override
+  ObservableList<Addresses> get addressesList {
+    _$addressesAtom.reportRead();
+    return super.addressesList;
+  }
+
+  @override
+  set addressesList(ObservableList<Addresses> value) {
+    _$addressesAtom.reportWrite(value, super.addressesList, () {
+      super.addressesList = value;
+    });
+  }
+
   late final _$getUserDataAsyncAction =
       AsyncAction('_UserDataBase.getUserData', context: context);
 
@@ -76,7 +92,7 @@ mixin _$UserData on _UserDataBase, Store {
   @override
   String toString() {
     return '''
-
+addresses: ${addressesList}
     ''';
   }
 }
