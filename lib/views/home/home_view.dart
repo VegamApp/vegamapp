@@ -7,6 +7,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
+import 'package:m2/services/scroll_behavoir.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
@@ -64,7 +65,6 @@ class _HomeViewState extends State<HomeView> {
             return BuildLoadingWidget(color: AppColors.primaryColor);
           }
           if (homeData.data.isEmpty) return const SizedBox();
-          Clipboard.setData(ClipboardData(text: jsonEncode(homeData.data)));
           return ListView(
             children: [
               ListView.builder(
@@ -98,62 +98,62 @@ class _HomeViewState extends State<HomeView> {
     }
     switch (data['__typename']) {
       case 'ProductBlock':
-        // if (data['display_style'] == 'slider') {
+        if (data['display_style'] == 'slider') {
+          return Column(
+            children: [
+              // const SizedBox(height: 20),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 0, vertical: 20),
+                child: ProductHorizontalListing(
+                  title: data['show_title'] ? data['title'] : null,
+                  id: data['id'].toString(),
+                  children: List<ProductItem>.generate(
+                    data['products'].length,
+                    (index) {
+                      var productModel = Items.fromJson(data['products'][index]);
+                      var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
+                      var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
+                      var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;
+                      return ProductItem(
+                        productModel: productModel,
+                        price: price,
+                        priceSize: 14,
+                        originalPrice: originalPrice,
+                        offer: offer,
+                        sku: productModel.sku!,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
         return Column(
           children: [
-            const SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 0, vertical: 20),
-              child: ProductHorizontalListing(
-                title: data['title'],
-                id: data['id'].toString(),
-                children: List<ProductItem>.generate(
-                  data['products'].length,
-                  (index) {
-                    var productModel = Items.fromJson(data['products'][index]);
-                    var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
-                    var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
-                    var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff.toString();
-                    return ProductItem(
-                      productModel: productModel,
-                      price: price,
-                      priceSize: 14,
-                      originalPrice: originalPrice,
-                      offer: offer,
-                      sku: productModel.sku!,
-                    );
-                  },
-                ),
+            // const SizedBox(height: 20),
+            ProductGridWidget(
+              title: data['show_title'] ? data['title'] : null,
+              id: data['id'].toString(),
+              children: List<ProductItem>.generate(
+                data['products'].length,
+                (index) {
+                  var productModel = Items.fromJson(data['products'][index]);
+                  var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
+                  var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
+                  var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;
+                  return ProductItem(
+                    productModel: productModel,
+                    price: price,
+                    originalPrice: originalPrice,
+                    offer: offer,
+                    sku: productModel.sku!,
+                  );
+                },
               ),
             ),
           ],
         );
-      // }
-      //   return Column(
-      //     children: [
-      //       const SizedBox(height: 20),
-      //       ProductGridWidget(
-      //         title: data['name'],
-      //         id: data['id'].toString(),
-      //         children: List<ProductItem>.generate(
-      //           data['products'].length,
-      //           (index) {
-      //             var productModel = Items.fromJson(data['products'][index]);
-      //             var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
-      //             var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
-      //             var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff.toString();
-      //             return ProductItem(
-      //               productModel: productModel,
-      //               price: price,
-      //               originalPrice: originalPrice,
-      //               offer: offer,
-      //               sku: productModel.sku!,
-      //             );
-      //           },
-      //         ),
-      //       ),
-      //     ],
-      //   );
       case 'BannerBlock':
         return BannerBlock(
           title: data['show_title'] ? data['title'] : null,
@@ -169,7 +169,7 @@ class _HomeViewState extends State<HomeView> {
       case 'CategoryBlock':
         return CategoryBlock(
           data: data,
-          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20),
         );
 
       case "ContentBlock":
@@ -204,42 +204,59 @@ class CategoryBlock extends StatelessWidget {
     return Column(
       children: [
         if (data['show_title']) TwoColoredTitle(title: data['title'], firstHeadColor: AppColors.primaryColor, secondHeadColor: Colors.black),
-        if (data['show_title']) const SizedBox(height: 10),
-        SizedBox(
-          height: 300,
-          child: ListView.separated(
-            padding: padding,
-            scrollDirection: Axis.horizontal,
-            itemCount: data['category_info'].length,
-            separatorBuilder: (context, index) => const SizedBox(width: 20),
-            itemBuilder: (context, index) => InkWell(
-              onTap: () {
-                String path = '';
-                if (data['category_info'][index]['category_id'] != null) {
-                  path = 'categoryId=${data['category_info'][index]['category_id']}';
-                }
-                context.push('/${ProductView.route}?$path');
-              },
-              child: Column(
-                children: [
-                  Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(
-                        image: CachedNetworkImageProvider(
-                          data['category_info'][index]['image'] ?? "https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png",
-                        ),
+        if (data['show_title']) const SizedBox(height: 20),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: AppResponsive.isMobile(context) ? (constraints.maxWidth * 0.2 + 50) : 220,
+              child: ScrollConfiguration(
+                behavior: MyCustomScrollBehavior(),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: padding,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: data['category_info'].length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 20),
+                  itemBuilder: (context, index) => InkWell(
+                    onTap: () {
+                      String path = '';
+                      if (data['category_info'][index]['category_id'] != null) {
+                        path = 'categoryId=${data['category_info'][index]['category_id']}';
+                      }
+                      context.push('/${ProductView.route}?$path');
+                    },
+                    child: SizedBox(
+                      width: AppResponsive.isMobile(context) ? constraints.maxWidth * 0.2 : 200,
+                      child: Column(
+                        children: [
+                          Container(
+                            // width: 200,
+                            height: AppResponsive.isMobile(context) ? constraints.maxWidth * 0.19 : 188,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                image: CachedNetworkImageProvider(
+                                  data['category_info'][index]['image'] ?? "https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png",
+                                ),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            data['category_info'][index]['name'],
+                            style: AppStyles.getMediumTextStyle(fontSize: 14),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(data['category_info'][index]['name'], style: AppStyles.getMediumTextStyle(fontSize: 14))
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         )
       ],
     );

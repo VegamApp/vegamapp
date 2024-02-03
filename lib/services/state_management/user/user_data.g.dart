@@ -40,18 +40,18 @@ mixin _$UserData on _UserDataBase, Store {
     });
   }
 
-  late final _$addressesAtom =
-      Atom(name: '_UserDataBase.addresses', context: context);
+  late final _$addressesListAtom =
+      Atom(name: '_UserDataBase.addressesList', context: context);
 
   @override
   ObservableList<Addresses> get addressesList {
-    _$addressesAtom.reportRead();
+    _$addressesListAtom.reportRead();
     return super.addressesList;
   }
 
   @override
   set addressesList(ObservableList<Addresses> value) {
-    _$addressesAtom.reportWrite(value, super.addressesList, () {
+    _$addressesListAtom.reportWrite(value, super.addressesList, () {
       super.addressesList = value;
     });
   }
@@ -90,9 +90,20 @@ mixin _$UserData on _UserDataBase, Store {
   }
 
   @override
+  dynamic removeAddress(Addresses address) {
+    final _$actionInfo = _$_UserDataBaseActionController.startAction(
+        name: '_UserDataBase.removeAddress');
+    try {
+      return super.removeAddress(address);
+    } finally {
+      _$_UserDataBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-addresses: ${addressesList}
+addressesList: ${addressesList}
     ''';
   }
 }

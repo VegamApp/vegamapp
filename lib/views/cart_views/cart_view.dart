@@ -361,19 +361,87 @@ class _CartViewState extends State<CartView> {
             separatorBuilder: (context, index) => const SizedBox(height: 30),
             itemBuilder: (context, index) {
               var item = result.data!['cart']['items'][index];
-              return Column(
+              return Stack(
                 children: [
-                  SizedBox(height: 100, child: CachedNetworkImage(imageUrl: item['product']['image']['url'])),
-                  const SizedBox(height: 15),
-                  Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
-                  const SizedBox(height: 10),
-                  BuildPriceWithOffer(
-                    price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
-                    priceSize: 17,
-                    currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                  Column(
+                    children: [
+                      SizedBox(height: 100, child: CachedNetworkImage(imageUrl: item['product']['image']['url'])),
+                      const SizedBox(height: 15),
+                      Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
+                      const SizedBox(height: 10),
+                      BuildPriceWithOffer(
+                        price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
+                        priceSize: 17,
+                        currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                      ),
+                      const SizedBox(height: 10),
+                      getItemNoChanger(size: size, item: item, cartData: cartData, refetch: refetch),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  getItemNoChanger(size: size, item: item, cartData: cartData, refetch: refetch),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Mutation(
+                        options: MutationOptions(
+                          document: gql(CartApis.removeProductsFromCart),
+                          onCompleted: (data) async {
+                            print(data); // cartData.checkVirtualCart();
+                            showSnackBar(
+                                context: context,
+                                message: "Removed item from cart",
+                                backgroundColor: AppColors.snackbarSuccessBackgroundColor,
+                                textColor: AppColors.snackbarSuccessTextColor);
+                            // await cartData.getCartData(context, Provider.of<AuthToken>(context, listen: false));
+                            refetch!();
+                          },
+                          onError: (error) {
+                            showSnackBar(
+                              context: context,
+                              message: error!.graphqlErrors[0].message,
+                              backgroundColor: AppColors.snackbarErrorBackgroundColor,
+                              textColor: AppColors.snackbarErrorTextColor,
+                            );
+
+                            print(error);
+                          },
+                        ),
+                        builder: (runMutation, result) {
+                          return IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text("Delete?", style: AppStyles.getMediumTextStyle(fontSize: 16)),
+                                  content: Text(
+                                    "Are you sure you want to delete this item from cart?",
+                                    style: AppStyles.getRegularTextStyle(fontSize: 14),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(
+                                        'Cancel',
+                                        style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        //print(item);
+                                        Navigator.pop(context);
+                                        runMutation({'cartId': cartData.cartId, 'itemId': item['id']});
+                                      },
+                                      child: Text(
+                                        'OK',
+                                        style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.delete_outline, color: AppColors.primaryColor),
+                          );
+                        }),
+                  ),
                 ],
               );
             },
@@ -394,33 +462,6 @@ class _CartViewState extends State<CartView> {
           //     ],
           //   ),
           // ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                alignment: Alignment.center,
-                width: size.width * 0.1,
-                height: 50,
-                child: InkWell(
-                  onTap: () {},
-                  child: Icon(FontAwesomeIcons.penToSquare, color: AppColors.buttonColor),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                alignment: Alignment.center,
-                width: size.width * 0.1,
-                height: 50,
-                child: InkWell(
-                  onTap: () {
-                    // cartList.clear();
-                  },
-                  child: const Icon(FontAwesomeIcons.xmark, color: Colors.red),
-                ),
-              ),
-            ],
-          )
         ],
       ),
     );

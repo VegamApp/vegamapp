@@ -7,23 +7,15 @@ import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class ProductHorizontalListing extends StatefulWidget {
-  const ProductHorizontalListing(
-      {super.key,
-      required this.title,
-      this.id,
-      required this.children,
-      this.gridSize,
-      this.aspectRatio,
-      this.padding});
-  final String title;
+  const ProductHorizontalListing({super.key, this.title, this.id, required this.children, this.gridSize, this.aspectRatio, this.padding});
+  final String? title;
   final String? id;
   final List<Widget> children;
   final int? gridSize;
   final double? aspectRatio;
   final EdgeInsets? padding;
   @override
-  State<ProductHorizontalListing> createState() =>
-      _ProductHorizontalListingState();
+  State<ProductHorizontalListing> createState() => _ProductHorizontalListingState();
 }
 
 class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
@@ -40,8 +32,7 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
         atBegining = true;
         atEdge = false;
         setState(() {});
-      } else if (_controller.position.pixels ==
-          _controller.position.maxScrollExtent) {
+      } else if (_controller.position.pixels == _controller.position.maxScrollExtent) {
         atBegining = false;
         atEdge = true;
         setState(() {});
@@ -54,20 +45,12 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
   }
 
   Widget leftArrow({BoxConstraints? constraints}) => InkWell(
-        onTap: () => _controller.animateTo(_controller.position.minScrollExtent,
-            duration: const Duration(milliseconds: 500), curve: Curves.easeIn),
-        child: getContainer(
-            Icons.chevron_left,
-            atBegining ? AppColors.evenFadedText : AppColors.primaryColor,
-            constraints),
+        onTap: () => _controller.animateTo(_controller.position.minScrollExtent, duration: const Duration(milliseconds: 500), curve: Curves.easeIn),
+        child: getContainer(Icons.chevron_left, atBegining ? AppColors.evenFadedText : AppColors.primaryColor, constraints),
       );
   Widget rightArrow({BoxConstraints? constraints}) => InkWell(
-        onTap: () => _controller.animateTo(_controller.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 500), curve: Curves.easeIn),
-        child: getContainer(
-            Icons.chevron_right,
-            atEdge ? AppColors.evenFadedText : AppColors.primaryColor,
-            constraints),
+        onTap: () => _controller.animateTo(_controller.position.maxScrollExtent, duration: const Duration(milliseconds: 500), curve: Curves.easeIn),
+        child: getContainer(Icons.chevron_right, atEdge ? AppColors.evenFadedText : AppColors.primaryColor, constraints),
       );
 
   Widget getArrows() {
@@ -109,23 +92,19 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
         //   textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false),
         //   textAlign: TextAlign.center,
         // ),
-        TwoColoredTitle(
-            title: widget.title,
-            firstHeadColor: AppColors.kPrimaryColor,
-            secondHeadColor: Colors.black),
+        if (widget.title != null) TwoColoredTitle(title: widget.title!, firstHeadColor: AppColors.kPrimaryColor, secondHeadColor: Colors.black),
         // const SizedBox(height: 10),
         Container(
           // height: 360,
           height: size.width * 0.85,
-          constraints: const BoxConstraints(maxHeight: 400),
+          constraints: const BoxConstraints(maxHeight: 380),
           // color: Colors.green,
           child: LayoutBuilder(builder: (context, totalConstraints) {
             return Stack(
               children: [
                 Row(
                   children: [
-                    if (totalConstraints.maxWidth >= 720)
-                      leftArrow(constraints: totalConstraints),
+                    if (totalConstraints.maxWidth >= 720) leftArrow(constraints: totalConstraints),
                     Expanded(
                       child: LayoutBuilder(builder: (context, constraints) {
                         print(constraints.maxWidth);
@@ -137,15 +116,12 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                             shrinkWrap: true,
                             itemCount: widget.children.length + 1,
                             scrollDirection: Axis.horizontal,
-                            padding: widget.padding ??
-                                const EdgeInsets.symmetric(horizontal: 20),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 20),
+                            padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 20),
+                            separatorBuilder: (context, index) => SizedBox(width: AppResponsive.isMobile(context) ? 10 : 20),
                             itemBuilder: (context, index) {
                               if (index != widget.children.length) {
                                 return Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
                                   width: constraints.maxWidth < 720
                                       ? constraints.maxWidth * 0.4
                                       : constraints.maxWidth > 1000
@@ -159,12 +135,10 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                                 return const SizedBox();
                               }
                               return InkWell(
-                                onHover: (value) =>
-                                    setState(() => _isHovered = value),
+                                onHover: (value) => setState(() => _isHovered = value),
                                 onTap: () {
                                   //print(widget.id);
-                                  context.go(
-                                      "/${ProductView.route}?viewAll=true&categoryId=${widget.id}");
+                                  context.go("/${ProductView.route}?viewAll=true&categoryId=${widget.id}");
                                   // navigate(context, ProductView.route, arguments: {
                                   //   'viewAll': true,
                                   //   'id': widget.id,
@@ -172,38 +146,29 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                                   // });
                                 },
                                 child: Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 10),
+                                  margin: const EdgeInsets.symmetric(vertical: 10),
                                   width: constraints.maxWidth < 720
                                       ? constraints.maxWidth * 0.4
                                       : constraints.maxWidth > 1000
                                           ? (constraints.maxWidth - 100) / 4
                                           : (constraints.maxWidth - 80) / 3,
-                                  constraints:
-                                      const BoxConstraints(maxHeight: 340),
+                                  constraints: const BoxConstraints(maxHeight: 340),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
-                                    boxShadow: !_isHovered
-                                        ? null
-                                        : [
-                                            BoxShadow(
-                                                color: AppColors.evenFadedText,
-                                                blurRadius: 5)
-                                          ],
+                                    boxShadow: AppResponsive.isMobile(context)
+                                        ? [BoxShadow(color: AppColors.evenFadedText, blurRadius: 5)]
+                                        : !_isHovered
+                                            ? null
+                                            : [BoxShadow(color: AppColors.evenFadedText, blurRadius: 5)],
                                   ),
                                   alignment: Alignment.center,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text("View All",
-                                          style: AppStyles.getSemiBoldTextStyle(
-                                              fontSize: 16,
-                                              color: AppColors.primaryColor)),
+                                      Text("View All", style: AppStyles.getSemiBoldTextStyle(fontSize: 16, color: AppColors.primaryColor)),
                                       const SizedBox(width: 5),
-                                      Icon(Icons.arrow_forward,
-                                          color: AppColors.primaryColor,
-                                          size: 20),
+                                      Icon(Icons.arrow_forward, color: AppColors.primaryColor, size: 20),
                                     ],
                                   ),
                                 ),
@@ -213,8 +178,7 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                         );
                       }),
                     ),
-                    if (totalConstraints.maxWidth >= 720)
-                      rightArrow(constraints: totalConstraints),
+                    if (totalConstraints.maxWidth >= 720) rightArrow(constraints: totalConstraints),
                   ],
                 ),
                 // Transform.translate(
@@ -231,20 +195,14 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
     );
   }
 
-  getContainer(IconData icon, Color color, BoxConstraints? totalConstraints) =>
-      Container(
-        width: totalConstraints != null && totalConstraints.maxWidth > 720
-            ? 50
-            : 25,
+  getContainer(IconData icon, Color color, BoxConstraints? totalConstraints) => Container(
+        width: totalConstraints != null && totalConstraints.maxWidth > 720 ? 50 : 25,
         height: 50,
         // margin: EdgeInsets.only(bottom: 200),
         decoration: BoxDecoration(
           color: color,
-          shape: totalConstraints != null && totalConstraints.maxWidth > 720
-              ? BoxShape.circle
-              : BoxShape.rectangle,
-          borderRadius: totalConstraints != null &&
-                  totalConstraints.maxWidth > 720
+          shape: totalConstraints != null && totalConstraints.maxWidth > 720 ? BoxShape.circle : BoxShape.rectangle,
+          borderRadius: totalConstraints != null && totalConstraints.maxWidth > 720
               ? null
               : icon == Icons.chevron_right
                   ? const BorderRadius.horizontal(left: Radius.circular(5))

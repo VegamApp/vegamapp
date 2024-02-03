@@ -43,8 +43,8 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
         if (widget.productModel.items![0].configurableOptions != null) const SizedBox(height: 20),
         buildQuantityChanger(),
         const SizedBox(height: 30),
-        buildDelivery(size),
-        const SizedBox(height: 20),
+        // buildDelivery(size),
+        // const SizedBox(height: 20),
         Divider(height: 1, color: AppColors.dividerColor),
         const SizedBox(height: 20),
         Row(

@@ -24,7 +24,7 @@ class _FootBarState extends State<FootBar> {
   List<Widget> getChildren(double size) {
     List<Widget> children = [
       Divider(height: 2, color: AppColors.evenFadedText),
-      StampContainer(width: widget.screenWidth),
+      // StampContainer(width: widget.screenWidth),
       LogoContainer(width: widget.width),
       ContactContainer(width: widget.width),
       Padding(
@@ -135,7 +135,7 @@ class _FootBarState extends State<FootBar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Divider(height: 2, color: AppColors.evenFadedText),
-          StampContainer(width: widget.screenWidth),
+          // StampContainer(width: widget.screenWidth),
           LogoContainer(width: widget.width),
           DesktopContactContainer(width: widget.width),
           Divider(height: 2, color: AppColors.evenFadedText),

@@ -79,18 +79,19 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
                   child: TextFormField(
                     controller: coupon,
                     decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        filled: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                        border: OutlineInputBorder(
-                          gapPadding: 0,
-                          borderRadius: BorderRadius.zero,
-                          borderSide: BorderSide(color: AppColors.evenFadedText),
-                        ),
-                        hintStyle: AppStyles.getExtraLightTextStyle(fontSize: 13, color: AppColors.fadedText),
-                        hintText: 'Enter your code'),
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                      border: OutlineInputBorder(
+                        gapPadding: 0,
+                        borderRadius: BorderRadius.zero,
+                        borderSide: BorderSide(color: AppColors.evenFadedText),
+                      ),
+                      hintStyle: AppStyles.getExtraLightTextStyle(fontSize: 13, color: AppColors.fadedText),
+                      hintText: 'Enter your code',
+                    ),
                     style: AppStyles.getExtraLightTextStyle(fontSize: 13, color: AppColors.fadedText),
-                    validator: (value) => value != '' ? null : 'Enter Coupon code',
+                    // validator: (value) => value != '' ? null : 'Enter Coupon code',
                   ),
                 ),
                 Container(

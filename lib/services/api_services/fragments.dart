@@ -19,6 +19,7 @@ class Fragments {
     available_payment_methods {
       code
       title
+      is_deferred
     }
   }''');
 

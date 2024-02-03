@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -149,7 +148,8 @@ class BuildLoginTextFormField extends StatefulWidget {
       this.hintTextStyle,
       this.maxLines,
       this.textCapitalization,
-      this.onFieldSubmitted})
+      this.onFieldSubmitted,
+      this.maxLength})
       : super(key: key);
   final TextEditingController controller;
   final String title;
@@ -158,6 +158,7 @@ class BuildLoginTextFormField extends StatefulWidget {
   final String? Function(String? value)? validator;
   final TextStyle? hintTextStyle;
   final int? maxLines;
+  final int? maxLength;
   final TextCapitalization? textCapitalization;
   final Function(String value)? onFieldSubmitted;
   @override
@@ -199,7 +200,7 @@ class _BuildLoginTextFormFieldState extends State<BuildLoginTextFormField> {
         hintText: widget.title,
         hintStyle: widget.hintTextStyle ?? AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.buttonColor),
       ),
-      maxLength: widget.maxLines,
+      maxLength: widget.maxLength,
       maxLines: widget.maxLines ?? 1,
       onFieldSubmitted: widget.onFieldSubmitted,
     );

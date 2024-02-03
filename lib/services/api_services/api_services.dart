@@ -63,18 +63,15 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
    }
  }''');
 
-  Future<List<SearchModel>> searchSuggessionApi(
-      {required searchQuery, required BuildContext context}) async {
+  Future<List<SearchModel>> searchSuggessionApi({required searchQuery, required BuildContext context}) async {
     var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(
-        document: searchSuggession, variables: {"searchQuery": searchQuery}));
+    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: searchSuggession, variables: {"searchQuery": searchQuery}));
     List<SearchModel> searchModelList = [];
     if (result.data != null) {
       try {
         searchModelList = List<SearchModel>.generate(
           result.data!['products']['items'].length,
-          (index) =>
-              SearchModel.fromJson(result.data!['products']['items'][index]),
+          (index) => SearchModel.fromJson(result.data!['products']['items'][index]),
         );
         return searchModelList;
       } catch (e) {
@@ -163,6 +160,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
         ...on ProductBlock{
           show_title
           product_type
+          display_style
           products {
             __typename
             type_id

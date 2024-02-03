@@ -81,8 +81,10 @@ class DrawerContainer extends StatelessWidget {
                                       contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                                       onTap: () {
                                         var data = categories.data['categories']['items'][index]['children'][index2];
-                                        print("hi ${categories.data['categories']['items'][index]['children'][index2]}");
-                                        context.push('/${ProductView.route}/${data['url_key']}${data['url_suffix']}');
+                                        context.goNamed(
+                                          ProductView.route,
+                                          queryParameters: {'categoryUid': data['uid']},
+                                        );
                                       },
                                       title: Text(
                                         categories.data['categories']['items'][index]['children'][index2]['name'],
@@ -106,7 +108,10 @@ class DrawerContainer extends StatelessWidget {
                                             style: TextButton.styleFrom(padding: EdgeInsets.zero),
                                             onPressed: () {
                                               print(data);
-                                              context.push('/${ProductView.route}/${data['url_key']}${data['url_suffix']}');
+                                              context.goNamed(
+                                                ProductView.route,
+                                                queryParameters: {'categoryUid': data['uid']},
+                                              );
                                             },
                                             child: Align(
                                               alignment: Alignment.centerLeft,

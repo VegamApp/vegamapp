@@ -39,29 +39,34 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: SearchView.route,
+          name: SearchView.route,
           pageBuilder: (context, state) {
             return getCustomTransition(state, const SearchView());
           },
         ),
         GoRoute(
           path: Auth.route,
+          name: Auth.route,
           pageBuilder: (context, state) {
             return getCustomTransition(state, const Auth());
           },
         ),
         GoRoute(
+          name: ForgotPassword.route,
           path: ForgotPassword.route,
           pageBuilder: (context, state) {
             return getCustomTransition(state, const ForgotPassword());
           },
         ),
         GoRoute(
+          // name: ProductView.route,
           path: '${ProductView.route}/:url',
           pageBuilder: (context, state) {
             return getCustomTransition(state, ProductView(urlKey: state.pathParameters['url']));
           },
         ),
         GoRoute(
+          name: ProductView.route,
           path: ProductView.route,
           pageBuilder: (context, state) {
             print(state.queryParameters);
@@ -77,12 +82,14 @@ final router = GoRouter(
           },
         ),
         GoRoute(
+          name: 'account',
           path: 'account',
           pageBuilder: (context, state) {
             return getCustomTransition(state, AccountSideBar(currentPage: AccountInformationView.route));
           },
           routes: [
             GoRoute(
+              name: AccountInformationView.route,
               path: AccountInformationView.route,
               pageBuilder: (context, state) {
                 print(state.fullPath);
@@ -90,6 +97,7 @@ final router = GoRouter(
               },
             ),
             GoRoute(
+              name: DownloadableProductsView.route,
               path: DownloadableProductsView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const DownloadableProductsView());
@@ -97,30 +105,35 @@ final router = GoRouter(
             ),
             GoRoute(
               path: AddressView.route,
+              name: AddressView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const AddressView());
               },
             ),
             GoRoute(
               path: OrdersView.route,
+              name: OrdersView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const OrdersView());
               },
             ),
             GoRoute(
               path: NewsletterView.route,
+              name: NewsletterView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const NewsletterView());
               },
             ),
             GoRoute(
               path: '${OrdersView.route}/:id',
+              // name: OrdersView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, MyOrderDetailView(orderId: state.pathParameters['id']!));
               },
             ),
             GoRoute(
               path: BillingAgreementsView.route,
+              name: BillingAgreementsView.route,
               pageBuilder: (context, state) {
                 return getCustomTransition(state, const BillingAgreementsView());
               },
@@ -129,24 +142,28 @@ final router = GoRouter(
         ),
         GoRoute(
             path: CartView.route,
+            name: CartView.route,
             pageBuilder: (context, state) {
               return getCustomTransition(state, const CartView());
             },
             routes: [
               GoRoute(
                 path: CartAddressView.route,
+                name: CartAddressView.route,
                 pageBuilder: (context, state) {
                   return getCustomTransition(state, const CartAddressView());
                 },
               ),
               GoRoute(
                 path: CartPayment.route,
+                name: CartPayment.route,
                 pageBuilder: (context, state) {
                   return getCustomTransition(state, const CartPayment());
                 },
               ),
               GoRoute(
                 path: OrderPlacedView.route,
+                name: OrderPlacedView.route,
                 pageBuilder: (context, state) {
                   return getCustomTransition(
                       state,

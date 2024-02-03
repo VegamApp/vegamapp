@@ -19,7 +19,7 @@ import 'package:provider/provider.dart';
 
 class CartAddressView extends StatefulWidget {
   const CartAddressView({super.key});
-  static String route = 'address';
+  static String route = 'cartaddress';
 
   @override
   State<CartAddressView> createState() => _CartAddressViewState();
@@ -32,6 +32,19 @@ class _CartAddressViewState extends State<CartAddressView> {
   bool isDefaultBilling = false;
   bool saveAddress = false;
   // For new addresses
+  // For test
+  // TextEditingController name = TextEditingController(text: "Jack");
+  // TextEditingController email = TextEditingController();
+  // TextEditingController state = TextEditingController();
+  // TextEditingController lName = TextEditingController(text: "Reacher");
+  // TextEditingController appartNo = TextEditingController(text: 'Appr');
+  // TextEditingController street = TextEditingController(text: "Str");
+  // TextEditingController address = TextEditingController(text: "Address");
+  // TextEditingController city = TextEditingController(text: "City");
+  // TextEditingController contact = TextEditingController(text: "1231231231");
+  // TextEditingController pin = TextEditingController(text: "682025");
+
+  //Default
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController lName = TextEditingController();
@@ -45,7 +58,8 @@ class _CartAddressViewState extends State<CartAddressView> {
   // AddressType _addressType = AddressType.office;
 
   Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
-  Map<String, dynamic> selectedRegion = {"name": "Kerala", "region_code": "KL", "id": 502, "__typename": "CustomerAddressRegion"};
+  Map<String, dynamic> selectedRegion = {"__typename": "Region", "id": 586, "code": "KL", "name": "Kerala"};
+
   Map<String, dynamic> countries = {};
   Map<String, dynamic> regions = {};
 
@@ -80,7 +94,7 @@ class _CartAddressViewState extends State<CartAddressView> {
               var cartData = Provider.of<CartData>(context);
               var token = Provider.of<AuthToken>(context);
               var user = Provider.of<UserData>(context);
-              log(jsonEncode(cartData.cartData));
+
               if (cartData.isLoading) {
                 return const BuildLoadingWidget();
               }
@@ -181,6 +195,11 @@ class _CartAddressViewState extends State<CartAddressView> {
                                 child: CartSummaryWidget(
                                   buttonText: "Go to Checkout",
                                   onButtonTap: () {
+                                    // log(jsonEncode(cartData.cartData));
+                                    if (cartData.cartData['shipping_addresses'] == null || cartData.cartData['shipping_addresses'].isEmpty) {
+                                      showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
+                                      return;
+                                    }
                                     context.go("/${CartView.route}/${CartPayment.route}");
                                   },
                                 ),
@@ -395,7 +414,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                                               onTap: () {
                                                 FocusManager.instance.primaryFocus?.unfocus();
                                                 selectedRegion = countries[index];
-                                                //print(selectedRegion);
+                                                print(selectedRegion);
                                                 countrySearch.clear();
                                                 Navigator.pop(context);
                                               },
@@ -503,7 +522,11 @@ class _CartAddressViewState extends State<CartAddressView> {
                     document: gql(CartApis.setBillingAddressesOnCart),
                     onCompleted: (result) {
                       log('billing result :$result');
+                      UserData userData = Provider.of<UserData>(context, listen: false);
+                      userData.getUserData(context);
+                      cartData.getCartData(context, authToken);
                       // navigate(context, const GuestPayment());
+                      print('hi');
                       if (authToken.loginToken == null) {
                         runMutationEmail({'cart_id': cartData.cartId, 'email': email.text});
                       } else {
@@ -518,27 +541,32 @@ class _CartAddressViewState extends State<CartAddressView> {
                       options: MutationOptions(
                           document: gql(CartApis.setShippingAddressesOnCart),
                           onCompleted: (result) {
+                            log(result.toString());
                             newAddress = false;
                             setState(() {});
-
+                            List streets = [];
+                            if (appartNo.text.isNotEmpty) {
+                              streets.add(appartNo.text);
+                            }
+                            if (street.text.isNotEmpty) {
+                              streets.add(street.text);
+                            }
                             runMutation({
                               "input": {
                                 "cart_id": cartData.cartId,
                                 "billing_address": {
                                   "address": {
-                                    "street": [street.text],
-                                    "house_name": appartNo.text,
-                                    "landmark": address.text,
-                                    "address_label": "Home",
-                                    'save_in_address_book': saveAddress,
+                                    'city': city.text,
+                                    'country_code': selectedCountry['id'],
                                     'firstname': name.text,
                                     'lastname': lName.text,
-                                    'city': city.text,
                                     'postcode': pin.text,
-                                    'telephone': contact.text,
                                     'region': selectedRegion['code'],
                                     'region_id': selectedRegion['id'],
-                                    'country_code': selectedCountry['id'],
+                                    "street": streets,
+                                    'telephone': contact.text,
+                                    // "landmark": address.text,
+                                    // "address_label": "Home",
                                   },
                                 }
                               }
@@ -557,26 +585,35 @@ class _CartAddressViewState extends State<CartAddressView> {
                             if (address.text != '') addressList.add(address.text);
                             if (form!.validate()) {
                               if (selectedCountry.isNotEmpty && selectedRegion.isNotEmpty) {
+                                List streets = [];
+                                if (appartNo.text.isNotEmpty) {
+                                  streets.add(appartNo.text);
+                                }
+                                if (street.text.isNotEmpty) {
+                                  streets.add(street.text);
+                                }
+
+                                var addressMap = {
+                                  'city': city.text,
+                                  'country_code': selectedCountry['id'],
+                                  'firstname': name.text,
+                                  'lastname': lName.text,
+                                  'postcode': pin.text,
+                                  'region': selectedRegion['code'],
+                                  'region_id': selectedRegion['id'],
+                                  "street": streets,
+                                  'telephone': contact.text,
+                                  // "landmark": address.text,
+                                  // "address_label": "Home",
+                                  'save_in_address_book': saveAddress,
+                                };
+                                print(addressMap);
                                 runMutation2({
                                   "input": {
                                     "cart_id": cartData.cartId,
                                     "shipping_addresses": [
                                       {
-                                        "address": {
-                                          "street": [street.text],
-                                          "house_name": appartNo.text,
-                                          "landmark": address.text,
-                                          "address_label": "Home",
-                                          'save_in_address_book': saveAddress,
-                                          'firstname': name.text,
-                                          'lastname': lName.text,
-                                          'city': city.text,
-                                          'postcode': pin.text,
-                                          'telephone': contact.text,
-                                          'region': selectedRegion['code'],
-                                          'region_id': selectedRegion['id'],
-                                          'country_code': selectedCountry['id'],
-                                        },
+                                        "address": addressMap,
                                       }
                                     ]
                                   }
@@ -615,41 +652,64 @@ class _CartAddressViewState extends State<CartAddressView> {
 
   getExistingAddress(UserData userData, Size size, AuthToken authToken, CartData cartData) {
     return Mutation(
-        options: MutationOptions(
-            document: gql(CartApis.setBillingAddressesOnCart),
-            onCompleted: (result) {
-              print('complete $result');
-              cartData.getCartData(context, authToken);
+      options: MutationOptions(
+          document: gql(CartApis.setBillingAddressesOnCart),
+          onCompleted: (result) {
+            print('complete $result');
+            cartData.getCartData(context, authToken);
 
-              if (result != null) {
-                context.go("/${CartView.route}/${CartPayment.route}");
-              }
-            },
-            onError: (error) {
-              print('error billing $error');
-            }),
-        builder: (RunMutation runMutationBilling, QueryResult? billingResult) {
-          return Mutation(
-              options: MutationOptions(
-                  document: gql(CartApis.setShippingAddressesOnCart),
-                  onCompleted: (result) {
-                    print(result);
-                    //print(user.addresses![index].region!.regionId);
+            if (result != null) {
+              context.go("/${CartView.route}/${CartPayment.route}");
+            }
+          },
+          onError: (error) {
+            print('error billing $error');
+          }),
+      builder: (RunMutation runMutationBilling, QueryResult? billingResult) {
+        return Mutation(
+          options: MutationOptions(
+              document: gql(CartApis.setShippingAddressesOnCart),
+              onCompleted: (result) {
+                print(result);
+                //print(user.addresses![index].region!.regionId);
 
-                    runMutationBilling({
-                      'input': {
-                        'cart_id': cartData.cartId,
-                        'billing_address': {'same_as_shipping': true}
-                      }
-                    });
-                    // refetch!();
-                  },
-                  onError: (error) {
-                    print('error shipping $error');
-                  }),
-              builder: (RunMutation runMutationShipping, QueryResult? shippingResult) {
-                if (billingResult!.isLoading || shippingResult!.isLoading) {
-                  return Container(
+                runMutationBilling({
+                  'input': {
+                    'cart_id': cartData.cartId,
+                    'billing_address': {'same_as_shipping': true}
+                  }
+                });
+                // refetch!();
+              },
+              onError: (error) {
+                print('error shipping $error');
+              }),
+          builder: (RunMutation runMutationShipping, QueryResult? shippingResult) {
+            if (billingResult!.isLoading || shippingResult!.isLoading) {
+              return Container(
+                constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                decoration: BoxDecoration(
+                  color: const Color(0xffffffff),
+                  borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                  border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0a000000),
+                      offset: Offset(0, 10),
+                      blurRadius: 40,
+                    ),
+                  ],
+                ),
+                child: Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+              );
+            }
+            return Wrap(
+              spacing: 20,
+              runSpacing: 20,
+              children: [
+                InkWell(
+                  onTap: () => setState(() => newAddress = true),
+                  child: Container(
                     constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
                     decoration: BoxDecoration(
                       color: const Color(0xffffffff),
@@ -663,62 +723,43 @@ class _CartAddressViewState extends State<CartAddressView> {
                         ),
                       ],
                     ),
-                    child: Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
-                  );
-                }
-                return Wrap(
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: [
-                    InkWell(
-                      onTap: () => setState(() => newAddress = true),
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffffffff),
-                          borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
-                          border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x0a000000),
-                              offset: Offset(0, 10),
-                              blurRadius: 40,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline,
-                                color: AppColors.primaryColor,
-                                size: 50,
-                              ),
-                              Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
-                            ],
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.add_circle_outline,
+                            color: AppColors.primaryColor,
+                            size: 50,
                           ),
-                        ),
+                          Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
+                        ],
                       ),
                     ),
-                    ...userData.data.addresses!
-                        .map((e) => InkWell(
-                              onTap: () {
-                                runMutationShipping({
-                                  "input": {
-                                    "cart_id": cartData.cartId,
-                                    "shipping_addresses": [
-                                      {"customer_address_id": e.id, "customer_notes": ""}
-                                    ]
-                                  }
-                                });
-                              },
-                              child: BuildAddressContainer(addressModel: e, size: size),
-                            ))
-                        .toList(),
-                  ],
-                );
-              });
-        });
+                  ),
+                ),
+                ...userData.data.addresses!
+                    .map(
+                      (e) => InkWell(
+                        onTap: () {
+                          runMutationShipping({
+                            "input": {
+                              "cart_id": cartData.cartId,
+                              "shipping_addresses": [
+                                {"customer_address_id": e.id, "customer_notes": ""}
+                              ]
+                            }
+                          });
+                        },
+                        child: BuildAddressContainer(addressModel: e, size: size),
+                      ),
+                    )
+                    .toList(),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   getCountryList(String text) {

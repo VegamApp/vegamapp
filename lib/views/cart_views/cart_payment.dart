@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -152,10 +153,10 @@ class _CartPaymentState extends State<CartPayment> {
                 }
 
                 if (result.data!['cart']['selected_payment_method'] != null) {
-                  paymentCode = result.data!['cart']['selected_payment_method']['code'];
+                  paymentCode ??= result.data!['cart']['selected_payment_method']['code'];
                 }
                 if (result.data!['cart']['shipping_addresses'][0]['selected_shipping_method'] != null) {
-                  selectedShippingMethod = result.data!['cart']['shipping_addresses'][0]['selected_shipping_method']['carrier_code'];
+                  selectedShippingMethod ??= result.data!['cart']['shipping_addresses'][0]['selected_shipping_method']['carrier_code'];
                 }
 
                 return ListView(
@@ -393,6 +394,7 @@ class _CartPaymentState extends State<CartPayment> {
                     return InkWell(
                       splashColor: Colors.transparent,
                       onTap: () {
+                        // Clipboard.setData(ClipboardData(text: jsonEncode(cartData.cartData)));
                         setState(() => paymentCode = paymentMethod['code']);
                         runMutation({
                           'cartId': cartData.cartId,
@@ -419,7 +421,7 @@ class _CartPaymentState extends State<CartPayment> {
                           ],
                         ),
                         // child: Image.asset('assets/images/${cardUrls[index]}'),
-                        child: mutationResult!.isLoading && paymentCode != paymentMethod['code']
+                        child: mutationResult!.isLoading && paymentCode == paymentMethod['code']
                             ? BuildLoadingWidget(color: AppColors.primaryColor)
                             : Center(
                                 child: Text(

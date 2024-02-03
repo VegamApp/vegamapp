@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:mobx/mobx.dart';
@@ -40,10 +41,10 @@ abstract class _HomeDataBase with Store {
   getHomeData(BuildContext context) async {
     setLoading(true);
     var client = GraphQLProvider.of(context);
-    QueryResult? result = await client.value
-        .query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
+    QueryResult? result = await client.value.query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
     // print(result);
-    log(jsonEncode(result.data));
+    // log(jsonEncode(result.data));
+    // Clipboard.setData(ClipboardData(text: jsonEncode(result.data)));
     _data = result.data!;
     setLoading(false);
   }

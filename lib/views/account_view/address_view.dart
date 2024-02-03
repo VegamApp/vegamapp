@@ -36,12 +36,7 @@ class _AddressViewState extends State<AddressView> {
   TextEditingController pin = TextEditingController();
   TextEditingController state = TextEditingController();
   Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
-  Map<String, dynamic> selectedRegion = {
-    "name": "Kerala",
-    "region_code": "KL",
-    "id": 502,
-    "__typename": "CustomerAddressRegion"
-  };
+  Map<String, dynamic> selectedRegion = {"name": "Kerala", "region_code": "KL", "id": 502, "__typename": "CustomerAddressRegion"};
   Map<String, dynamic> countries = {};
   Map<String, dynamic> regions = {};
   @override
@@ -83,12 +78,7 @@ class _AddressViewState extends State<AddressView> {
                         margin: const EdgeInsets.only(top: 40),
                         decoration: BoxDecoration(
                           color: AppColors.scaffoldColor,
-                          boxShadow: [
-                            BoxShadow(
-                                color: AppColors.shadowColor,
-                                blurRadius: 50,
-                                offset: const Offset(0, 10))
-                          ],
+                          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
                         ),
                         child: getBody(context, size)),
                   ),
@@ -105,18 +95,14 @@ class _AddressViewState extends State<AddressView> {
   Padding getBody(BuildContext context, Size size) {
     var userData = Provider.of<UserData>(context, listen: false);
     return Padding(
-      padding: AppResponsive.isDesktop(context)
-          ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50)
-          : EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text('Manage Addresses',
-                style: AppStyles.getMediumTextStyle(
-                    fontSize: 18, color: AppColors.primaryColor)),
+            child: Text('Manage Addresses', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.primaryColor)),
           ),
           const SizedBox(height: 30),
           Observer(builder: (_) {
@@ -127,14 +113,11 @@ class _AddressViewState extends State<AddressView> {
                 InkWell(
                   onTap: () => showAddAddressDialog(size, userData),
                   child: Container(
-                    constraints:
-                        const BoxConstraints(maxWidth: 400, minHeight: 255),
+                    constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
                     decoration: BoxDecoration(
                       color: const Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(
-                          size.width * .025 > 20 ? 20 : size.width * 0.025),
-                      border: Border.all(
-                          width: 1.0, color: const Color(0xffa0dcd6)),
+                      borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                      border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0x0a000000),
@@ -151,9 +134,7 @@ class _AddressViewState extends State<AddressView> {
                             color: AppColors.primaryColor,
                             size: 50,
                           ),
-                          Text("Add New Address",
-                              style: AppStyles.getMediumTextStyle(
-                                  fontSize: 20, color: AppColors.fadedText)),
+                          Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
                         ],
                       ),
                     ),
@@ -174,8 +155,7 @@ class _AddressViewState extends State<AddressView> {
     );
   }
 
-  showAddAddressDialog(Size size, UserData userData,
-      {Addresses? addressModel}) {
+  showAddAddressDialog(Size size, UserData userData, {Addresses? addressModel}) {
     final formKey = GlobalKey<FormState>();
     return showDialog(
       context: context,
@@ -186,35 +166,25 @@ class _AddressViewState extends State<AddressView> {
           return Dialog(
             backgroundColor: Colors.transparent,
             child: Container(
-              constraints:
-                  BoxConstraints(maxWidth: 500, maxHeight: size.height * 0.8),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: AppColors.scaffoldColor),
+              constraints: BoxConstraints(maxWidth: 500, maxHeight: size.height * 0.8),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: AppColors.scaffoldColor),
               child: Form(
                 key: formKey,
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Center(
-                        child: Text('Add a New Address',
-                            style: AppStyles.getMediumTextStyle(
-                                fontSize: 20, color: AppColors.primaryColor))),
+                    Center(child: Text('Add a New Address', style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.primaryColor))),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: fName,
                       hint: 'First name',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid name',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: lName,
                       hint: 'Last name',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid name',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
                     ),
                     const SizedBox(height: 20),
                     Padding(
@@ -235,9 +205,7 @@ class _AddressViewState extends State<AddressView> {
                             setState(() {});
                           },
                         ),
-                        title: Text('This is default Shipping Address',
-                            style: AppStyles.getRegularTextStyle(
-                                fontSize: 15, color: AppColors.fadedText)),
+                        title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -259,66 +227,49 @@ class _AddressViewState extends State<AddressView> {
                             setState(() {});
                           },
                         ),
-                        title: Text('This is default Billing Address',
-                            style: AppStyles.getRegularTextStyle(
-                                fontSize: 15, color: AppColors.fadedText)),
+                        title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
                       ),
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: appartNo,
                       hint: 'Appartment Number',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid appartment number',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid appartment number',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: street,
                       hint: 'Street',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid street name',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid street name',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: city,
                       hint: 'City',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid city',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid city',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: contact,
                       hint: 'Contact Number',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid contact number',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid contact number',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: pin,
                       hint: 'PIN Code',
-                      validator: (value) => value != null && value != ''
-                          ? null
-                          : 'Enter a valid PIN code',
+                      validator: (value) => value != null && value != '' ? null : 'Enter a valid PIN code',
                     ),
                     const SizedBox(height: 20),
                     Query(
-                      options:
-                          QueryOptions(document: gql(ApiServices.getCountries)),
+                      options: QueryOptions(document: gql(ApiServices.getCountries)),
                       builder: (result, {fetchMore, refetch}) {
                         // if (result.isLoading) {
                         //   return Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.primaryColor)));
                         // }
                         if (result.isLoading) return const SizedBox();
                         if (selectedRegion.isEmpty && addressModel != null) {
-                          selectedRegion = result.data!['countries'][0]
-                                  ['available_regions']
-                              .firstWhere((element) =>
-                                  element['code'] ==
-                                  addressModel.region?.regionCode);
+                          selectedRegion = result.data!['countries'][0]['available_regions'].firstWhere((element) => element['code'] == addressModel.region?.regionCode);
                           // //print(selectedRegion);
                         }
                         countries = result.data!;
@@ -328,66 +279,40 @@ class _AddressViewState extends State<AddressView> {
                             builder: (context) {
                               return Dialog(
                                 backgroundColor: Colors.transparent,
-                                child: StatefulBuilder(
-                                    builder: (context, setState) {
+                                child: StatefulBuilder(builder: (context, setState) {
                                   return Container(
                                     width: size.width * 0.8,
                                     height: size.height * 0.8,
-                                    padding: const EdgeInsets.symmetric(
-                                            horizontal: 20)
-                                        .copyWith(top: 20),
-                                    constraints: BoxConstraints(
-                                        maxWidth: 500,
-                                        maxHeight: size.height * 0.8),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: AppColors.scaffoldColor),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 20),
+                                    constraints: BoxConstraints(maxWidth: 500, maxHeight: size.height * 0.8),
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: AppColors.scaffoldColor),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Material(
                                         color: Colors.white,
                                         child: Column(
                                           children: [
-                                            BuildTextField(
-                                                controller: countrySearch,
-                                                hint: 'Search',
-                                                onChanged: (value) =>
-                                                    setState(() {})),
+                                            BuildTextField(controller: countrySearch, hint: 'Search', onChanged: (value) => setState(() {})),
                                             Expanded(
                                               child: ListView.separated(
                                                 // shrinkWrap: true,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 20,
-                                                        horizontal: 10),
-                                                itemCount: getCountryList(
-                                                        countrySearch.text)
-                                                    .length,
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    const SizedBox(height: 20),
+                                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                                itemCount: getCountryList(countrySearch.text).length,
+                                                separatorBuilder: (context, index) => const SizedBox(height: 20),
                                                 itemBuilder: (context, index) {
-                                                  List countries =
-                                                      getCountryList(
-                                                          countrySearch.text);
+                                                  List countries = getCountryList(countrySearch.text);
                                                   return InkWell(
                                                     onTap: () {
-                                                      selectedCountry =
-                                                          countries[index];
+                                                      selectedCountry = countries[index];
                                                       //print(selectedCountry);
-                                                      FocusManager
-                                                          .instance.primaryFocus
-                                                          ?.unfocus();
+                                                      FocusManager.instance.primaryFocus?.unfocus();
                                                       countrySearch.clear();
                                                       Navigator.pop(context);
                                                       setState(() {});
                                                     },
                                                     child: Text(
-                                                      countries[index]
-                                                          ['full_name_english'],
-                                                      style: AppStyles
-                                                          .getRegularTextStyle(
-                                                              fontSize: 16),
+                                                      countries[index]['full_name_english'],
+                                                      style: AppStyles.getRegularTextStyle(fontSize: 16),
                                                     ),
                                                   );
                                                 },
@@ -407,15 +332,10 @@ class _AddressViewState extends State<AddressView> {
                             padding: const EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                  width: 1, color: AppColors.evenFadedText),
+                              border: Border.all(width: 1, color: AppColors.evenFadedText),
                             ),
-                            child: Text(
-                                selectedCountry.isEmpty
-                                    ? 'Select country'
-                                    : selectedCountry['full_name_english'],
-                                style: AppStyles.getLightTextStyle(
-                                    fontSize: 14, color: AppColors.fadedText)),
+                            child: Text(selectedCountry.isEmpty ? 'Select country' : selectedCountry['full_name_english'],
+                                style: AppStyles.getLightTextStyle(fontSize: 14, color: AppColors.fadedText)),
                           ),
                         );
                       },
@@ -423,9 +343,7 @@ class _AddressViewState extends State<AddressView> {
                     const SizedBox(height: 20),
                     if (selectedCountry.isNotEmpty)
                       Query(
-                        options: QueryOptions(
-                            document: gql(
-                                ApiServices.getRegion(selectedCountry['id']))),
+                        options: QueryOptions(document: gql(ApiServices.getRegion(selectedCountry['id']))),
                         builder: (result, {fetchMore, refetch}) {
                           // if (result.isLoading) {
                           //   return Center(child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.primaryColor)));
@@ -440,71 +358,39 @@ class _AddressViewState extends State<AddressView> {
                                 builder: (context) {
                                   return Dialog(
                                     backgroundColor: Colors.transparent,
-                                    child: StatefulBuilder(
-                                        builder: (context, setState) {
+                                    child: StatefulBuilder(builder: (context, setState) {
                                       return Container(
                                         width: size.width * 0.8,
                                         height: size.height * 0.8,
-                                        padding: const EdgeInsets.symmetric(
-                                                horizontal: 20)
-                                            .copyWith(top: 20),
-                                        constraints: BoxConstraints(
-                                            maxWidth: 500,
-                                            maxHeight: size.height * 0.8),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            color: AppColors.scaffoldColor),
+                                        padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(top: 20),
+                                        constraints: BoxConstraints(maxWidth: 500, maxHeight: size.height * 0.8),
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: AppColors.scaffoldColor),
                                         child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(20),
                                           child: Material(
                                             color: Colors.white,
                                             child: Column(
                                               children: [
-                                                BuildTextField(
-                                                    controller: countrySearch,
-                                                    hint: 'Search',
-                                                    onChanged: (value) =>
-                                                        setState(() {})),
+                                                BuildTextField(controller: countrySearch, hint: 'Search', onChanged: (value) => setState(() {})),
                                                 Expanded(
                                                   child: ListView.separated(
                                                     // shrinkWrap: true,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 20,
-                                                        horizontal: 10),
-                                                    itemCount: getRegionList(
-                                                            countrySearch.text)
-                                                        .length,
-                                                    separatorBuilder:
-                                                        (context, index) =>
-                                                            const SizedBox(
-                                                                height: 20),
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      List countries =
-                                                          getRegionList(
-                                                              countrySearch
-                                                                  .text);
+                                                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                                    itemCount: getRegionList(countrySearch.text).length,
+                                                    separatorBuilder: (context, index) => const SizedBox(height: 20),
+                                                    itemBuilder: (context, index) {
+                                                      List countries = getRegionList(countrySearch.text);
                                                       return InkWell(
                                                         onTap: () {
-                                                          FocusManager.instance
-                                                              .primaryFocus
-                                                              ?.unfocus();
-                                                          selectedRegion =
-                                                              countries[index];
+                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                          selectedRegion = countries[index];
                                                           //print(selectedRegion);
                                                           countrySearch.clear();
-                                                          Navigator.pop(
-                                                              context);
+                                                          Navigator.pop(context);
                                                         },
                                                         child: Text(
-                                                          countries[index]
-                                                              ['name'],
-                                                          style: AppStyles
-                                                              .getRegularTextStyle(
-                                                                  fontSize: 16),
+                                                          countries[index]['name'],
+                                                          style: AppStyles.getRegularTextStyle(fontSize: 16),
                                                         ),
                                                       );
                                                     },
@@ -525,16 +411,10 @@ class _AddressViewState extends State<AddressView> {
                               padding: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5),
-                                border: Border.all(
-                                    width: 1, color: AppColors.evenFadedText),
+                                border: Border.all(width: 1, color: AppColors.evenFadedText),
                               ),
-                              child: Text(
-                                  selectedRegion.isEmpty
-                                      ? 'Select region'
-                                      : selectedRegion['name'],
-                                  style: AppStyles.getLightTextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.fadedText)),
+                              child: Text(selectedRegion.isEmpty ? 'Select region' : selectedRegion['name'],
+                                  style: AppStyles.getLightTextStyle(fontSize: 14, color: AppColors.fadedText)),
                             ),
                           );
                         },
@@ -560,9 +440,7 @@ class _AddressViewState extends State<AddressView> {
                               color: AppColors.primaryColor,
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: const Center(
-                                child: CircularProgressIndicator(
-                                    color: Colors.white)),
+                            child: const Center(child: CircularProgressIndicator(color: Colors.white)),
                           );
                         }
                         return SizedBox(
@@ -570,8 +448,7 @@ class _AddressViewState extends State<AddressView> {
                           child: TextButton(
                             style: TextButton.styleFrom(
                                 backgroundColor: AppColors.primaryColor,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20),
+                                padding: const EdgeInsets.symmetric(vertical: 20),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 )),
@@ -579,12 +456,14 @@ class _AddressViewState extends State<AddressView> {
                               final formState = formKey.currentState;
                               List addressList = [];
                               log('message');
-                              if (appartNo.text.isNotEmpty)
+                              if (appartNo.text.isNotEmpty) {
                                 addressList.add(appartNo.text);
-                              if (street.text.isNotEmpty)
+                              }
+                              if (street.text.isNotEmpty) {
                                 addressList.add(street.text);
+                              }
                               if (formState!.validate()) {
-                                runMutation({
+                                var addressMap = {
                                   'firstname': fName.text,
                                   'lastname': lName.text,
                                   'street': addressList,
@@ -593,13 +472,14 @@ class _AddressViewState extends State<AddressView> {
                                   'telephone': contact.text,
                                   'default_shipping': isDefaultShipping,
                                   'default_billing': isDefaultBilling,
-                                });
+                                };
+                                print(addressMap);
+                                runMutation(addressMap);
                               }
                             },
                             child: Text(
                               'SUBMIT',
-                              style: AppStyles.getSemiBoldTextStyle(
-                                  fontSize: 20, color: Colors.white),
+                              style: AppStyles.getSemiBoldTextStyle(fontSize: 20, color: Colors.white),
                             ),
                           ),
                         );
@@ -619,9 +499,7 @@ class _AddressViewState extends State<AddressView> {
     List region = [];
     for (int i = 0; i < countries['countries'].length; i++) {
       try {
-        if (countries['countries'][i]['full_name_english']
-            .toLowerCase()
-            .contains(text.toLowerCase())) {
+        if (countries['countries'][i]['full_name_english'].toLowerCase().contains(text.toLowerCase())) {
           region.add(countries['countries'][i]);
         }
       } catch (e) {
@@ -636,9 +514,7 @@ class _AddressViewState extends State<AddressView> {
     List region = [];
     for (int i = 0; i < regions['country']['available_regions'].length; i++) {
       try {
-        if (regions['country']['available_regions'][i]['name']
-            .toLowerCase()
-            .contains(text.toLowerCase())) {
+        if (regions['country']['available_regions'][i]['name'].toLowerCase().contains(text.toLowerCase())) {
           region.add(regions['country']['available_regions'][i]);
         }
       } catch (e) {

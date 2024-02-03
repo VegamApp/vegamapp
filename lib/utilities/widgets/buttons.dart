@@ -140,7 +140,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                   'cartIdString': '${cart.cartId}',
                   'cartItemsMap': [
                     {
-                      'quantity': 1,
+                      'quantity': widget.quantity,
                       'parent_sku': widget.parentSku,
                       'sku': widget.selectedSku,
                     }
@@ -151,14 +151,14 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                 runMutation({
                   'cartIdString': '${cart.cartId}',
                   'cartItemsMap': [
-                    {'quantity': 1, 'sku': widget.parentSku}
+                    {'quantity': widget.quantity, 'sku': widget.parentSku}
                   ]
                 });
               } else {
                 runMutation({
                   'cartIdString': cart.cartId,
                   'cartItemsMap': [
-                    {'quantity': 1, 'sku': widget.parentSku}
+                    {'quantity': widget.quantity, 'sku': widget.parentSku}
                   ]
                 });
               }

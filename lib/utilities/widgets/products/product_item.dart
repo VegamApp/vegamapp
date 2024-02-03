@@ -23,7 +23,7 @@ class ProductItem extends StatefulWidget {
   final Items productModel;
   final String price;
   final String? originalPrice;
-  final String? offer;
+  final double? offer;
   final double? priceSize;
   final double? originalPriceSize;
   final double? offerSize;
@@ -39,19 +39,19 @@ class _ProductItemState extends State<ProductItem> {
   Widget build(BuildContext context) {
     return InkWell(
       hoverColor: Colors.transparent,
-      onTap: () => context.go(
-          '/${ProductView.route}/${widget.productModel.urlKey}.${widget.productModel.urlSuffix}'),
+      onTap: () => context.go('/${ProductView.route}/${widget.productModel.urlKey}.${widget.productModel.urlSuffix}'),
       onHover: (value) => setState(() => _isHovered = value),
       child: Container(
-        padding:
-            AppResponsive.isMobile(context) ? null : const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(15),
         constraints: const BoxConstraints(maxHeight: 400),
         decoration: BoxDecoration(
           color: AppColors.scaffoldColor,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: !_isHovered
-              ? null
-              : [BoxShadow(color: AppColors.evenFadedText, blurRadius: 5)],
+          boxShadow: AppResponsive.isMobile(context)
+              ? [BoxShadow(color: AppColors.evenFadedText, blurRadius: 5)]
+              : !_isHovered
+                  ? null
+                  : [BoxShadow(color: AppColors.evenFadedText, blurRadius: 5)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,22 +59,27 @@ class _ProductItemState extends State<ProductItem> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
-              child: Center(
-                child: Container(
-                  constraints:
-                      const BoxConstraints(minHeight: 100, maxHeight: 220),
-                  // color: Colors.amber,
-                  // height: 250,
-                  child: CachedNetworkImage(
-                      imageUrl: widget.productModel.image!.url!),
+              // child: Center(
+              // child: Container(
+              // constraints: const BoxConstraints(minHeight: 100, maxHeight: 220),
+              // color: Colors.amber,
+              // height: 250,
+              // child: CachedNetworkImage(imageUrl: widget.productModel.image!.url!),
+              //   ),
+              // ),
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: Colors.green,
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(widget.productModel.image!.url!),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             Text(
               "${widget.productModel.name}",
-              style: AppStyles.getMediumTextStyle(
-                  fontSize: 16, color: AppColors.fadedText),
+              style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText),
               maxLines: 2,
             ),
             const SizedBox(height: 5),
@@ -102,23 +107,22 @@ class _ProductItemState extends State<ProductItem> {
                         textColor: Colors.white,
                         svg: 'assets/svg/shopping-cart.svg',
                         parentSku: widget.productModel.sku!,
-                        selectedSku:
-                            widget.productModel.variants?[0].product?.sku!,
+                        selectedSku: widget.productModel.variants?[0].product?.sku!,
                         quantity: 1,
                       ),
-                      const SizedBox(height: 5),
-                      BuildButtonSingle(
-                        typeName: widget.productModel.sTypename!,
-                        width: 400,
-                        title: 'BUY NOW',
-                        buttonColor: AppColors.fontColor,
-                        textColor: Colors.white,
-                        svg: 'assets/svg/flash.svg',
-                        parentSku: widget.productModel.sku!,
-                        selectedSku:
-                            widget.productModel.variants?[0].product?.sku!,
-                        quantity: 1,
-                      ),
+                      // const SizedBox(height: 5),
+                      // BuildButtonSingle(
+                      //   typeName: widget.productModel.sTypename!,
+                      //   width: 400,
+                      //   title: 'BUY NOW',
+                      //   buttonColor: AppColors.fontColor,
+                      //   textColor: Colors.white,
+                      //   svg: 'assets/svg/flash.svg',
+                      //   parentSku: widget.productModel.sku!,
+                      //   selectedSku:
+                      //       widget.productModel.variants?[0].product?.sku!,
+                      //   quantity: 1,
+                      // ),
                     ],
                   )
                 : Row(
@@ -132,26 +136,24 @@ class _ProductItemState extends State<ProductItem> {
                           textColor: Colors.white,
                           svg: 'assets/svg/shopping-cart.svg',
                           parentSku: widget.productModel.sku!,
-                          selectedSku:
-                              widget.productModel.variants?[0].product?.sku!,
+                          selectedSku: widget.productModel.variants?[0].product?.sku!,
                           quantity: 1,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: BuildButtonSingle(
-                          typeName: widget.productModel.sTypename!,
-                          width: 400,
-                          title: 'BUY NOW',
-                          buttonColor: AppColors.fontColor,
-                          textColor: Colors.white,
-                          svg: 'assets/svg/flash.svg',
-                          parentSku: widget.productModel.sku!,
-                          selectedSku:
-                              widget.productModel.variants?[0].product?.sku!,
-                          quantity: 1,
-                        ),
-                      ),
+                      // const SizedBox(width: 10),
+                      // Expanded(
+                      //   child: BuildButtonSingle(
+                      //     typeName: widget.productModel.sTypename!,
+                      //     width: 400,
+                      //     title: 'BUY NOW',
+                      //     buttonColor: AppColors.fontColor,
+                      //     textColor: Colors.white,
+                      //     svg: 'assets/svg/flash.svg',
+                      //     parentSku: widget.productModel.sku!,
+                      //     selectedSku: widget.productModel.variants?[0].product?.sku!,
+                      //     quantity: 1,
+                      //   ),
+                      // ),
                     ],
                   ),
           ],

@@ -39,7 +39,7 @@ abstract class _CategoriesDataBase with Store {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: gql(ApiServices.getCategories)));
-    print(result.data);
+    // print(result.data);
     _data = result.data!;
     setLoading(false);
   }

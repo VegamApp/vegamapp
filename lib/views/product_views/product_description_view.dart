@@ -19,7 +19,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
   late ProductModel productModel;
   String price = '';
   String? originalPrice;
-  String? offer;
+  double? offer;
   List<Map<String, dynamic>> originalMedia = [];
   List<Map<String, dynamic>> mediaGallery = [];
   @override
@@ -33,7 +33,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
     print(jsonEncode(widget.data));
     price = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
-    offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff.toString();
+    offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff;
     super.initState();
   }
 
@@ -102,7 +102,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
               itemBuilder: (context, index) {
                 var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
                 var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
-                var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
+                var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff;
                 return ProductItem(
                   productModel: productModel.items![0].relatedProducts![index],
                   price: price,
@@ -208,7 +208,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 itemBuilder: (context, index) {
                   var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
                   var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
-                  var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff.toString();
+                  var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff;
                   return ProductItem(
                     productModel: productModel.items![0].relatedProducts![index],
                     price: price,

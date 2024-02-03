@@ -18,7 +18,7 @@ class BuildPriceWithOffer extends StatelessWidget {
   final double priceSize;
   final String? originalPrice;
   final double? originalPriceSize;
-  final String? offer;
+  final double? offer;
   final double? offerSize;
   final String? currency;
   @override
@@ -33,7 +33,7 @@ class BuildPriceWithOffer extends StatelessWidget {
               text: '${double.parse(price!).toStringAsFixed(2)}   ',
               style: AppStyles.getMediumTextStyle(fontSize: priceSize, color: AppColors.fontColor),
             ),
-          if (originalPrice != null && offer != '0')
+          if (originalPrice != null && offer != 0)
             TextSpan(
                 text: currency != null ? '$currency' : '₹',
                 style: TextStyle(
@@ -42,7 +42,7 @@ class BuildPriceWithOffer extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   decoration: TextDecoration.lineThrough,
                 )),
-          if (originalPrice != null && offer != '0')
+          if (originalPrice != null && offer != 0)
             TextSpan(
               text: '$originalPrice ',
               style: TextStyle(
@@ -52,7 +52,7 @@ class BuildPriceWithOffer extends StatelessWidget {
                 decoration: TextDecoration.lineThrough,
               ),
             ),
-          if (originalPrice != null && offer != '0')
+          if (originalPrice != null && offer != 0)
             TextSpan(
               text: '   $offer% off',
               style: AppStyles.getMediumTextStyle(fontSize: offerSize!, color: AppColors.buttonColor),
