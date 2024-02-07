@@ -159,6 +159,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                             const SizedBox(height: 20),
                             CartSummaryWidget(
                               buttonText: "Go to Checkout",
+                              refetch: () {},
                               onButtonTap: () {
                                 context.go("/${CartView.route}/${CartPayment.route}");
                               },
@@ -190,6 +191,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                               ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 350),
                                 child: CartSummaryWidget(
+                                  refetch: () {},
                                   buttonText: "Go to Checkout",
                                   onButtonTap: () {
                                     // log(jsonEncode(cartData.cartData));

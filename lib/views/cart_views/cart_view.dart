@@ -122,6 +122,7 @@ class _CartViewState extends State<CartView> {
                                 const SizedBox(height: 20),
                                 CartSummaryWidget(
                                   buttonText: "Next",
+                                  refetch: refetch,
                                   onButtonTap: _showSignInDialog,
                                 ),
                               ],
@@ -134,7 +135,7 @@ class _CartViewState extends State<CartView> {
                                   const SizedBox(width: 20),
                                   ConstrainedBox(
                                     constraints: const BoxConstraints(maxWidth: 350),
-                                    child: CartSummaryWidget(buttonText: "Next", onButtonTap: _showSignInDialog),
+                                    child: CartSummaryWidget(refetch: refetch, buttonText: "Next", onButtonTap: _showSignInDialog),
                                   )
                                 ],
                               ),

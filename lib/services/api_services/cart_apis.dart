@@ -121,6 +121,24 @@ class CartApis {
       }
     }
   ''';
+  static String applyCouponToCart = r'''mutation applyCouponToCart($cartID: String!, $couponCode: String!){
+  applyCouponToCart(input: { cart_id: $cartID, coupon_code: $couponCode }) {
+    cart {
+      total_quantity
+    }
+  }
+}
+''';
+  static String removeCouponFromCart = r'''
+mutation removeCouponFromCart($cartId:String!) {
+  removeCouponFromCart(input: { cart_id: $cartId }) {
+    cart {
+
+      total_quantity
+    }
+  }
+}
+''';
 
   static String updateCart = r'''
     mutation updateCartItems($input: UpdateCartItemsInput){

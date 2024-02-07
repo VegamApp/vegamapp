@@ -213,6 +213,7 @@ class _CartPaymentState extends State<CartPayment> {
                                 getBody(size, cartData, refetch),
                                 const SizedBox(height: 20),
                                 CartSummaryWidget(
+                                  refetch: refetch,
                                   buttonText: "Place Order",
                                   isLoading: isLoading,
                                   onButtonTap: () {
@@ -239,6 +240,7 @@ class _CartPaymentState extends State<CartPayment> {
                                     constraints: const BoxConstraints(maxWidth: 350),
                                     child: CartSummaryWidget(
                                       buttonText: "Place Order",
+                                      refetch: refetch,
                                       isLoading: isLoading,
                                       onButtonTap: () {
                                         if (!mutResult!.isLoading && !cartData.isLoading) {
