@@ -31,7 +31,6 @@ class _AccountInformationViewState extends State<AccountInformationView> {
   late UserData userData;
 
   getData() async {
-    userData = Provider.of<UserData>(context, listen: false);
     fName.text = userData.data.firstname!;
     lName.text = userData.data.lastname!;
     email.text = userData.data.email!;
@@ -41,8 +40,14 @@ class _AccountInformationViewState extends State<AccountInformationView> {
 
   @override
   void initState() {
-    getData();
     super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) => getData());
+  }
+
+  @override
+  void didChangeDependencies() {
+    userData = Provider.of<UserData>(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -108,7 +113,7 @@ class _AccountInformationViewState extends State<AccountInformationView> {
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text('Account Information', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.primaryColor)),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           TextFormField(
             enabled: isEnabled,
             controller: fName,
@@ -122,7 +127,7 @@ class _AccountInformationViewState extends State<AccountInformationView> {
               hintText: 'First name',
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           TextFormField(
             enabled: isEnabled,
             controller: lName,
@@ -137,45 +142,45 @@ class _AccountInformationViewState extends State<AccountInformationView> {
             ),
           ),
           const SizedBox(height: 20),
-          Wrap(
-            children: [
-              SizedBox(
-                width: 150,
-                child: ListTile(
-                  onTap: () => setState(() {
-                    if (isEnabled) _gender = Gender.male;
-                  }),
-                  leading: Radio(
-                    toggleable: isEnabled,
-                    value: Gender.male,
-                    groupValue: _gender,
-                    onChanged: (value) => setState(() {
-                      if (isEnabled) _gender = Gender.male;
-                    }),
-                  ),
-                  title: Text('Male', style: AppStyles.getLightTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                ),
-              ),
-              SizedBox(
-                width: 150,
-                child: ListTile(
-                  onTap: () => setState(() {
-                    if (isEnabled) _gender = Gender.female;
-                  }),
-                  leading: Radio(
-                    toggleable: isEnabled,
-                    value: Gender.female,
-                    groupValue: _gender,
-                    onChanged: (value) => setState(() {
-                      if (isEnabled) _gender = Gender.female;
-                    }),
-                  ),
-                  title: Text('Female', style: AppStyles.getLightTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          // Wrap(
+          //   children: [
+          //     SizedBox(
+          //       width: 150,
+          //       child: ListTile(
+          //         onTap: () => setState(() {
+          //           if (isEnabled) _gender = Gender.male;
+          //         }),
+          //         leading: Radio(
+          //           toggleable: isEnabled,
+          //           value: Gender.male,
+          //           groupValue: _gender,
+          //           onChanged: (value) => setState(() {
+          //             if (isEnabled) _gender = Gender.male;
+          //           }),
+          //         ),
+          //         title: Text('Male', style: AppStyles.getLightTextStyle(fontSize: 16, color: AppColors.fadedText)),
+          //       ),
+          //     ),
+          //     SizedBox(
+          //       width: 150,
+          //       child: ListTile(
+          //         onTap: () => setState(() {
+          //           if (isEnabled) _gender = Gender.female;
+          //         }),
+          //         leading: Radio(
+          //           toggleable: isEnabled,
+          //           value: Gender.female,
+          //           groupValue: _gender,
+          //           onChanged: (value) => setState(() {
+          //             if (isEnabled) _gender = Gender.female;
+          //           }),
+          //         ),
+          //         title: Text('Female', style: AppStyles.getLightTextStyle(fontSize: 16, color: AppColors.fadedText)),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(height: 20),
           TextFormField(
             enabled: false,
             controller: email,
@@ -189,27 +194,29 @@ class _AccountInformationViewState extends State<AccountInformationView> {
               hintText: 'Email',
             ),
           ),
-          const SizedBox(height: 30),
-          TextFormField(
-            enabled: false,
-            controller: phoneNo,
-            style: AppStyles.getLightTextStyle(fontSize: 17, color: AppColors.fadedText),
-            keyboardType: TextInputType.name,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
-              border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
-              hintStyle: AppStyles.getLightTextStyle(fontSize: 17, color: AppColors.fadedText),
-              hintText: 'Phone number',
-            ),
-          ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
+          // TextFormField(
+          //   enabled: false,
+          //   controller: phoneNo,
+          //   style: AppStyles.getLightTextStyle(fontSize: 17, color: AppColors.fadedText),
+          //   keyboardType: TextInputType.name,
+          //   textInputAction: TextInputAction.next,
+          //   decoration: InputDecoration(
+          //     disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
+          //     border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
+          //     hintStyle: AppStyles.getLightTextStyle(fontSize: 17, color: AppColors.fadedText),
+          //     hintText: 'Phone number',
+          //   ),
+          // ),
+          // const SizedBox(height: 20),
           // Edit details and upload to database
           Mutation(
               options: MutationOptions(
                   document: gql(CustomerApis.updateCustomer),
                   onCompleted: (data) {
                     print(data);
+                    showSnackBar(context: context, message: "User updated successfully", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
+                    userData.getUserData(context);
                   },
                   onError: (error) {
                     print(error);
@@ -226,7 +233,7 @@ class _AccountInformationViewState extends State<AccountInformationView> {
                         'input': {
                           'firstname': fName.text,
                           'lastname': lName.text,
-                          'gender': _gender == Gender.male ? 1 : 2,
+                          // 'gender': _gender == Gender.male ? 1 : 2,
                         }
                       });
                     }

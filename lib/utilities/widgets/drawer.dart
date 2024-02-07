@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
@@ -21,7 +24,6 @@ class DrawerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var categories = Provider.of<CategoriesData>(context);
-
     return Observer(
       builder: (context) {
         return Container(
@@ -37,162 +39,196 @@ class DrawerContainer extends StatelessWidget {
                       height: double.infinity,
                       child: Text('No items to show', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)))
                   : ListView(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20),
                       children: [
                         Text('SHOP BY CATEGORY', style: AppStyles.getBoldTextStyle(fontSize: 18, color: AppColors.fadedText)),
                         const SizedBox(height: 20),
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: categories.data['categories']['items'].length,
+                          itemCount: categories.data['categories']['items'][0]['children'].length,
                           itemBuilder: (context, index) {
-                            if (categories.data['categories']['items'][index]['children'] == null || categories.data['categories']['items'][index]['children'].isEmpty) {
+                            if (categories.data['categories']['items'][0]['children'][index]['include_in_menu'] == 0) {
+                              return SizedBox();
+                            }
+                            if (categories.data['categories']['items'][0]['children'][index]['children'] == null ||
+                                categories.data['categories']['items'][0]['children'][index]['children'].isEmpty) {
+                              var data = categories.data['categories']['items'][0]['children'][index];
                               return ListTile(
-                                //TODO: Ontap
-                                contentPadding: EdgeInsets.zero,
                                 onTap: () {
-                                  print(categories.data['categories']['items'][index]);
+                                  context.push('/${ProductView.route}?categoryUid=${data['uid']}&title=${data['name']}');
                                 },
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                                 title: Text(
-                                  categories.data['categories']['items'][index]['name'],
-                                  style: AppStyles.getBoldTextStyle(fontSize: 16),
+                                  data['name'],
+                                  style: AppStyles.getMediumTextStyle(fontSize: 15),
                                 ),
                               );
                             }
-                            return ExpansionTile(
-                              initiallyExpanded: true,
-                              maintainState: true,
+                            return CustomExpansionTile(
+                              // initiallyExpanded: false,
                               // expandedAlignment: Alignment.centerRight,
                               // expandedCrossAxisAlignment: CrossAxisAlignment.end,
-                              tilePadding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.only(left: 10),
                               title: Text(
-                                categories.data['categories']['items'][index]['name'],
-                                style: AppStyles.getBoldTextStyle(fontSize: 16),
+                                categories.data['categories']['items'][0]['children'][index]['name'],
+                                style: AppStyles.getMediumTextStyle(fontSize: 15),
                               ),
+                              expandedItem: _expanded,
+                              key: ValueKey(index),
                               children: List.generate(
-                                categories.data['categories']['items'][index]['children'].length,
-                                (index2) {
-                                  if (categories.data['categories']['items'][index]['children'][index2]['include_in_menu'] == 0) {
-                                    return const SizedBox();
-                                  }
-                                  if (categories.data['categories']['items'][index]['children'][index2]['children'] == null ||
-                                      categories.data['categories']['items'][index]['children'][index2]['children'].isEmpty) {
-                                    return ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                      onTap: () {
-                                        var data = categories.data['categories']['items'][index]['children'][index2];
-                                        context.goNamed(
-                                          ProductView.route,
-                                          queryParameters: {'categoryUid': data['uid']},
-                                        );
-                                      },
-                                      title: Text(
-                                        categories.data['categories']['items'][index]['children'][index2]['name'],
-                                        style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                categories.data['categories']['items'][0]['children'][index]['children'].length,
+                                (index3) {
+                                  var data = categories.data['categories']['items'][0]['children'][index]['children'][index3];
+                                  return TextButton(
+                                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                    onPressed: () {
+                                      context.push('/${ProductView.route}?categoryUid=${data['uid']}&title=${data['name']}');
+                                      // navigate(context, ProductListingPage.route, arguments: {'catergoryId': data['id'], 'title': data['name']});
+                                    },
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 20),
+                                        child: Text(
+                                          data['name'],
+                                          style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText),
+                                        ),
                                       ),
-                                    );
-                                  }
-                                  return CustomExpansionTile(
-                                      // initiallyExpanded: false,
-                                      // expandedAlignment: Alignment.centerRight,
-                                      // expandedCrossAxisAlignment: CrossAxisAlignment.end,
-                                      padding: const EdgeInsets.only(left: 10),
-                                      title: Text(categories.data['categories']['items'][index]['children'][index2]['name']),
-                                      expandedItem: _expanded,
-                                      key: ValueKey(index2),
-                                      children: List.generate(
-                                        categories.data['categories']['items'][index]['children'][index2]['children'].length,
-                                        (index3) {
-                                          var data = categories.data['categories']['items'][index]['children'][index2]['children'][index3];
-                                          return TextButton(
-                                            style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                                            onPressed: () {
-                                              print(data);
-                                              context.goNamed(
-                                                ProductView.route,
-                                                queryParameters: {'categoryUid': data['uid']},
-                                              );
-                                            },
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(left: 20),
-                                                child: Text(
-                                                  data['name'],
-                                                  style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ));
+                                    ),
+                                  );
                                 },
                               ),
                             );
                           },
                         ),
-                        const SizedBox(height: 20),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, CMSPage.route, arguments: {'id': 'our-story', 'title': 'Our Story'}),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('Our Story', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, CMSPage.route, arguments: {'id': 'about-us', 'title': 'About Us'}),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('About Us', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, ContactUs.route),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('Contact Us', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, FAQView.route),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('FAQS', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, CMSPage.route, arguments: {'id': 'terms-and-conditions', 'title': 'Terms of use'}),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('Terms of use', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // TextButton(
-                        //   onPressed: () =>
-                        //       navigate(context, CMSPage.route, arguments: {'id': 'return-and-replacement-policies', 'title': 'Shipping and Returns'}),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('Shipping and Returns', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 10),
-                        // TextButton(
-                        //   onPressed: () => navigate(context, CMSPage.route, arguments: {'id': 'privacypolicy', 'title': 'Privacy and Security'}),
-                        //   child: Align(
-                        //     alignment: Alignment.centerLeft,
-                        //     child: Text('Privacy and Security', style: AppStyles.getBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                        //   ),
-                        // ),
                         const SizedBox(height: 10),
+                        Divider(color: AppColors.fadedText.withOpacity(0.2)),
+                        const SizedBox(height: 10),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=about-us');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "About us",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=delivery');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Delivery",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=payment');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Payment",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=career');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Career",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=fin-docs');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Annual Return",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=csr');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Corporate Social Responsibility",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=latest');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "News",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=exchange_or_return');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Exchange or Return",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=privacy-policy');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Privacy Policy",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${CMSPage.route}?id=showroom');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Store locater",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // ListTile(
+                        //   onTap: () {
+                        //     context.push('/${ContactView.route}');
+                        //   },
+                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        //   title: Text(
+                        //     "Contact Us",
+                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 10),
+                        // Divider(color: AppColors.fadedText.withOpacity(0.2)),
+                        // const SizedBox(height: 10),
                       ],
                     ),
         );
       },
     );
+  }
+
+  Widget getChild(Map data) {
+    return SizedBox();
   }
 
   ListTile getListTile(String title, void Function()? onTap) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -59,19 +60,16 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
         options: MutationOptions(
             document: gql(CartApis.addProductToCart),
             onCompleted: (result) {
-              print("cartId ${cart.cartId}");
-              print(result!['addProductsToCart']['cart']['total_quantity']);
-              print("addProductToCart: ${jsonEncode(result)}");
-              cart.putCartCount(result['addProductsToCart']['cart']['total_quantity']);
-              cart.getCartData(context, token);
-              setState(() {});
+              cart.putCartCount(result?['addProductsToCart']['cart']['total_quantity']);
+              // Timer(const Duration(milliseconds: 1000), () => cart.getCartData(context, token));
+              print(cart.cartCount);
               try {
                 try {
                   showSnackBar(
                     backgroundColor: AppColors.snackbarErrorBackgroundColor,
                     textColor: AppColors.snackbarErrorTextColor,
                     context: context,
-                    message: result['addProductsToCart']['user_errors'][0]['message'],
+                    message: result?['addProductsToCart']['user_errors'][0]['message'],
                   );
                 } catch (e) {
                   print(e);
@@ -81,6 +79,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                     context: context,
                     message: 'Added to cart',
                   );
+                  // cart.getCartData(context, token);
                   if (widget.isBuyNow) {
                     if (loginToken.loginToken == null) {
                       // navigate(context, const Auth());
@@ -136,16 +135,18 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
               // print(widget.parentSku);
               // print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
-                runMutation({
+                Map<String, dynamic> data = {
                   'cartIdString': '${cart.cartId}',
                   'cartItemsMap': [
                     {
-                      'quantity': widget.quantity,
                       'parent_sku': widget.parentSku,
+                      'quantity': widget.quantity,
                       'sku': widget.selectedSku,
                     }
                   ]
-                });
+                };
+                print(data);
+                runMutation(data);
               } else if (widget.typeName == 'SimpleProduct') {
                 //print(loginToken.cartId);
                 runMutation({
@@ -173,15 +174,15 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                           style: AppStyles.getMediumTextStyle(fontSize: widget.width * 0.028 > 14 ? 14 : widget.width * 0.028),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SvgPicture.asset(
-                          widget.svg,
-                          width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
-                          color: getTextColor(statesController.value),
-                          // color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor,
-                        ),
-                      )
+                      // Align(
+                      //   alignment: Alignment.centerRight,
+                      //   child: SvgPicture.asset(
+                      //     widget.svg,
+                      //     width: widget.width * 0.08 > 30 ? 30 : widget.width * 0.08,
+                      //     color: getTextColor(statesController.value),
+                      //     // color: statesController.value.contains(MaterialState.hovered) ? widget.buttonColor : widget.textColor,
+                      //   ),
+                      // )
                     ],
                   ),
           );

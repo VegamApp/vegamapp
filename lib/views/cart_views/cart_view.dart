@@ -12,6 +12,7 @@ import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/cart_views/cart_addresss_view.dart';
 import 'package:provider/provider.dart';
 
@@ -26,16 +27,21 @@ class _CartViewState extends State<CartView> {
   var f = NumberFormat("#,##,##,##0.00", "en_IN");
   ScrollController scrollController = ScrollController();
   final deboucer = Debouncer(milliseconds: 500);
+  late CartData cartData;
+  late AuthToken token;
 
   getCart() async {
     var cartData = Provider.of<CartData>(context, listen: false);
     var token = Provider.of<AuthToken>(context, listen: false);
     cartData.getCartData(context, token);
+    print(cartData.cartId);
+    print(token.loginToken);
   }
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => getCart());
   }
 
@@ -56,22 +62,12 @@ class _CartViewState extends State<CartView> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    cartData = Provider.of<CartData>(context);
+    token = Provider.of<AuthToken>(context);
     // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
       child: LayoutBuilder(builder: (context, constraints) {
         return Observer(builder: (_) {
-          var cartData = Provider.of<CartData>(context);
-          var token = Provider.of<AuthToken>(context);
-
-          if (cartData.isLoading) {
-            return const BuildLoadingWidget();
-          }
-          if (cartData.cartData.isEmpty) {
-            return BuildErrorWidget(
-              errorMsg: 'An error occured, please try again.',
-              onRefresh: () => cartData.getCartData(context, token),
-            );
-          }
           return Query(
               options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
               builder: (result, {fetchMore, refetch}) {
@@ -79,34 +75,44 @@ class _CartViewState extends State<CartView> {
                   return const BuildLoadingWidget();
                 }
                 if (result.hasException) {
-                  functionOnException(refetch);
-                  return BuildErrorWidget(
-                    errorMsg: result.exception?.graphqlErrors[0].message,
-                    onRefresh: refetch,
+                  cartData.getCartData(context, token);
+                  return Center(
+                    child: BuildErrorWidget(
+                      onRefresh: () async {
+                        await cartData.getCartData(context, token);
+                        refetch!();
+                      },
+                      errorMsg: result.exception!.graphqlErrors.isNotEmpty ? result.exception?.graphqlErrors[0].message : "An error occured",
+                    ),
                   );
+                  // functionOnException(refetch);
+                  // return BuildErrorWidget(
+                  //   errorMsg: result.exception?.graphqlErrors[0].message,
+                  //   onRefresh: refetch,
+                  // );
                 }
-                cartData.setCartData(result.data!);
-                cartData.putCartCount(result.data!['cart']['total_quantity']);
+                // cartData.setCartData(result.data!);
+                // cartData.putCartCount(result.data!['cart']['total_quantity']);
                 return ListView(
                   controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
                   children: [
                     const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
-                        decoration: AppResponsive.isDesktop(context)
-                            ? BoxDecoration(
-                                color: AppColors.shadowColor,
-                                borderRadius: BorderRadius.circular(30),
-                              )
-                            : null,
-                        child: const BuildCartSteps(currentCartIndex: 0),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Container(
+                    //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
+                    //     decoration: AppResponsive.isDesktop(context)
+                    //         ? BoxDecoration(
+                    //             color: AppColors.shadowColor,
+                    //             borderRadius: BorderRadius.circular(30),
+                    //           )
+                    //         : null,
+                    //     child: const BuildCartSteps(currentCartIndex: 0),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 20),
                     cartData.cartCount == 0
                         ? SizedBox(height: 200, child: Center(child: Text("Cart Empty", style: AppStyles.getMediumTextStyle(fontSize: 18))))
                         : AppResponsive(
@@ -116,9 +122,7 @@ class _CartViewState extends State<CartView> {
                                 const SizedBox(height: 20),
                                 CartSummaryWidget(
                                   buttonText: "Next",
-                                  onButtonTap: () {
-                                    context.go("/${CartView.route}/${CartAddressView.route}");
-                                  },
+                                  onButtonTap: _showSignInDialog,
                                 ),
                               ],
                             ),
@@ -130,12 +134,7 @@ class _CartViewState extends State<CartView> {
                                   const SizedBox(width: 20),
                                   ConstrainedBox(
                                     constraints: const BoxConstraints(maxWidth: 350),
-                                    child: CartSummaryWidget(
-                                      buttonText: "Next",
-                                      onButtonTap: () {
-                                        context.go("/${CartView.route}/${CartAddressView.route}");
-                                      },
-                                    ),
+                                    child: CartSummaryWidget(buttonText: "Next", onButtonTap: _showSignInDialog),
                                   )
                                 ],
                               ),
@@ -147,6 +146,71 @@ class _CartViewState extends State<CartView> {
         });
       }),
     );
+  }
+
+// If not signed in, proceeds to sign in or continue as guest
+  _showSignInDialog() {
+    if (token.loginToken != null) {
+      return context.go("/${CartView.route}/${CartAddressView.route}");
+    }
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              // height: 400,
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                shrinkWrap: true,
+                children: [
+                  const SizedBox(height: 20),
+                  Center(child: Image.asset(logoUrl, width: 200)),
+                  const SizedBox(height: 40),
+                  TextButton(
+                    style: AppStyles.filledButtonStyle,
+                    onPressed: () => context.go('/${Auth.route}'),
+                    child: Text(
+                      'Sign In & Checkout',
+                      style: AppStyles.getMediumTextStyle(fontSize: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    style: AppStyles.outlineButtonStyle,
+                    onPressed: () => setState(() {
+                      Navigator.pop(context);
+                      context.go("/${CartView.route}/${CartAddressView.route}");
+                    }),
+                    child: Text(
+                      'Guest checkout',
+                      style: AppStyles.getMediumTextStyle(fontSize: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: AppColors.buttonColor,
+                          fixedSize: const Size(50, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Icon(FontAwesomeIcons.xmark, color: Colors.white)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Widget getBody(Size size, CartData cartData, QueryResult result, Future<QueryResult<Object?>?> Function()? refetch) {

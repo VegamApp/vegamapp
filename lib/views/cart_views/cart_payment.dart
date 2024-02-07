@@ -123,9 +123,6 @@ class _CartPaymentState extends State<CartPayment> {
           cartData = Provider.of<CartData>(context);
           authToken = Provider.of<AuthToken>(context);
 
-          if (cartData.isLoading) {
-            return const BuildLoadingWidget();
-          }
           if (cartData.cartData.isEmpty) {
             return BuildErrorWidget(
               errorMsg: 'An error occured, please try again.',
@@ -161,27 +158,28 @@ class _CartPaymentState extends State<CartPayment> {
 
                 return ListView(
                   controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
                   children: [
-                    const SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
-                        decoration: AppResponsive.isDesktop(context)
-                            ? BoxDecoration(
-                                color: AppColors.shadowColor,
-                                borderRadius: BorderRadius.circular(30),
-                              )
-                            : null,
-                        child: const BuildCartSteps(currentCartIndex: 2),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    // const SizedBox(height: 20),
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Container(
+                    //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
+                    //     decoration: AppResponsive.isDesktop(context)
+                    //         ? BoxDecoration(
+                    //             color: AppColors.shadowColor,
+                    //             borderRadius: BorderRadius.circular(30),
+                    //           )
+                    //         : null,
+                    //     child: const BuildCartSteps(currentCartIndex: 2),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 20),
                     Mutation(
                         options: MutationOptions(
-                          document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
+                          // document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
+                          document: gql(PaymentServices.placeOrder),
                           onError: (data) {
                             print(data);
                             try {
@@ -195,11 +193,11 @@ class _CartPaymentState extends State<CartPayment> {
                             if (data != null) {
                               log(data.toString());
                               if (paymentCode == 'razorpay') {
-                                if (data['placeRazorpayOrder']['success']) {
-                                  getRazorPay(data, authToken);
-                                } else {
-                                  showSnackBar(context: context, message: data['placeRazorpayOrder']['message'], backgroundColor: Colors.red);
-                                }
+                                // if (data['placeRazorpayOrder']['success']) {
+                                //   getRazorPay(data, authToken);
+                                // } else {
+                                //   showSnackBar(context: context, message: data['placeRazorpayOrder']['message'], backgroundColor: Colors.red);
+                                // }
                               } else {
                                 await cartData.getCustomerCart(context, authToken);
                                 context.go("/${CartView.route}/${OrderPlacedView.route}");
@@ -455,7 +453,7 @@ class _CartPaymentState extends State<CartPayment> {
 
       var options = {
         //test
-        'key': 'rzp_test_KlUME9CyoNI00x',
+        'key': 'rzp_test_kviuSU4uhhoBlr',
         // live
         // 'key': 'rzp_live_1LicnHl9VVn03e',
         // "description": storeConfig.storeData.storeConfig?.defaultDescription ?? "",

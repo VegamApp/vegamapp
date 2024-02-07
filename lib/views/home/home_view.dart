@@ -111,7 +111,8 @@ class _HomeViewState extends State<HomeView> {
                     data['products'].length,
                     (index) {
                       var productModel = Items.fromJson(data['products'][index]);
-                      var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
+                      print(productModel.specialPrice);
+                      var price = productModel.specialPrice ?? productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
                       var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
                       var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;
                       return ProductItem(
@@ -139,7 +140,7 @@ class _HomeViewState extends State<HomeView> {
                 data['products'].length,
                 (index) {
                   var productModel = Items.fromJson(data['products'][index]);
-                  var price = productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
+                  var price = productModel.specialPrice ?? productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
                   var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
                   var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;
                   return ProductItem(

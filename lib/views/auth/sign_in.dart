@@ -64,6 +64,7 @@ class _SignInState extends State<SignIn> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 20),
               Text(
                 'Registered Customers',
                 style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText),

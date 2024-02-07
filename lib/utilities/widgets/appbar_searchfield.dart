@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/search_services.dart';
 import 'package:m2/utilities/app_colors.dart';
-import 'package:m2/utilities/text_style.dart';
+import 'package:m2/utilities/app_style.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class AppbarSearchService extends StatefulWidget {

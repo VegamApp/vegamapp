@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:m2/services/api_services/payment_services.dart';
+import 'package:m2/services/search_services.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
+import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/cart_views/payment_complete_view.dart';
 import 'package:provider/provider.dart';
+import 'package:razorpay_web/razorpay_web.dart';
 
 class CartSummaryWidget extends StatefulWidget {
   const CartSummaryWidget({super.key, this.estimatedDelivery, this.onButtonTap, required this.buttonText, this.isLoading = false});
@@ -19,6 +26,76 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
   TextEditingController coupon = TextEditingController();
   var f = NumberFormat("#,##,##,##0.00", "en_IN");
   MaterialStatesController buttonStateController = MaterialStatesController();
+  var _razorPay = Razorpay();
+  bool isLoading = false;
+  late AuthToken authToken;
+  late CartData cart;
+
+  @override
+  void initState() {
+    super.initState();
+    _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    // Do something when payment succeeds
+    setState(() {
+      isLoading = true;
+    });
+
+    showSnackBar(context: context, message: "Payment Successfull", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
+
+    var graphqlClient = GraphQLProvider.of(context);
+    var input = {
+      'cart_id': cart.cartId,
+      'rzp_order_id': response.orderId,
+      'rzp_payment_id': response.paymentId,
+      'rzp_signature': response.signature,
+    };
+    // log(input.toString());
+    QueryResult? result = await graphqlClient.value.mutate(
+      MutationOptions(document: gql(PaymentServices.setRazorOnCart), variables: {"input": input}),
+    );
+
+    try {} catch (e) {}
+    if (!result.hasException) {
+      QueryResult? placeOrderresult = await graphqlClient.value.mutate(
+        MutationOptions(document: gql(PaymentServices.placeOrder), variables: {'cartId': cart.cartId}),
+      );
+      if (!placeOrderresult.hasException) {
+        CartData cartData = Provider.of<CartData>(context, listen: false);
+        AuthToken authToken = Provider.of<AuthToken>(context, listen: false);
+        await cartData.getCustomerCart(context, authToken);
+        context.push('/cart/${OrderPlacedView.route}?orderid=${placeOrderresult.data?['placeOrder']['order']['order_number']}');
+      }
+    } else {
+      showSnackBar(context: context, message: result.exception!.graphqlErrors[0].message, backgroundColor: Colors.red);
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) async {
+    // Do something when payment fails
+    await cart.getCartData(context, authToken);
+    ////print(response.message);
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message!, style: AppStyles.getRegularTextStyle(fontSize: 14))));
+    // await fetchNewCart();
+    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) async {
+    // Do something when an external wallet is selected
+    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Unknown Error", style: AppStyles.getRegularTextStyle(fontSize: 14))));
+    // await fetchNewCart();
+
+    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
+  }
+
+  Debouncer debouncer = Debouncer(milliseconds: 700);
 
   @override
   void dispose() {
@@ -30,7 +107,9 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    var cart = Provider.of<CartData>(context);
+    cart = Provider.of<CartData>(context);
+    authToken = Provider.of<AuthToken>(context);
+
     return Container(
       width: size.width,
       constraints: const BoxConstraints(maxWidth: 500),

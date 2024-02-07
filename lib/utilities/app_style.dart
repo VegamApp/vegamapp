@@ -73,6 +73,8 @@ class AppStyles {
     foregroundColor: MaterialStatePropertyAll(AppColors.primaryColor),
     padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
   );
+
+  static List<BoxShadow> defaultShadow = [BoxShadow(color: AppColors.fadedText.withOpacity(0.3), blurRadius: 5, offset: const Offset(0, 3))];
 }
 
 // List of various text styles used within the app

@@ -33,28 +33,28 @@ class _CartAddressViewState extends State<CartAddressView> {
   bool saveAddress = false;
   // For new addresses
   // For test
-  // TextEditingController name = TextEditingController(text: "Jack");
-  // TextEditingController email = TextEditingController();
-  // TextEditingController state = TextEditingController();
-  // TextEditingController lName = TextEditingController(text: "Reacher");
-  // TextEditingController appartNo = TextEditingController(text: 'Appr');
-  // TextEditingController street = TextEditingController(text: "Str");
-  // TextEditingController address = TextEditingController(text: "Address");
-  // TextEditingController city = TextEditingController(text: "City");
-  // TextEditingController contact = TextEditingController(text: "1231231231");
-  // TextEditingController pin = TextEditingController(text: "682025");
+  TextEditingController name = TextEditingController(text: "Jack");
+  TextEditingController email = TextEditingController();
+  TextEditingController state = TextEditingController();
+  TextEditingController lName = TextEditingController(text: "Reacher");
+  TextEditingController appartNo = TextEditingController(text: 'Appr');
+  TextEditingController street = TextEditingController(text: "Str");
+  TextEditingController address = TextEditingController(text: "Address");
+  TextEditingController city = TextEditingController(text: "City");
+  TextEditingController contact = TextEditingController(text: "1231231231");
+  TextEditingController pin = TextEditingController(text: "682025");
 
   //Default
-  TextEditingController name = TextEditingController();
-  TextEditingController email = TextEditingController();
-  TextEditingController lName = TextEditingController();
-  TextEditingController appartNo = TextEditingController();
-  TextEditingController street = TextEditingController();
-  TextEditingController address = TextEditingController();
-  TextEditingController city = TextEditingController();
-  TextEditingController contact = TextEditingController();
-  TextEditingController pin = TextEditingController();
-  TextEditingController state = TextEditingController();
+  // TextEditingController name = TextEditingController();
+  // TextEditingController email = TextEditingController();
+  // TextEditingController lName = TextEditingController();
+  // TextEditingController appartNo = TextEditingController();
+  // TextEditingController street = TextEditingController();
+  // TextEditingController address = TextEditingController();
+  // TextEditingController city = TextEditingController();
+  // TextEditingController contact = TextEditingController();
+  // TextEditingController pin = TextEditingController();
+  // TextEditingController state = TextEditingController();
   // AddressType _addressType = AddressType.office;
 
   Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
@@ -95,9 +95,6 @@ class _CartAddressViewState extends State<CartAddressView> {
               var token = Provider.of<AuthToken>(context);
               var user = Provider.of<UserData>(context);
 
-              if (cartData.isLoading) {
-                return const BuildLoadingWidget();
-              }
               if (cartData.cartData.isEmpty) {
                 return BuildErrorWidget(
                   errorMsg: 'An error occured, please try again.',
@@ -127,24 +124,24 @@ class _CartAddressViewState extends State<CartAddressView> {
                   key: _formKey,
                   child: ListView(
                     controller: scrollController,
-                    padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+                    padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
                     children: [
-                      const SizedBox(height: 20),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                          width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
-                          decoration: AppResponsive.isDesktop(context)
-                              ? BoxDecoration(
-                                  color: AppColors.shadowColor,
-                                  borderRadius: BorderRadius.circular(30),
-                                )
-                              : null,
-                          child: const BuildCartSteps(currentCartIndex: 1),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 20),
+                      // Align(
+                      //   alignment: Alignment.centerLeft,
+                      //   child: Container(
+                      //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
+                      //     decoration: AppResponsive.isDesktop(context)
+                      //         ? BoxDecoration(
+                      //             color: AppColors.shadowColor,
+                      //             borderRadius: BorderRadius.circular(30),
+                      //           )
+                      //         : null,
+                      //     child: const BuildCartSteps(currentCartIndex: 1),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 20),
                       AppResponsive(
                         mobile: Column(
                           children: [
@@ -236,6 +233,14 @@ class _CartAddressViewState extends State<CartAddressView> {
             validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
           ),
           const SizedBox(height: 20),
+          if (authToken.loginToken == null) ...[
+            BuildTextField(
+              controller: email,
+              hint: 'Email',
+              validator: validateEmail,
+            ),
+            const SizedBox(height: 20),
+          ],
           BuildTextField(
             controller: appartNo,
             hint: 'Apartment Number',
@@ -449,42 +454,44 @@ class _CartAddressViewState extends State<CartAddressView> {
               },
             ),
           const SizedBox(height: 20),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            hoverColor: Colors.transparent,
-            onTap: () {
-              isDefaultShipping = !isDefaultShipping;
-              setState(() {});
-            },
-            leading: Checkbox(
-              activeColor: AppColors.primaryColor,
-              checkColor: Colors.white,
-              value: isDefaultShipping,
-              onChanged: (bool? value) {
+          if (authToken.loginToken != null)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              hoverColor: Colors.transparent,
+              onTap: () {
                 isDefaultShipping = !isDefaultShipping;
                 setState(() {});
               },
+              leading: Checkbox(
+                activeColor: AppColors.primaryColor,
+                checkColor: Colors.white,
+                value: isDefaultShipping,
+                onChanged: (bool? value) {
+                  isDefaultShipping = !isDefaultShipping;
+                  setState(() {});
+                },
+              ),
+              title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
             ),
-            title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            hoverColor: Colors.transparent,
-            onTap: () {
-              isDefaultBilling = !isDefaultBilling;
-              setState(() {});
-            },
-            leading: Checkbox(
-              activeColor: AppColors.primaryColor,
-              checkColor: Colors.white,
-              value: isDefaultBilling,
-              onChanged: (bool? value) {
+          if (authToken.loginToken != null)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              hoverColor: Colors.transparent,
+              onTap: () {
                 isDefaultBilling = !isDefaultBilling;
                 setState(() {});
               },
+              leading: Checkbox(
+                activeColor: AppColors.primaryColor,
+                checkColor: Colors.white,
+                value: isDefaultBilling,
+                onChanged: (bool? value) {
+                  isDefaultBilling = !isDefaultBilling;
+                  setState(() {});
+                },
+              ),
+              title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
             ),
-            title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
-          ),
           if (authToken.loginToken != null)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -504,7 +511,7 @@ class _CartAddressViewState extends State<CartAddressView> {
               ),
               title: Text('Save in address book', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
             ),
-          const SizedBox(height: 10),
+          if (authToken.loginToken != null) const SizedBox(height: 10),
           Mutation(
             options: MutationOptions(
                 document: gql(CartApis.setEmailOnGuestCart),
@@ -512,6 +519,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                   newAddress = false;
                   setState(() {});
                   cartData.getCartData(context, authToken);
+                  context.go("/${CartView.route}/${CartPayment.route}");
                 },
                 onError: (error) {
                   //print(error);

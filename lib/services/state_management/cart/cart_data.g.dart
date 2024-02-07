@@ -9,6 +9,13 @@ part of 'cart_data.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$CartData on _CartDataBase, Store {
+  Computed<int>? _$cartCountComputed;
+
+  @override
+  int get cartCount => (_$cartCountComputed ??=
+          Computed<int>(() => super.cartCount, name: '_CartDataBase.cartCount'))
+      .value;
+
   late final _$_cartIdAtom =
       Atom(name: '_CartDataBase._cartId', context: context);
 
@@ -167,7 +174,7 @@ mixin _$CartData on _CartDataBase, Store {
   @override
   String toString() {
     return '''
-
+cartCount: ${cartCount}
     ''';
   }
 }

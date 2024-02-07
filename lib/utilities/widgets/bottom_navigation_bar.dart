@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
@@ -15,6 +17,7 @@ class BuildBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var cart = Provider.of<CartData>(context);
     return SizedBox(
       width: size.width,
       height: 74,
@@ -22,7 +25,30 @@ class BuildBottomNavBar extends StatelessWidget {
         children: [
           getIcon(size, SvgPicture.asset('assets/svg/home.svg', color: currentIndex == 0 ? AppColors.kPrimaryColor : Colors.black), 0, context),
           getIcon(size, SvgPicture.asset('assets/svg/search.svg', color: currentIndex == 1 ? AppColors.kPrimaryColor : Colors.black), 1, context),
-          getIcon(size, SvgPicture.asset('assets/svg/cart.svg', color: currentIndex == 2 ? AppColors.kPrimaryColor : Colors.black), 2, context),
+          getIcon(
+            size,
+            Observer(builder: (context) {
+              return SizedBox(
+                width: size.width * 0.1,
+                child: Stack(
+                  children: [
+                    Center(child: SvgPicture.asset('assets/svg/cart.svg', color: currentIndex == 2 ? AppColors.kPrimaryColor : Colors.black)),
+                    if (cart.cartCount != 0)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: CircleAvatar(
+                          backgroundColor: AppColors.buttonColor,
+                          radius: 7.5,
+                          child: Text(cart.cartCount.toString(), style: AppStyles.getRegularTextStyle(fontSize: 9, color: Colors.white)),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+            2,
+            context,
+          ),
           getIcon(size, SvgPicture.asset('assets/svg/person.svg', color: currentIndex == 3 ? AppColors.kPrimaryColor : Colors.black), 3, context),
         ],
       ),

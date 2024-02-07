@@ -8,6 +8,7 @@ import 'package:m2/services/models/product_model.dart' show ProductModel, Items;
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/product_views/product_description_view.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductView extends StatefulWidget {
   const ProductView({super.key, this.urlKey, this.categoryId, this.categoryUid, this.viewAll = false, this.searchQuery});
@@ -53,11 +54,7 @@ class _ProductViewState extends State<ProductView> {
     });
     getQueryString();
     _scrollController.addListener(() {
-      print('pixel ${_scrollController.position.pixels == _scrollController.position.maxScrollExtent}');
-      print('page ${page <= totalPages}');
-      print('isLoading $isLoading \n');
-      if ((_scrollController.position.pixels == _scrollController.position.maxScrollExtent && page <= totalPages && !isLoading)) {
-        //print('hi');
+      if (_scrollController.position.pixels >= (_scrollController.position.maxScrollExtent - 1200) && page <= totalPages && !isLoading) {
         page++;
         fetchMore!(opts!);
       }
@@ -184,7 +181,24 @@ class _ProductViewState extends State<ProductView> {
           // }
 
           this.fetchMore = fetchMore;
+          opts = FetchMoreOptions(
+            document: gql(queryString),
+            variables: {'page': ++page},
+            updateQuery: (previousResultData, fetchMoreResultData) {
+              if (widget.viewAll != true) {
+                final List<dynamic> repos = [...previousResultData!['products']['items'] as List<dynamic>, ...fetchMoreResultData!['products']['items'] as List<dynamic>];
+                fetchMoreResultData['products']['items'] = repos;
+              } else {
+                final List<dynamic> repos = [
+                  ...previousResultData!['viewallProducts']['products'] as List<dynamic>,
+                  ...fetchMoreResultData!['viewallProducts']['products'] as List<dynamic>
+                ];
+                fetchMoreResultData['viewallProducts']['products'] = repos;
+              }
 
+              return fetchMoreResultData;
+            },
+          );
           return WillPopScope(
             onWillPop: () async {
               // //print(dController.size);
@@ -272,8 +286,8 @@ class _ProductViewState extends State<ProductView> {
                                           ),
                                   itemBuilder: (context, index) {
                                     var price = productModel.items != null
-                                        ? productModel.items![index].priceRange!.minimumPrice!.regularPrice!.value.toString()
-                                        : items[index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                                        ? productModel.items![index].specialPrice ?? productModel.items![index].priceRange!.minimumPrice!.regularPrice!.value.toString()
+                                        : items[index].specialPrice ?? items[index].priceRange!.minimumPrice!.regularPrice!.value.toString();
                                     var originalPrice = productModel.items == null
                                         ? items[index].priceRange!.maximumPrice!.regularPrice!.value.toString()
                                         : productModel.items![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
@@ -290,8 +304,7 @@ class _ProductViewState extends State<ProductView> {
                                   },
                                 ),
                                 const SizedBox(height: 20),
-                                if (result.isLoading || totalPages >= page) const Build
-                                // Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                                if (result.isLoading || totalPages >= page) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
                                 const SizedBox(height: 20),
                               ],
                             ),
@@ -395,7 +408,7 @@ class _ProductViewState extends State<ProductView> {
                           ),
                           onPressed: () {
                             getQueryString();
-                            isLoading = true;
+                            // isLoading = true;
                             //print(variables);
                             refetch!();
                             try {
@@ -426,7 +439,7 @@ class _ProductViewState extends State<ProductView> {
                             // queryString = ProductQueries.filterProduct(filterAttribute: filteringAttributes.toString());
                             // Navigator.pop(context);
                             print(filter);
-                            isLoading = true;
+                            // isLoading = true;
                             refetch!();
                             try {
                               dController.reset();

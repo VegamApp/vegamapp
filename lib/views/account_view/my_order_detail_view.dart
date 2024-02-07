@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/app_responsive.dart';
-import 'package:m2/utilities/text_style.dart';
+import 'package:m2/utilities/app_style.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/account_view/orders_view.dart';
+import 'package:m2/views/product_views/product_view.dart';
 
 class MyOrderDetailView extends StatefulWidget {
   const MyOrderDetailView({Key? key, required this.orderId}) : super(key: key);
@@ -48,7 +51,7 @@ class _MyOrderDetailViewState extends State<MyOrderDetailView> {
                 );
               }
               return SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
                 child: AppResponsive(
                   mobile: _getMobileView(size, result.data!),
                   desktop: Row(
@@ -121,6 +124,7 @@ class _MyOrderDetailViewState extends State<MyOrderDetailView> {
             product_name
             status
             product_sku
+            product_url_key
             quantity_ordered
             product_sale_price{
                 value
@@ -152,28 +156,34 @@ class BuildOrderDetailContainer extends StatefulWidget {
 class _BuildOrderDetailContainerState extends State<BuildOrderDetailContainer> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.size.width,
-      child: AppResponsive(
-        mobile: _getMobileView(),
-        desktop: Row(
-          children: [
-            Flexible(flex: 5, child: _getOrderDetails()),
-            const Spacer(),
-            Flexible(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _getOrderPrice(),
-                  // _getOrderDelivery(),
-                  _orderCancelButton(),
-                  _trackOrderButton(),
-                ],
-              ),
-            )
-          ],
+    return InkWell(
+      onTap: () {
+        print(widget.data);
+        context.push('/${ProductView.route}/${widget.data['product_url_key']}');
+      },
+      child: SizedBox(
+        width: widget.size.width,
+        child: AppResponsive(
+          mobile: _getMobileView(),
+          desktop: Row(
+            children: [
+              Flexible(flex: 5, child: _getOrderDetails()),
+              const Spacer(),
+              Flexible(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _getOrderPrice(),
+                    // _getOrderDelivery(),
+                    _orderCancelButton(),
+                    _trackOrderButton(),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -210,8 +220,8 @@ class _BuildOrderDetailContainerState extends State<BuildOrderDetailContainer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        _getProductContainer(),
-        const SizedBox(width: 20),
+        // _getProductContainer(),
+        // const SizedBox(width: 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,18 +305,18 @@ class _BuildOrderDetailContainerState extends State<BuildOrderDetailContainer> {
     );
   }
 
-  Container _getProductContainer() {
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 100, maxWidth: 100),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xffffffff),
-        borderRadius: BorderRadius.circular(7.0),
-        border: Border.all(width: 1.0, color: AppColors.evenFadedText),
-      ),
-      // child: Image.network(
-      //   images[0],
-      // ),
-    );
-  }
+  // Container _getProductContainer() {
+  //   return Container(
+  //     constraints: const BoxConstraints(maxHeight: 100, maxWidth: 100),
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xffffffff),
+  //       borderRadius: BorderRadius.circular(7.0),
+  //       border: Border.all(width: 1.0, color: AppColors.evenFadedText),
+  //     ),
+  //     child: Text(
+  //         // images[0],
+  //         widget.data.toString()),
+  //   );
+  // }
 }

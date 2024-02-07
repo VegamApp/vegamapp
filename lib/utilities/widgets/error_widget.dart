@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m2/utilities/app_colors.dart';
-import 'package:m2/utilities/text_style.dart';
+import 'package:m2/utilities/app_style.dart';
 
 class BuildErrorWidget extends StatelessWidget {
   const BuildErrorWidget({Key? key, this.onRefresh, this.buttonColor, this.textColor, this.buttonTextColor, this.errorMsg}) : super(key: key);

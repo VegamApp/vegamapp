@@ -55,6 +55,7 @@ class _AuthState extends State<Auth> with TickerProviderStateMixin {
                                 indicatorWeight: 5,
                                 indicatorSize: TabBarIndicatorSize.label,
                                 indicatorColor: AppColors.buttonColor,
+                                tabAlignment: TabAlignment.start,
                                 isScrollable: true,
                                 onTap: (index) => setState(() {}),
                                 tabs: [
@@ -88,30 +89,30 @@ class _AuthState extends State<Auth> with TickerProviderStateMixin {
                         }),
                       ),
                       const SizedBox(height: 30),
-                      Center(
-                        child: Text(
-                          'Login with social',
-                          style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fadedText),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          BuildLoginSocialButton(
-                            size: size,
-                            onPressed: () {},
-                            icon: FontAwesomeIcons.facebookF,
-                            color: AppColors.facebookBlue,
-                          ),
-                          BuildLoginSocialButton(
-                            size: size,
-                            onPressed: () {},
-                            icon: FontAwesomeIcons.googlePlusG,
-                            color: AppColors.googleRed,
-                          ),
-                        ],
-                      ),
+                      // Center(
+                      //   child: Text(
+                      //     'Login with social',
+                      //     style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fadedText),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 20),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //   children: [
+                      //     BuildLoginSocialButton(
+                      //       size: size,
+                      //       onPressed: () {},
+                      //       icon: FontAwesomeIcons.facebookF,
+                      //       color: AppColors.facebookBlue,
+                      //     ),
+                      //     BuildLoginSocialButton(
+                      //       size: size,
+                      //       onPressed: () {},
+                      //       icon: FontAwesomeIcons.googlePlusG,
+                      //       color: AppColors.googleRed,
+                      //     ),
+                      //   ],
+                      // ),
                       // const SizedBox(height: 20),
                     ],
                   ),

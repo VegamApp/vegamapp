@@ -163,7 +163,7 @@ class Items {
     description = json['description'] != null ? Description.fromJson(json['description']) : null;
     shortDescription = json['short_description'] != null ? Description.fromJson(json['short_description']) : null;
     sTypename = json['__typename'];
-    specialPrice = json['special_price'].toString();
+    specialPrice = json['special_price'] == null ? null : json['special_price'].toString();
     priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
 
     if (json['configurable_options'] != null) {

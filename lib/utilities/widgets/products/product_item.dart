@@ -39,7 +39,8 @@ class _ProductItemState extends State<ProductItem> {
   Widget build(BuildContext context) {
     return InkWell(
       hoverColor: Colors.transparent,
-      onTap: () => context.go('/${ProductView.route}/${widget.productModel.urlKey}.${widget.productModel.urlSuffix}'),
+      onTap: () => context.push('/${ProductView.route}/${widget.productModel.urlKey}.${widget.productModel.urlSuffix}'),
+      // onTap: () => context.pushNamed(ProductView.route, pathParameters: {'url': '${widget.productModel.urlKey}.${widget.productModel.urlSuffix}'}),
       onHover: (value) => setState(() => _isHovered = value),
       child: Container(
         padding: const EdgeInsets.all(15),
@@ -79,7 +80,7 @@ class _ProductItemState extends State<ProductItem> {
             const SizedBox(height: 5),
             Text(
               "${widget.productModel.name}",
-              style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText),
+              style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fadedText),
               maxLines: 2,
             ),
             const SizedBox(height: 5),
@@ -87,11 +88,11 @@ class _ProductItemState extends State<ProductItem> {
               child: BuildPriceWithOffer(
                 price: widget.price,
                 currency: currency,
-                priceSize: widget.priceSize ?? 18,
+                priceSize: widget.priceSize ?? 16,
                 originalPrice: widget.originalPrice,
-                originalPriceSize: widget.originalPriceSize ?? 16,
+                originalPriceSize: widget.originalPriceSize ?? 14,
                 offer: widget.offer,
-                offerSize: widget.offerSize ?? 13,
+                offerSize: widget.offerSize ?? 12,
               ),
             ),
             const SizedBox(height: 5),

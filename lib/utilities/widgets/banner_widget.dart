@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/app_colors.dart';
-import 'package:m2/utilities/text_style.dart';
+import 'package:m2/utilities/app_style.dart';
 import 'package:m2/utilities/widgets/two_colored_title.dart';
 import 'package:m2/views/product_views/product_view.dart';
 

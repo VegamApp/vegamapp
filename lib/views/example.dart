@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +13,6 @@ class _ExPageState extends State<ExPage> {
   @override
   Widget build(BuildContext context) {
     final authToken = Provider.of<AuthToken>(context);
-    final graphqlToken = GraphQLProvider.of(context);
     return Scaffold(
       body: Center(
         child: TextButton(

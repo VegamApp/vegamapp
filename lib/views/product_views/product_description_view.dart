@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
-import 'package:m2/services/sliver_grid_with_fixed_height.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 
@@ -31,7 +30,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
       mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
     }
     print(jsonEncode(widget.data));
-    price = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
+    price = productModel.items![0].specialPrice ?? productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff;
     super.initState();
@@ -100,7 +99,8 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 mainAxisExtent: 400,
               ),
               itemBuilder: (context, index) {
-                var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                var price = productModel.items![0].relatedProducts![index].specialPrice ??
+                    productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
                 var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
                 var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff;
                 return ProductItem(
@@ -120,7 +120,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
   Widget getDesktopChildren(Size size) {
     return LayoutBuilder(builder: (context, constraints) {
       return ListView(
-        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
         children: [
           Row(children: [
             const Expanded(flex: 1, child: SizedBox()),
@@ -206,7 +206,8 @@ class _ProductDescriptionState extends State<ProductDescription> {
                   mainAxisExtent: 400,
                 ),
                 itemBuilder: (context, index) {
-                  var price = productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
+                  var price = productModel.items![0].relatedProducts![index].specialPrice ??
+                      productModel.items![0].relatedProducts![index].priceRange!.minimumPrice!.regularPrice!.value.toString();
                   var originalPrice = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.regularPrice!.value.toString();
                   var offer = productModel.items![0].relatedProducts![index].priceRange!.maximumPrice!.discount!.percentOff;
                   return ProductItem(

@@ -25,25 +25,10 @@ class _AddressViewState extends State<AddressView> {
   bool isDefaultShipping = false;
   bool isDefaultBilling = false;
   bool regAsUser = false;
-  // For new addresses
-  TextEditingController fName = TextEditingController();
-  TextEditingController lName = TextEditingController();
-  TextEditingController appartNo = TextEditingController();
-  TextEditingController street = TextEditingController();
-  TextEditingController address = TextEditingController();
-  TextEditingController city = TextEditingController();
-  TextEditingController contact = TextEditingController();
-  TextEditingController pin = TextEditingController();
-  TextEditingController state = TextEditingController();
-  Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
-  Map<String, dynamic> selectedRegion = {"name": "Kerala", "region_code": "KL", "id": 502, "__typename": "CustomerAddressRegion"};
-  Map<String, dynamic> countries = {};
-  Map<String, dynamic> regions = {};
+  late UserData userData;
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    Provider.of<UserData>(context);
   }
 
   @override
@@ -93,7 +78,7 @@ class _AddressViewState extends State<AddressView> {
   }
 
   Padding getBody(BuildContext context, Size size) {
-    var userData = Provider.of<UserData>(context, listen: false);
+    userData = Provider.of<UserData>(context);
     return Padding(
       padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(
@@ -155,8 +140,23 @@ class _AddressViewState extends State<AddressView> {
     );
   }
 
+  Map<String, dynamic> countries = {};
+  Map<String, dynamic> regions = {};
+
   showAddAddressDialog(Size size, UserData userData, {Addresses? addressModel}) {
     final formKey = GlobalKey<FormState>();
+    // For new addresses
+    TextEditingController fName = TextEditingController(text: addressModel?.firstname);
+    TextEditingController lName = TextEditingController(text: addressModel?.lastname);
+    TextEditingController appartNo = TextEditingController(text: addressModel?.street != null && addressModel!.street!.length > 1 ? addressModel.street?.first : null);
+    TextEditingController street = TextEditingController(text: addressModel?.street?.last);
+    TextEditingController city = TextEditingController(text: addressModel?.city);
+    TextEditingController contact = TextEditingController(text: addressModel?.telephone);
+    TextEditingController pin = TextEditingController(text: addressModel?.postcode);
+    // TextEditingController state = TextEditingController();
+    Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
+    Map<String, dynamic> selectedRegion = {"name": "Kerala", "region_code": "KL", "id": 502, "__typename": "CustomerAddressRegion"};
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -185,50 +185,6 @@ class _AddressViewState extends State<AddressView> {
                       controller: lName,
                       hint: 'Last name',
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        hoverColor: Colors.transparent,
-                        onTap: () {
-                          isDefaultShipping = !isDefaultShipping;
-                          setState(() {});
-                        },
-                        leading: Checkbox(
-                          activeColor: AppColors.primaryColor,
-                          checkColor: Colors.white,
-                          value: isDefaultShipping,
-                          onChanged: (bool? value) {
-                            isDefaultShipping = !isDefaultShipping;
-                            setState(() {});
-                          },
-                        ),
-                        title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        hoverColor: Colors.transparent,
-                        onTap: () {
-                          isDefaultBilling = !isDefaultBilling;
-                          setState(() {});
-                        },
-                        leading: Checkbox(
-                          activeColor: AppColors.primaryColor,
-                          checkColor: Colors.white,
-                          value: isDefaultBilling,
-                          onChanged: (bool? value) {
-                            isDefaultBilling = !isDefaultBilling;
-                            setState(() {});
-                          },
-                        ),
-                        title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
-                      ),
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
@@ -419,7 +375,36 @@ class _AddressViewState extends State<AddressView> {
                           );
                         },
                       ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    CheckboxListTile.adaptive(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      hoverColor: Colors.transparent,
+                      visualDensity: VisualDensity.comfortable,
+                      activeColor: AppColors.primaryColor,
+                      checkColor: Colors.white,
+                      value: isDefaultShipping,
+                      onChanged: (bool? value) {
+                        isDefaultShipping = !isDefaultShipping;
+                        setState(() {});
+                      },
+                      title: Text('This is default Shipping Address', style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                    ),
+                    CheckboxListTile.adaptive(
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      hoverColor: Colors.transparent,
+                      activeColor: AppColors.primaryColor,
+                      visualDensity: VisualDensity.comfortable,
+                      checkColor: Colors.white,
+                      value: isDefaultBilling,
+                      onChanged: (bool? value) {
+                        isDefaultBilling = !isDefaultBilling;
+                        setState(() {});
+                      },
+                      title: Text('This is default Billing Address', style: AppStyles.getRegularTextStyle(fontSize: 15, color: AppColors.fadedText)),
+                    ),
+                    const SizedBox(height: 10),
                     Mutation(
                       options: MutationOptions(
                         document: gql(CustomerApis.createCustomerAddress),

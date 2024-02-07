@@ -10,6 +10,7 @@ import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/app_colors.dart';
+import 'package:m2/utilities/app_style.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:m2/services/route_services.dart' as routes;
@@ -102,6 +103,14 @@ class _MyAppState extends State<MyApp> {
               focusColor: Colors.transparent,
               highlightColor: Colors.transparent,
               splashFactory: NoSplash.splashFactory,
+              tooltipTheme: TooltipThemeData(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: AppColors.containerColor,
+                  boxShadow: AppStyles.defaultShadow,
+                ),
+              ),
             ),
             routerConfig: routes.router,
 
