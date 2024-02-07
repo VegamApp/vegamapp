@@ -290,7 +290,8 @@ class _ProductViewState extends State<ProductView> {
                                   },
                                 ),
                                 const SizedBox(height: 20),
-                                if (result.isLoading || totalPages >= page) Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                                if (result.isLoading || totalPages >= page) const Build
+                                // Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
                                 const SizedBox(height: 20),
                               ],
                             ),
