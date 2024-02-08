@@ -169,6 +169,9 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
             url_key
             sku
             id
+            #wishlistData{
+             # wishlistItem
+            #}
             stock_status
             rating_summary
             review_count

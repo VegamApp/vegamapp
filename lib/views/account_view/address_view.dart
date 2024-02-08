@@ -34,18 +34,20 @@ class _AddressViewState extends State<AddressView> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    userData = Provider.of<UserData>(context);
 
     return BuildScaffold(
       child: Observer(builder: (_) {
         return LayoutBuilder(builder: (context, constraints) {
           return SingleChildScrollView(
             padding: EdgeInsets.symmetric(
-                horizontal: AppResponsive.isMobile(context)
-                    ? 20
-                    : constraints.maxWidth > 1400
-                        ? (constraints.maxWidth - 1400) / 2
-                        : 60,
-                vertical: 20),
+              horizontal: AppResponsive.isMobile(context)
+                  ? 20
+                  : constraints.maxWidth > 1400
+                      ? (constraints.maxWidth - 1400) / 2
+                      : 20,
+              vertical: 20,
+            ),
             child: AppResponsive(
               desktop: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +80,6 @@ class _AddressViewState extends State<AddressView> {
   }
 
   Padding getBody(BuildContext context, Size size) {
-    userData = Provider.of<UserData>(context);
     return Padding(
       padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
       child: Column(

@@ -37,13 +37,13 @@ class _BuildScaffoldState extends State<BuildScaffold> {
         cart.getCartData(context, token);
       }
     }
-    if (token.loginToken != null && userData.data.email == null) {
-      bool valid = await userData.getUserData(context);
-      if (!valid) {
-        token.clearLoginToken();
-        token.putWishlistCount(0);
-      }
-    }
+    // if (token.loginToken != null && userData.data.email == null) {
+    await userData.getUserData(context);
+    // if (!valid) {
+    //   token.clearLoginToken();
+    //   token.putWishlistCount(0);
+    // }
+    // }
     if (categories.data.isEmpty || categories.data['categories']['items'].isEmpty) {
       categories.getCategoryData(context);
     }

@@ -435,7 +435,9 @@ class _CartViewState extends State<CartView> {
                       Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
                       const SizedBox(height: 10),
                       BuildPriceWithOffer(
-                        price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
+                        price: f.format(item['product']['special_price'] ?? item['product']['price_range']['minimum_price']['regular_price']['value']),
+                        originalPrice: item['product']['price_range']['maximum_price']['regular_price']['value'].toString(),
+                        offer: item['product']['price_range']['maximum_price']['discount']['percent_off'],
                         priceSize: 17,
                         currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
                       ),

@@ -42,6 +42,7 @@ abstract class _HomeDataBase with Store {
     setLoading(true);
     var client = GraphQLProvider.of(context);
     QueryResult? result = await client.value.query(WatchQueryOptions(document: gql(ApiServices.queryHome)));
+
     // print(result);
     // log(jsonEncode(result.data));
     // Clipboard.setData(ClipboardData(text: jsonEncode(result.data)));

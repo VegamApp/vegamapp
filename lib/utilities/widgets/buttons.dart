@@ -63,6 +63,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
         options: MutationOptions(
             document: gql(CartApis.addProductToCart),
             onCompleted: (result) {
+              print(result);
               cart.putCartCount(result?['addProductsToCart']['cart']['total_quantity']);
               // Timer(const Duration(milliseconds: 1000), () => cart.getCartData(context, token));
               print(cart.cartCount);

@@ -30,7 +30,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     final authToken = Provider.of<AuthToken>(context);
-    final cart = Provider.of<CartData>(context);
+    // final cart = Provider.of<CartData>(context);
 
     return Padding(
       padding: const EdgeInsets.all(20),

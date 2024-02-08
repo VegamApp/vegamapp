@@ -55,7 +55,7 @@ class BuildPriceWithOffer extends StatelessWidget {
           if (originalPrice != null && offer != 0)
             TextSpan(
               text: '   $offer% off',
-              style: AppStyles.getMediumTextStyle(fontSize: offerSize!, color: AppColors.buttonColor),
+              style: AppStyles.getMediumTextStyle(fontSize: offerSize ?? 12, color: AppColors.buttonColor),
             ),
         ],
       ),

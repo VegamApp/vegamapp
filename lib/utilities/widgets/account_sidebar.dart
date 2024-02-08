@@ -9,12 +9,14 @@ import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
+import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/address_view.dart';
 import 'package:m2/views/account_view/billing_agreement_view.dart';
 import 'package:m2/views/account_view/downloadable_products_view.dart';
 import 'package:m2/views/account_view/newsletter_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';
+import 'package:m2/views/account_view/wishlist_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,7 +90,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
   @override
   Widget build(BuildContext context) {
     return AppResponsive(
-      mobile: Scaffold(body: SingleChildScrollView(child: getScaffoldChild(context))),
+      mobile: BuildScaffold(currentIndex: 3, child: SingleChildScrollView(child: getScaffoldChild(context))),
       desktop: getScaffoldChild(context),
     );
   }
@@ -204,7 +206,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
                       BuilProfileButtons(
                         title: 'My Wish List',
                         svgUrl: 'wishlist',
-                        // child: const WishList(),
+                        url: "/account/${WishlistView.route}",
                         isBold: widget.currentPage == 'My Wish List' && !AppResponsive.isMobile(context),
                       ),
                       BuilProfileButtons(

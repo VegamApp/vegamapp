@@ -123,6 +123,7 @@ class Items {
   List<Variants>? variants;
   List<MediaGallery>? mediaGallery;
   List<Items>? relatedProducts;
+  String? wishlistItem;
 
   Items({
     this.name,
@@ -143,6 +144,7 @@ class Items {
     this.mediaGallery,
     this.relatedProducts,
     this.urlSuffix,
+    this.wishlistItem,
   });
 
   Items.fromJson(Map<String, dynamic> json) {
@@ -165,6 +167,7 @@ class Items {
     sTypename = json['__typename'];
     specialPrice = json['special_price'] == null ? null : json['special_price'].toString();
     priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
+    wishlistItem = json['wishlistData']?['wishlistItem'];
 
     if (json['configurable_options'] != null) {
       configurableOptions = <ConfigurableOptions>[];

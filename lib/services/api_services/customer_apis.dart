@@ -1,3 +1,7 @@
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/services/api_services/fragments.dart';
+import 'package:m2/utilities/utilities.dart';
+
 class CustomerApis {
   static String signInWithEmail = r'''
     mutation SignInWithEmail($email:String!, $password: String!){
@@ -38,36 +42,134 @@ class CustomerApis {
       )
     }
   ''';
-
-  static String requestUserData = '''
+  static String wishList = '''
   {
-    customer {
-      firstname
-      lastname
-      suffix
-      email
-      gender
-      is_subscribed
-      wishlist{
+    wishlist {
+      items_count
+      sharing_code
+      updated_at
+      items {
         id
-      }
-      addresses {
-        id
-        firstname
-        lastname
-        street
-        city
-        region {
-          region_code
-          region
+        qty
+        description
+        added_at
+        product{
+          __typename
+          name
+          sku
+          url_key
+          size_chart
+          rating_summary
+          review_count
+          stock_status
+          image{
+            url
+          }
+          special_price
+          price_range {
+            minimum_price {
+              regular_price {
+                value
+                currency
+              }
+            }
+            maximum_price {
+              regular_price {
+                value
+                currency
+              }
+              discount {
+                  amount_off
+                  percent_off
+              }
+            }
+          }
+          ... on CustomizableProductInterface {
+            options {
+              title
+              required
+              sort_order
+              option_id
+              uid
+              ... on CustomizableDropDownOption {
+                value {
+                  option_type_id
+                  price
+                  price_type
+                  sku
+                  sort_order
+                  title
+                  uid
+                }
+              }
+            }
+          }
+          ... on ConfigurableProduct {
+            configurable_options {
+              id
+              label
+              position
+              use_default
+              attribute_code
+              values {
+                store_label
+                store_label
+                label
+                uid
+                swatch_data {
+                  value
+                }
+              }
+            }
+            variants {
+              product {
+                name
+                sku
+                id
+                media_gallery {
+                  url
+                  label
+                }
+                special_price
+                price_range {
+                  minimum_price {
+                    regular_price {
+                      value
+                      currency
+                    }
+                  }
+                  maximum_price {
+                    regular_price {
+                      value
+                      currency
+                    }
+                    discount {
+                        amount_off
+                        percent_off
+                    }
+                  }
+                }
+              }
+              attributes {
+                label
+                code
+                value_index
+                uid
+              }
+            }
+          }
         }
-        postcode
-        country_code
-        telephone
       }
     }
+  }''';
+  static final requestUserData = addFragments(gql(r'''
+  query GetCustomer($showWishlist: Boolean = true) {
+  customer {
+    ...Customer
+    __typename
   }
-''';
+}
+'''), [Fragments.Customer]);
 
   static String updateCustomer = r'''
     mutation updateCustomerV2($input: CustomerUpdateInput!) {

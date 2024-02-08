@@ -108,6 +108,7 @@ abstract class _CartDataBase with Store {
     if (result.hasException) {
       // var token = Provider.of<AuthToken>(context, listen: false);
       _cartData.clear();
+      log(token.loginToken.toString());
       if (token.loginToken == null) {
         await getGuestCart(context);
       } else {
@@ -203,6 +204,7 @@ abstract class _CartDataBase with Store {
     QueryResult? result = await graphqlClient.value.query(
       QueryOptions(document: gql("{customerCart {id\ntotal_quantity}}")),
     );
+    log(result.toString());
     if (result.hasException) {
       token.clearLoginToken();
       token.putWishlistCount(0);

@@ -34,28 +34,28 @@ class _CartAddressViewState extends State<CartAddressView> {
   bool saveAddress = false;
   // For new addresses
   // For test
-  TextEditingController name = TextEditingController(text: "Jack");
-  TextEditingController email = TextEditingController();
-  TextEditingController state = TextEditingController();
-  TextEditingController lName = TextEditingController(text: "Reacher");
-  TextEditingController appartNo = TextEditingController(text: 'Appr');
-  TextEditingController street = TextEditingController(text: "Str");
-  TextEditingController address = TextEditingController(text: "Address");
-  TextEditingController city = TextEditingController(text: "City");
-  TextEditingController contact = TextEditingController(text: "1231231231");
-  TextEditingController pin = TextEditingController(text: "682025");
+  // TextEditingController name = TextEditingController(text: "Jack");
+  // TextEditingController email = TextEditingController();
+  // TextEditingController state = TextEditingController();
+  // TextEditingController lName = TextEditingController(text: "Reacher");
+  // TextEditingController appartNo = TextEditingController(text: 'Appr');
+  // TextEditingController street = TextEditingController(text: "Str");
+  // TextEditingController address = TextEditingController(text: "Address");
+  // TextEditingController city = TextEditingController(text: "City");
+  // TextEditingController contact = TextEditingController(text: "1231231231");
+  // TextEditingController pin = TextEditingController(text: "682025");
 
   //Default
-  // TextEditingController name = TextEditingController();
-  // TextEditingController email = TextEditingController();
-  // TextEditingController lName = TextEditingController();
-  // TextEditingController appartNo = TextEditingController();
-  // TextEditingController street = TextEditingController();
-  // TextEditingController address = TextEditingController();
-  // TextEditingController city = TextEditingController();
-  // TextEditingController contact = TextEditingController();
-  // TextEditingController pin = TextEditingController();
-  // TextEditingController state = TextEditingController();
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController lName = TextEditingController();
+  TextEditingController appartNo = TextEditingController();
+  TextEditingController street = TextEditingController();
+  TextEditingController address = TextEditingController();
+  TextEditingController city = TextEditingController();
+  TextEditingController contact = TextEditingController();
+  TextEditingController pin = TextEditingController();
+  TextEditingController state = TextEditingController();
   // AddressType _addressType = AddressType.office;
 
   Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};

@@ -26,15 +26,14 @@ abstract class _UserDataBase with Store {
   Future<bool> getUserData(BuildContext context) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
-    QueryResult? result = await graphqlClient.value
-        .query(WatchQueryOptions(document: gql(CustomerApis.requestUserData)));
+    QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: CustomerApis.requestUserData));
+    print(result);
     if (result.hasException) {
       setLoading(false);
       return false;
     } else {
       _data = User.fromJson(result.data!['customer']);
-      addressesList.addAll(
-          ObservableList<Addresses>.of(_data.addresses ?? <Addresses>[]));
+      addressesList.addAll(ObservableList<Addresses>.of(_data.addresses ?? <Addresses>[]));
     }
     setLoading(false);
     return true;

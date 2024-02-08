@@ -4,10 +4,11 @@ import 'package:m2/services/models/user.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class BuildAddressContainer extends StatefulWidget {
-  const BuildAddressContainer({Key? key, required this.addressModel, required this.size, this.fromCart = false, this.onRemove}) : super(key: key);
+  const BuildAddressContainer({Key? key, required this.addressModel, required this.size, this.fromCart = false, this.onRemove, this.onEdit}) : super(key: key);
   final Addresses addressModel;
   final Size size;
   final bool fromCart;
+  final Future<void> Function()? onEdit;
   final void Function()? onRemove;
   @override
   State<BuildAddressContainer> createState() => _BuildAddressContainerState();
@@ -75,7 +76,7 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
                       fixedSize: const Size(80, 20),
                       shape: const StadiumBorder(),
                     ),
-                    onPressed: () {},
+                    onPressed: widget.onEdit,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

@@ -33,7 +33,6 @@ class ProductApi {
       rating_summary
       review_count
       stock_status
-
       categories {
         name
         uid
@@ -42,9 +41,9 @@ class ProductApi {
       ... on PhysicalProductInterface {
         weight
       }
-      # wishlistData{
-      #   wishlistItem
-      # }
+      #wishlistData{
+      #  wishlistItem
+      #}
       description {
         html
       }
@@ -153,61 +152,7 @@ class ProductApi {
           }
         }
       }
-      ... on BundleProduct {
-        description {
-          html
-        }
-        dynamic_price
-        dynamic_sku
-        items {
-          option_id
-          options {
-            can_change_quantity
-            id
-            is_default
-            label
-            position
-            price
-            price_type
-            product {
-              name
-              url_key
-              sku
-              attribute_set_id
-              media_gallery {
-                url
-                label
-              }
-            }
-            quantity
-            uid
-          }
-          position
-          price_range {
-            minimum_price {
-              regular_price {
-                value
-                currency
-              }
-            }
-            maximum_price {
-              regular_price {
-                value
-                currency
-              }
-              discount {
-                amount_off
-                percent_off
-              }
-            }
-          }
-          required
-          sku
-          title
-          type
-          uid
-        }
-      }
+      
       media_gallery {
         url
         label
@@ -233,7 +178,9 @@ class ProductApi {
         rating_summary
         review_count
         stock_status
-
+        #wishlistData{
+        #  wishlistItem
+        #}
         categories {
           name
           uid
@@ -354,6 +301,9 @@ class ProductApi {
       name
       sku
       url_key
+      wishlistData{
+        wishlistItem
+      }
       url_suffix
       image{
         url
@@ -370,9 +320,9 @@ class ProductApi {
       ... on PhysicalProductInterface{
         weight
       }
-      # wishlistData{
-      #   wishlistItem
-      # }
+       wishlistData{
+         wishlistItem
+       }
       description {
         html
       }
@@ -444,4 +394,73 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
     }
   }
   ''';
+
+  static String removeProductsFromWishlist = r''' 
+  mutation removeProductsFromWishlist($wishlistId: ID!,$wishlistItemsIds: [ID!]!){
+    removeProductsFromWishlist(wishlistId: $wishlistId, wishlistItemsIds: $wishlistItemsIds) {
+      user_errors {
+        code
+        message
+      }
+      wishlist{
+        id
+        items_count
+      }
+    }
+  }''';
+  static String addToWishList = r''' 
+  mutation addProductsToWishlist($id: ID!,$wishlistItems: [WishlistItemInput!]!){
+    addProductsToWishlist(
+      wishlistId: $id,
+      wishlistItems: $wishlistItems
+    ){
+      user_errors {
+          code
+          message
+        }
+        wishlist {
+          id
+          items_count
+        }
+    }
+  }''';
+  static String addWishlistItemstoCart = r'''
+mutation addWishlistItemsToCart($wishlistId: ID!,$wishlistItemsIds: [ID!]!){
+  addWishlistItemsToCart(wishlistId: $wishlistId, wishlistItemIds: $wishlistItemsIds) {
+    add_wishlist_items_to_cart_user_errors {
+      code
+      message
+      wishlistId
+      wishlistItemId
+    }
+    status
+    wishlist {
+      id
+      items_count 
+    }
+  }
+}
+''';
+
+  static String addProductToCart = r'''
+  mutation addProductsToCart($cartIdString: String!,$cartItemsMap:[CartItemInput!]!){
+    addProductsToCart(
+     cartId: $cartIdString
+      cartItems: $cartItemsMap
+  ) {
+    user_errors {
+      code
+      message
+    }
+    cart {
+      prices {
+        grand_total {
+          value
+          __typename
+        }
+      }
+      total_quantity
+    }
+  }
+  }''';
 }

@@ -1,4 +1,5 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/utilities/constants.dart';
 
 class Fragments {
 //   static final cartFragment = gql('''
@@ -153,4 +154,188 @@ class Fragments {
       title
     }
 }''');
+
+  static final Customer = addFragments(gql(r'''
+  fragment Customer on Customer {
+    orders {
+      items {
+        number
+        total {
+          grand_total {
+            value
+            __typename
+          }
+          __typename
+        }
+        shipping_address {
+          firstname
+          lastname
+          city
+          street 
+          region
+          country_code
+          __typename
+        }
+        billing_address {
+          firstname
+          lastname
+          city
+          street 
+          region
+          country_code
+          __typename
+        }
+        order_date
+        order_number
+        items {
+          product_sale_price {
+            value
+            __typename
+          }
+          id
+          product_url_key
+          product_sku
+          quantity_ordered
+          product_name
+          __typename
+        }
+        shipping_method
+        status
+        payment_methods {
+          name
+          __typename
+        }
+        __typename
+      }
+      total_count
+      page_info {
+        page_size
+        total_pages
+        current_page
+        __typename
+      }
+      __typename
+    }
+    addresses {
+      ...CAddress
+      __typename
+    }
+    compare_list {
+      attributes {
+        code
+        __typename
+      }
+      item_count
+      uid
+      items {
+        uid
+        product {
+          image {
+            label
+            url
+            __typename
+          }
+          description {
+            html
+            __typename
+          }
+          short_description {
+            html
+            __typename
+          }
+          sku
+          name
+          price_range {
+            maximum_price {
+              final_price {
+                currency
+                value
+                __typename
+              }
+              __typename
+            }
+            minimum_price {
+              final_price {
+                value
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      uid
+      __typename
+    }
+    wishlists @include(if: $showWishlist) {
+      id
+      items_count
+      __typename
+    }
+
+    allow_remote_shopping_assistance
+    created_at
+    date_of_birth
+    default_billing
+    default_shipping
+    email
+    firstname
+    gender
+    is_subscribed
+    lastname
+    middlename
+    prefix
+    suffix
+    taxvat
+    #mobilenumber
+    reviews {
+      __typename
+      items {
+        average_rating
+        created_at
+        text
+        product {
+          sku
+          name
+          __typename
+        }
+        __typename
+      }
+    }
+    __typename
+  }
+  '''), [CAddress]);
+  static final CAddress = gql(r'''
+  fragment CAddress on CustomerAddress {
+    city
+    company
+    country_code
+    default_billing
+    default_shipping
+    extension_attributes {
+      attribute_code
+      value
+      __typename
+    }
+    fax
+    firstname
+    id
+    lastname
+    middlename
+    postcode
+    prefix
+    region {
+      region
+      region_code
+      region_id
+      __typename
+    }
+    street
+    suffix
+    telephone
+    __typename
+  }''');
 }

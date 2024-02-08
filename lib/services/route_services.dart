@@ -10,6 +10,7 @@ import 'package:m2/views/account_view/downloadable_products_view.dart';
 import 'package:m2/views/account_view/my_order_detail_view.dart';
 import 'package:m2/views/account_view/newsletter_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';
+import 'package:m2/views/account_view/wishlist_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/auth/forgot_password.dart';
 import 'package:m2/views/cart_views/cart_addresss_view.dart';
@@ -94,6 +95,14 @@ final router = GoRouter(
               pageBuilder: (context, state) {
                 print(state.fullPath);
                 return getCustomTransition(state, const AccountInformationView());
+              },
+            ),
+            GoRoute(
+              name: WishlistView.route,
+              path: WishlistView.route,
+              pageBuilder: (context, state) {
+                print(state.fullPath);
+                return getCustomTransition(state, const WishlistView());
               },
             ),
             GoRoute(
