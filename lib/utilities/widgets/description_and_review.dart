@@ -86,6 +86,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
               ),
             );
           }
+          print('rgetr ${result.data!['products']['items'][0]['reviews']['items'][0]['nickname']}');
 
           // //print(jsonEncode(result.data));
           return Column(
@@ -359,6 +360,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
                                         //print(ratingsData);
                                         //print(ratings);
                                         //print(widget.sku);
+                                        print('grer ${{'name': name.text, 'sku': widget.sku, 'summary': summary.text, 'text': text.text, 'ratings': ratingsData}}');
                                         runMutation({'name': name.text, 'sku': widget.sku, 'summary': summary.text, 'text': text.text, 'ratings': ratingsData});
                                       }
                                     },

@@ -257,7 +257,7 @@ class _ProductViewState extends State<ProductView> {
                       constraints: const BoxConstraints(maxWidth: 300, minWidth: 300),
                       child: getFilter(size, result, refetch),
                     ),
-                  const VerticalDivider(),
+                  // const VerticalDivider(),
                   Expanded(
                     flex: 8,
                     child: LayoutBuilder(
@@ -323,19 +323,19 @@ class _ProductViewState extends State<ProductView> {
                                 const SizedBox(height: 20),
                               ],
                             ),
-                            if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
-                              DraggableScrollableActuator(
-                                child: DraggableScrollableSheet(
-                                  controller: dController,
-                                  initialChildSize: 0,
-                                  minChildSize: 0,
-                                  maxChildSize: 1,
-                                  snap: true,
-                                  builder: (context, scrollController) {
-                                    return getFilter(size, result, refetch, scrollController: scrollController);
-                                  },
-                                ),
-                              )
+                            // if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
+                            //   DraggableScrollableActuator(
+                            //     child: DraggableScrollableSheet(
+                            //       controller: dController,
+                            //       initialChildSize: 0,
+                            //       minChildSize: 0,
+                            //       maxChildSize: 1,
+                            //       snap: true,
+                            //       builder: (context, scrollController) {
+                            //         return getFilter(size, result, refetch, scrollController: scrollController);
+                            //       },
+                            //     ),
+                            //   )
                           ],
                         );
                       },
