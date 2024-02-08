@@ -8,7 +8,7 @@ class CustomerApis {
   ''';
 
   static String signUpWithEmail = r'''
-    mutation  SignUp($firstname: String!,$lastname: String!,$email: String!,$password: String!,$date_of_birth: String!,$gender: Int!,$is_subscribed: Boolean!){
+    mutation  SignUp($firstname: String!,$lastname: String!,$email: String!,$password: String!,$date_of_birth: String,$gender: Int,$is_subscribed: Boolean){
       createCustomerV2(
         input: {
         firstname: $firstname

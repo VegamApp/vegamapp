@@ -41,7 +41,12 @@ class DrawerContainer extends StatelessWidget {
                   : ListView(
                       padding: EdgeInsets.all(20),
                       children: [
-                        Text('SHOP BY CATEGORY', style: AppStyles.getBoldTextStyle(fontSize: 18, color: AppColors.fadedText)),
+                        Row(
+                          children: [
+                            IconButton(onPressed: () => Navigator.pop(context), icon: Icon(Icons.arrow_back, color: AppColors.primaryColor)),
+                            Text('SHOP BY CATEGORY', style: AppStyles.getBoldTextStyle(fontSize: 18, color: AppColors.fadedText)),
+                          ],
+                        ),
                         const SizedBox(height: 20),
                         ListView.builder(
                           shrinkWrap: true,
