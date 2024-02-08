@@ -226,7 +226,7 @@ class _ProductViewState extends State<ProductView> {
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
               endDrawer: DrawerContainer(size: size),
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-              floatingActionButton: AppResponsive.isDesktop(context)
+              floatingActionButton: AppResponsive.isDesktop(context) || widget.viewAll
                   ? null
                   : dController.isAttached && dController.size <= 0.1
                       ? FloatingActionButton.extended(
