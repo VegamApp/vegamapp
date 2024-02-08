@@ -135,26 +135,26 @@ class _AccountSideBarState extends State<AccountSideBar> {
                                   ),
                                   child: Center(child: Text(user.data.firstname?[0] ?? "", style: AppStyles.getMediumTextStyle(fontSize: 50, color: Colors.white)))),
                             ),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Container(
-                                height: 40,
-                                width: 40,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.buttonColor,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.shadowColor,
-                                      offset: const Offset(0, 5),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: SvgPicture.asset('assets/svg/camera.svg'),
-                              ),
-                            )
+                            // Align(
+                            //   alignment: Alignment.bottomRight,
+                            //   child: Container(
+                            //     height: 40,
+                            //     width: 40,
+                            //     padding: const EdgeInsets.all(10),
+                            //     decoration: BoxDecoration(
+                            //       shape: BoxShape.circle,
+                            //       color: AppColors.buttonColor,
+                            //       boxShadow: [
+                            //         BoxShadow(
+                            //           color: AppColors.shadowColor,
+                            //           offset: const Offset(0, 5),
+                            //           blurRadius: 10,
+                            //         ),
+                            //       ],
+                            //     ),
+                            //     child: SvgPicture.asset('assets/svg/camera.svg'),
+                            //   ),
+                            // )
                           ],
                         ),
                       ),
