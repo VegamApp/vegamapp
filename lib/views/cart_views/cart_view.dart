@@ -66,6 +66,7 @@ class _CartViewState extends State<CartView> {
     token = Provider.of<AuthToken>(context);
     // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
+      currentIndex: 2,
       child: LayoutBuilder(builder: (context, constraints) {
         return Observer(builder: (_) {
           return Query(
@@ -551,7 +552,7 @@ class _CartViewState extends State<CartView> {
           alignment: Alignment.center,
           width: size.width * 0.1,
           height: height ?? 50,
-          child: FittedBox(child: Text(item['quantity'].toString().padLeft(2, '0'), style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText))),
+          child: Text(item['quantity'].toString().padLeft(2, '0'), style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fadedText)),
         ),
         Container(
           decoration: BoxDecoration(
@@ -582,6 +583,7 @@ class _CartViewState extends State<CartView> {
                         onTap: () {
                           // cartList[index].noOfItems++;
 
+                          print(item['quantity']);
                           item['quantity']++;
                           deboucer.run(() {
                             print(item['quantity']);

@@ -88,14 +88,15 @@ class _ProductDescriptionState extends State<ProductDescription> {
         if (productModel.items![0].relatedProducts != null)
           LayoutBuilder(builder: (context, constraints) {
             return GridView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               itemCount: productModel.items![0].relatedProducts!.length,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 400,
-                crossAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
-                mainAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                maxCrossAxisExtent: constraints.maxWidth < 500 ? 200 : 400,
+                // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 250).floor(),
+                crossAxisSpacing: constraints.maxWidth < 500 ? 10 : 30,
+                mainAxisSpacing: constraints.maxWidth < 500 ? 10 : 30,
                 mainAxisExtent: 400,
               ),
               itemBuilder: (context, index) {
@@ -200,9 +201,10 @@ class _ProductDescriptionState extends State<ProductDescription> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 400,
-                  crossAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
-                  mainAxisSpacing: AppResponsive.isMobile(context) ? 10 : 40,
+                  maxCrossAxisExtent: constraints.maxWidth < 500 ? 200 : 400,
+                  // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 250).floor(),
+                  crossAxisSpacing: constraints.maxWidth < 500 ? 10 : 30,
+                  mainAxisSpacing: constraints.maxWidth < 500 ? 10 : 30,
                   mainAxisExtent: 400,
                 ),
                 itemBuilder: (context, index) {

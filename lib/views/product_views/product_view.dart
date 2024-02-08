@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -48,6 +49,14 @@ class _ProductViewState extends State<ProductView> {
   @override
   void initState() {
     super.initState();
+    dController.addListener(() {
+      if (dController.isAttached) {
+        dController.reset();
+      }
+      log('dController.pixels ${dController.pixels}');
+      setState(() {});
+      dController.removeListener(() {});
+    });
     variables.addAll({
       'pageSize': 20,
       'page': page,
@@ -104,6 +113,7 @@ class _ProductViewState extends State<ProductView> {
     super.dispose();
     _scrollController.dispose();
     _filterScrollController.dispose();
+    dController.dispose();
   }
 
   final key = GlobalKey<ScaffoldState>();
@@ -199,6 +209,9 @@ class _ProductViewState extends State<ProductView> {
               return fetchMoreResultData;
             },
           );
+          if (dController.isAttached) {
+            log("pixels: ${dController.pixels}");
+          }
           return WillPopScope(
             onWillPop: () async {
               // //print(dController.size);
@@ -215,9 +228,10 @@ class _ProductViewState extends State<ProductView> {
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
               floatingActionButton: AppResponsive.isDesktop(context)
                   ? null
-                  : dController.isAttached && dController.pixels == 0
+                  : dController.isAttached && dController.size <= 0.1
                       ? FloatingActionButton.extended(
                           onPressed: () async {
+                            print(dController.size);
                             await dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
                           },
@@ -227,6 +241,7 @@ class _ProductViewState extends State<ProductView> {
                         )
                       : FloatingActionButton(
                           onPressed: () async {
+                            print(dController.size);
                             await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
                           },

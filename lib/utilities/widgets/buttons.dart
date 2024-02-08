@@ -3,12 +3,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/loading_builder.dart';
+import 'package:m2/views/auth/auth.dart';
+import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:provider/provider.dart';
 
 class BuildButtonSingle extends StatefulWidget {
@@ -83,7 +86,9 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                   if (widget.isBuyNow) {
                     if (loginToken.loginToken == null) {
                       // navigate(context, const Auth());
+                      context.pushNamed(Auth.route);
                     } else {
+                      context.pushNamed(CartView.route);
                       // navigate(context, const GuestShippingView());
                     }
                   }
@@ -145,7 +150,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                     }
                   ]
                 };
-                print(data);
+                print('data $data');
                 runMutation(data);
               } else if (widget.typeName == 'SimpleProduct') {
                 //print(loginToken.cartId);

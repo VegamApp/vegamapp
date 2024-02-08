@@ -32,7 +32,7 @@ class _FootBarState extends State<FootBar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NewsSub(),
+            const NewsSub(),
             const SizedBox(height: 30),
             BuildColumnText(
               title: 'Information',
@@ -104,7 +104,7 @@ class _FootBarState extends State<FootBar> {
               ],
             ),
             const SizedBox(height: 30),
-            BuildPaymentMethodList(),
+            const BuildPaymentMethodList(),
           ],
         ),
       ),
@@ -121,11 +121,12 @@ class _FootBarState extends State<FootBar> {
 
   @override
   Widget build(BuildContext context) {
-    return AppResponsive(
-      desktop: getDesktopChildren(),
-      mobile: Container(color: AppColors.fadedContainerColor, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: getChildren(widget.screenWidth))),
-      tablet: Container(color: AppColors.fadedContainerColor, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: getChildren(widget.screenWidth))),
-    );
+    return const SizedBox();
+    // return AppResponsive(
+    //   desktop: getDesktopChildren(),
+    //   mobile: Container(color: AppColors.fadedContainerColor, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: getChildren(widget.screenWidth))),
+    //   tablet: Container(color: AppColors.fadedContainerColor, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: getChildren(widget.screenWidth))),
+    // );
   }
 
   Container getDesktopChildren() {
@@ -162,7 +163,7 @@ class DesktopContactContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -173,7 +174,7 @@ class DesktopContactContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ContactText(title: 'ADDRESS:', subtitle: '1234 Street Name, City, England'),
-                    const SizedBox(height: 30),
+                    SizedBox(height: 30),
                     ContactText(title: 'EMAIL:', subtitle: 'mail@example.com'),
                   ],
                 ),
@@ -184,7 +185,7 @@ class DesktopContactContainer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ContactText(title: 'PHONE:', subtitle: '(123) 456-7890'),
-                    const SizedBox(height: 30),
+                    SizedBox(height: 30),
                     ContactText(title: 'WORKING DAYS/HOURS:', subtitle: 'Mon - Sun / 9:00 AM - 8:00 PM'),
                   ],
                 ),
@@ -273,7 +274,7 @@ class DesktopContactContainer extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
+              const Expanded(
                 flex: 25,
                 child: BuildPaymentMethodList(),
               ),
@@ -294,16 +295,16 @@ class ContactContainer extends StatelessWidget {
     return Container(
       width: width < 1100 ? width : 1100,
       padding: EdgeInsets.all(width * 0.075),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 30),
+          SizedBox(height: 30),
           ContactText(title: 'ADDRESS:', subtitle: '1234 Street Name, City, England'),
-          const SizedBox(height: 50),
+          SizedBox(height: 50),
           ContactText(title: 'EMAIL:', subtitle: 'mail@example.com'),
-          const SizedBox(height: 50),
+          SizedBox(height: 50),
           ContactText(title: 'PHONE:', subtitle: '(123) 456-7890'),
-          const SizedBox(height: 50),
+          SizedBox(height: 50),
           ContactText(title: 'WORKING DAYS/HOURS:', subtitle: 'Mon - Sun / 9:00 AM - 8:00 PM'),
         ],
       ),
@@ -376,7 +377,7 @@ class BuildColumnText extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: TextButton(
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  onPressed: () => Navigator.push(context, PageTransition(child: list[index].navigationChild ?? HomeView(), type: PageTransitionType.fade)),
+                  onPressed: () => Navigator.push(context, PageTransition(child: list[index].navigationChild ?? const HomeView(), type: PageTransitionType.fade)),
                   child: Text(
                     list[index].title,
                     style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.evenFadedText),

@@ -159,7 +159,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                             const SizedBox(height: 20),
                             CartSummaryWidget(
                               buttonText: "Go to Checkout",
-                              refetch: () {},
+                              refetch: () => cartData.getCartData(context, token),
                               onButtonTap: () {
                                 context.go("/${CartView.route}/${CartPayment.route}");
                               },
@@ -191,7 +191,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                               ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 350),
                                 child: CartSummaryWidget(
-                                  refetch: () {},
+                                  refetch: null,
                                   buttonText: "Go to Checkout",
                                   onButtonTap: () {
                                     // log(jsonEncode(cartData.cartData));
@@ -747,23 +747,24 @@ class _CartAddressViewState extends State<CartAddressView> {
                     ),
                   ),
                 ),
-                ...userData.data.addresses!
-                    .map(
-                      (e) => InkWell(
-                        onTap: () {
-                          runMutationShipping({
-                            "input": {
-                              "cart_id": cartData.cartId,
-                              "shipping_addresses": [
-                                {"customer_address_id": e.id, "customer_notes": ""}
-                              ]
-                            }
-                          });
-                        },
-                        child: BuildAddressContainer(addressModel: e, size: size),
-                      ),
-                    )
-                    .toList(),
+                if (userData.data.addresses != null)
+                  ...userData.data.addresses!
+                      .map(
+                        (e) => InkWell(
+                          onTap: () {
+                            runMutationShipping({
+                              "input": {
+                                "cart_id": cartData.cartId,
+                                "shipping_addresses": [
+                                  {"customer_address_id": e.id, "customer_notes": ""}
+                                ]
+                              }
+                            });
+                          },
+                          child: BuildAddressContainer(addressModel: e, size: size),
+                        ),
+                      )
+                      .toList(),
               ],
             );
           },

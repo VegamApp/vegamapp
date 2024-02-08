@@ -25,6 +25,7 @@ class _SearchViewState extends State<SearchView> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return BuildScaffold(
+      currentIndex: 1,
       child: Column(
         children: [
           Container(

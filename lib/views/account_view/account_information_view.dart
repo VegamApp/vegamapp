@@ -64,6 +64,7 @@ class _AccountInformationViewState extends State<AccountInformationView> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return BuildScaffold(
+      currentIndex: 3,
       child: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(

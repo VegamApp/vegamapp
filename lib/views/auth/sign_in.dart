@@ -122,7 +122,7 @@ class _SignInState extends State<SignIn> {
               const SizedBox(height: 30),
               Center(
                 child: InkWell(
-                  onTap: () => context.go('/${ForgotPassword.route}'),
+                  onTap: () => context.push('/${ForgotPassword.route}'),
                   child: Text(
                     'Forgot Password?',
                     style: AppStyles.getRegularTextStyle(fontSize: 12, color: AppColors.fontColor),

@@ -23,8 +23,20 @@ class BuildBottomNavBar extends StatelessWidget {
       height: 74,
       child: Row(
         children: [
-          getIcon(size, SvgPicture.asset('assets/svg/home.svg', color: currentIndex == 0 ? AppColors.kPrimaryColor : Colors.black), 0, context),
-          getIcon(size, SvgPicture.asset('assets/svg/search.svg', color: currentIndex == 1 ? AppColors.kPrimaryColor : Colors.black), 1, context),
+          getIcon(
+              size,
+              currentIndex == 0
+                  ? Icon(Icons.home_filled, color: AppColors.primaryColor)
+                  : SvgPicture.asset('assets/svg/home.svg', color: currentIndex == 0 ? AppColors.kPrimaryColor : Colors.black),
+              0,
+              context),
+          getIcon(
+              size,
+              currentIndex == 1
+                  ? Icon(Icons.search_sharp, color: AppColors.primaryColor)
+                  : SvgPicture.asset('assets/svg/search.svg', color: currentIndex == 1 ? AppColors.kPrimaryColor : Colors.black),
+              1,
+              context),
           getIcon(
             size,
             Observer(builder: (context) {
@@ -32,7 +44,10 @@ class BuildBottomNavBar extends StatelessWidget {
                 width: size.width * 0.1,
                 child: Stack(
                   children: [
-                    Center(child: SvgPicture.asset('assets/svg/cart.svg', color: currentIndex == 2 ? AppColors.kPrimaryColor : Colors.black)),
+                    Center(
+                        child: currentIndex == 2
+                            ? Icon(Icons.shopping_cart, color: AppColors.primaryColor)
+                            : SvgPicture.asset('assets/svg/cart.svg', color: currentIndex == 2 ? AppColors.kPrimaryColor : Colors.black)),
                     if (cart.cartCount != 0)
                       Align(
                         alignment: Alignment.topRight,
@@ -49,7 +64,13 @@ class BuildBottomNavBar extends StatelessWidget {
             2,
             context,
           ),
-          getIcon(size, SvgPicture.asset('assets/svg/person.svg', color: currentIndex == 3 ? AppColors.kPrimaryColor : Colors.black), 3, context),
+          getIcon(
+              size,
+              currentIndex == 3
+                  ? Icon(Icons.person, color: AppColors.primaryColor)
+                  : SvgPicture.asset('assets/svg/person.svg', color: currentIndex == 3 ? AppColors.kPrimaryColor : Colors.black),
+              3,
+              context),
         ],
       ),
     );

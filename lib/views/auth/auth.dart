@@ -26,6 +26,7 @@ class _AuthState extends State<Auth> with TickerProviderStateMixin {
     Size size = MediaQuery.of(context).size;
     return BuildScaffold(
       // bottomNavBarVisible: true,
+      currentIndex: 3,
       child: ListView(
         children: [
           const Divider(height: 1),

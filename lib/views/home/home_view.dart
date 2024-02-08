@@ -59,6 +59,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     // var homeData = Provider.of<HomeData>(context);
     return BuildScaffold(
+      currentIndex: 0,
       child: LayoutBuilder(builder: (context, constraints) {
         return Observer(builder: (context) {
           if (homeData.isLoading || homeData.data.isEmpty) {
