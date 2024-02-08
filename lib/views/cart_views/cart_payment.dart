@@ -116,154 +116,126 @@ class _CartPaymentState extends State<CartPayment> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    cartData = Provider.of<CartData>(context);
+    authToken = Provider.of<AuthToken>(context);
     // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
       child: LayoutBuilder(builder: (context, constraints) {
-        return Observer(builder: (_) {
-          cartData = Provider.of<CartData>(context);
-          authToken = Provider.of<AuthToken>(context);
-
-          if (cartData.cartData.isEmpty) {
-            return BuildErrorWidget(
-              errorMsg: 'An error occured, please try again.',
-              onRefresh: () => cartData.getCartData(context, authToken),
-            );
-          }
-          return Query(
-              options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
-              builder: (result, {fetchMore, refetch}) {
-                if (result.isLoading && result.data == null) {
-                  return const BuildLoadingWidget();
-                }
-                if (result.hasException) {
-                  return BuildErrorWidget(
-                    errorMsg: result.exception?.graphqlErrors[0].message,
-                    onRefresh: refetch,
-                  );
-                }
-                log(jsonEncode(result.data));
-                cartData.setCartData(cartData.cartData);
-                cartData.putCartCount(cartData.cartData['cart']['total_quantity']);
-
-                if (result.data!['cart']['shipping_addresses'].isEmpty) {
-                  context.go("/${CartView.route}");
-                }
-
-                if (result.data!['cart']['selected_payment_method'] != null) {
-                  paymentCode ??= result.data!['cart']['selected_payment_method']['code'];
-                }
-                if (result.data!['cart']['shipping_addresses'][0]['selected_shipping_method'] != null) {
-                  selectedShippingMethod ??= result.data!['cart']['shipping_addresses'][0]['selected_shipping_method']['carrier_code'];
-                }
-
-                return ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
-                  children: [
-                    // const SizedBox(height: 20),
-                    // Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: Container(
-                    //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
-                    //     decoration: AppResponsive.isDesktop(context)
-                    //         ? BoxDecoration(
-                    //             color: AppColors.shadowColor,
-                    //             borderRadius: BorderRadius.circular(30),
-                    //           )
-                    //         : null,
-                    //     child: const BuildCartSteps(currentCartIndex: 2),
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 20),
-                    Mutation(
-                        options: MutationOptions(
-                          // document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
-                          document: gql(PaymentServices.placeOrder),
-                          onError: (data) {
-                            print(data);
-                            try {
-                              showSnackBar(context: context, message: data!.graphqlErrors[0].message, backgroundColor: Colors.red);
-                            } catch (e) {
-                              //print(e);
-                            }
-                          },
-                          onCompleted: (data) async {
-                            print(data);
-                            if (data != null) {
-                              log(data.toString());
-                              if (paymentCode == 'razorpay') {
-                                // if (data['placeRazorpayOrder']['success']) {
-                                //   getRazorPay(data, authToken);
-                                // } else {
-                                //   showSnackBar(context: context, message: data['placeRazorpayOrder']['message'], backgroundColor: Colors.red);
-                                // }
-                              } else {
-                                await cartData.getCustomerCart(context, authToken);
-                                context.go("/${CartView.route}/${OrderPlacedView.route}");
-                              }
-                            }
-                            // navigate(context, RazorPayWeb());
-                          },
-                        ),
-                        builder: (runMutation, mutResult) {
-                          return AppResponsive(
-                            mobile: Column(
-                              children: [
-                                getBody(size, cartData, refetch),
-                                const SizedBox(height: 20),
-                                CartSummaryWidget(
-                                  refetch: refetch,
-                                  buttonText: "Place Order",
-                                  isLoading: isLoading,
-                                  onButtonTap: () {
-                                    if (!mutResult!.isLoading && !cartData.isLoading) {
-                                      if (paymentCode == null) {
-                                        showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
-                                        return;
-                                      }
-                                      runMutation({
-                                        'cartId': cartData.cartId,
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                            desktop: SizedBox(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(flex: 75, child: getBody(size, cartData, refetch)),
-                                  const SizedBox(width: 20),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 350),
-                                    child: CartSummaryWidget(
-                                      buttonText: "Place Order",
-                                      refetch: refetch,
-                                      isLoading: isLoading,
-                                      onButtonTap: () {
-                                        if (!mutResult!.isLoading && !cartData.isLoading) {
-                                          if (paymentCode == null) {
-                                            showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
-                                            return;
-                                          }
-                                          runMutation({
-                                            'cartId': cartData.cartId,
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                  ],
+        return Query(
+            options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
+            builder: (result, {fetchMore, refetch}) {
+              if (result.isLoading && result.data == null) {
+                return const BuildLoadingWidget();
+              }
+              if (result.hasException) {
+                return BuildErrorWidget(
+                  errorMsg: result.exception?.graphqlErrors[0].message,
+                  onRefresh: refetch,
                 );
-              });
-        });
+              }
+              log(jsonEncode(result.data));
+              cartData.setCartData(cartData.cartData);
+              cartData.putCartCount(cartData.cartData['cart']['total_quantity']);
+
+              if (result.data!['cart']['shipping_addresses'].isEmpty) {
+                context.go("/${CartView.route}");
+              }
+
+              if (result.data!['cart']['selected_payment_method'] != null) {
+                paymentCode ??= result.data!['cart']['selected_payment_method']['code'];
+              }
+              if (result.data!['cart']['shipping_addresses'][0]['selected_shipping_method'] != null) {
+                selectedShippingMethod ??= result.data!['cart']['shipping_addresses'][0]['selected_shipping_method']['carrier_code'];
+              }
+
+              return Mutation(
+                  options: MutationOptions(
+                    // document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
+                    document: gql(PaymentServices.placeOrder),
+                    onError: (data) {
+                      print(data);
+                      try {
+                        showSnackBar(context: context, message: data!.graphqlErrors[0].message, backgroundColor: Colors.red);
+                      } catch (e) {
+                        //print(e);
+                      }
+                    },
+                    onCompleted: (data) async {
+                      print(data);
+                      if (data != null) {
+                        log(data.toString());
+                        if (paymentCode == 'razorpay') {
+                          // if (data['placeRazorpayOrder']['success']) {
+                          //   getRazorPay(data, authToken);
+                          // } else {
+                          //   showSnackBar(context: context, message: data['placeRazorpayOrder']['message'], backgroundColor: Colors.red);
+                          // }
+                        } else {
+                          await cartData.getCustomerCart(context, authToken);
+                          cartData.getCartData(context, authToken);
+                          context.go("/${CartView.route}/${OrderPlacedView.route}");
+                        }
+                      }
+                      // navigate(context, RazorPayWeb());
+                    },
+                  ),
+                  builder: (runMutation, mutResult) {
+                    return AppResponsive(
+                      mobile: ListView(
+                        controller: scrollController,
+                        padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
+                        children: [
+                          getBody(size, cartData, refetch),
+                          const SizedBox(height: 20),
+                          CartSummaryWidget(
+                            refetch: refetch,
+                            buttonText: "Place Order",
+                            isLoading: isLoading || mutResult!.isLoading,
+                            onButtonTap: () {
+                              if (!mutResult!.isLoading && !cartData.isLoading) {
+                                if (paymentCode == null) {
+                                  showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
+                                  return;
+                                }
+                                runMutation({
+                                  'cartId': cartData.cartId,
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      desktop: SizedBox(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 75, child: getBody(size, cartData, refetch)),
+                            const SizedBox(width: 20),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 350),
+                              child: CartSummaryWidget(
+                                buttonText: "Place Order",
+                                refetch: refetch,
+                                isLoading: isLoading,
+                                onButtonTap: () {
+                                  if (!mutResult!.isLoading && !cartData.isLoading) {
+                                    if (paymentCode == null) {
+                                      showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
+                                      return;
+                                    }
+                                    runMutation({
+                                      'cartId': cartData.cartId,
+                                    });
+                                  }
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  });
+            });
       }),
     );
   }
@@ -321,7 +293,7 @@ class _CartPaymentState extends State<CartPayment> {
                         // setState(() {});
                       },
                       child: Container(
-                        width: size.width * 0.4,
+                        width: size.width * 0.35,
                         height: size.width * 0.2,
                         constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
                         padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -349,13 +321,13 @@ class _CartPaymentState extends State<CartPayment> {
                                   Text(
                                     shippingMethod['carrier_title'],
                                     textAlign: TextAlign.center,
-                                    style: AppStyles.getMediumTextStyle(fontSize: 16),
+                                    style: AppStyles.getMediumTextStyle(fontSize: 14),
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
                                     '${shippingMethod['amount']['currency']} ${shippingMethod['amount']['value']}',
                                     textAlign: TextAlign.center,
-                                    style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.primaryColor),
+                                    style: AppStyles.getMediumTextStyle(fontSize: 12, color: AppColors.primaryColor),
                                   ),
                                 ],
                               ),
@@ -404,7 +376,7 @@ class _CartPaymentState extends State<CartPayment> {
                         // setState(() {});
                       },
                       child: Container(
-                        width: size.width * 0.4,
+                        width: size.width * 0.35,
                         height: size.width * 0.2,
                         constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
                         padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -427,7 +399,7 @@ class _CartPaymentState extends State<CartPayment> {
                                 child: Text(
                                   paymentMethod['title'],
                                   textAlign: TextAlign.center,
-                                  style: AppStyles.getMediumTextStyle(fontSize: 16),
+                                  style: AppStyles.getMediumTextStyle(fontSize: 14),
                                 ),
                               ),
                       ),

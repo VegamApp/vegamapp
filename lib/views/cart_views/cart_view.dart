@@ -31,24 +31,19 @@ class _CartViewState extends State<CartView> {
   late AuthToken token;
 
   getCart() async {
-    var cartData = Provider.of<CartData>(context, listen: false);
-    var token = Provider.of<AuthToken>(context, listen: false);
+    cartData = Provider.of<CartData>(context);
+    token = Provider.of<AuthToken>(context);
     cartData.getCartData(context, token);
-    print(cartData.cartId);
-    print(token.loginToken);
+    // print(cartData.cartId);
+    // print(token.loginToken);
   }
 
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => getCart());
   }
 
   functionOnException(Function()? refetch) async {
-    var cartData = Provider.of<CartData>(context, listen: false);
-    var token = Provider.of<AuthToken>(context, listen: false);
-
     await cartData.getCartData(context, token);
     refetch!();
   }
@@ -60,6 +55,12 @@ class _CartViewState extends State<CartView> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getCart();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     cartData = Provider.of<CartData>(context);
@@ -68,84 +69,82 @@ class _CartViewState extends State<CartView> {
     return BuildScaffold(
       currentIndex: 2,
       child: LayoutBuilder(builder: (context, constraints) {
-        return Observer(builder: (_) {
-          return Query(
-              options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
-              builder: (result, {fetchMore, refetch}) {
-                if (result.isLoading) {
-                  return const BuildLoadingWidget();
-                }
-                if (result.hasException) {
-                  cartData.getCartData(context, token);
-                  return Center(
-                    child: BuildErrorWidget(
-                      onRefresh: () async {
-                        await cartData.getCartData(context, token);
-                        refetch!();
-                      },
-                      errorMsg: result.exception!.graphqlErrors.isNotEmpty ? result.exception?.graphqlErrors[0].message : "An error occured",
-                    ),
-                  );
-                  // functionOnException(refetch);
-                  // return BuildErrorWidget(
-                  //   errorMsg: result.exception?.graphqlErrors[0].message,
-                  //   onRefresh: refetch,
-                  // );
-                }
-                // cartData.setCartData(result.data!);
-                // cartData.putCartCount(result.data!['cart']['total_quantity']);
-                return ListView(
-                  controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
-                  children: [
-                    const SizedBox(height: 20),
-                    // Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: Container(
-                    //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
-                    //     decoration: AppResponsive.isDesktop(context)
-                    //         ? BoxDecoration(
-                    //             color: AppColors.shadowColor,
-                    //             borderRadius: BorderRadius.circular(30),
-                    //           )
-                    //         : null,
-                    //     child: const BuildCartSteps(currentCartIndex: 0),
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 20),
-                    cartData.cartCount == 0
-                        ? SizedBox(height: 200, child: Center(child: Text("Cart Empty", style: AppStyles.getMediumTextStyle(fontSize: 18))))
-                        : AppResponsive(
-                            mobile: Column(
+        return Query(
+            options: QueryOptions(document: CartApis.cart, variables: {'id': cartData.cartId}),
+            builder: (result, {fetchMore, refetch}) {
+              if (result.isLoading) {
+                return const BuildLoadingWidget();
+              }
+              if (result.hasException) {
+                cartData.getCartData(context, token);
+                return Center(
+                  child: BuildErrorWidget(
+                    onRefresh: () async {
+                      await cartData.getCartData(context, token);
+                      refetch!();
+                    },
+                    errorMsg: result.exception!.graphqlErrors.isNotEmpty ? result.exception?.graphqlErrors[0].message : "An error occured",
+                  ),
+                );
+                // functionOnException(refetch);
+                // return BuildErrorWidget(
+                //   errorMsg: result.exception?.graphqlErrors[0].message,
+                //   onRefresh: refetch,
+                // );
+              }
+              cartData.setCartData(result.data!);
+
+              return ListView(
+                controller: scrollController,
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
+                children: [
+                  const SizedBox(height: 20),
+                  // Align(
+                  //   alignment: Alignment.centerLeft,
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 410 : constraints.maxWidth,
+                  //     decoration: AppResponsive.isDesktop(context)
+                  //         ? BoxDecoration(
+                  //             color: AppColors.shadowColor,
+                  //             borderRadius: BorderRadius.circular(30),
+                  //           )
+                  //         : null,
+                  //     child: const BuildCartSteps(currentCartIndex: 0),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 20),
+                  result.data!['cart']['total_quantity'] == 0
+                      ? SizedBox(height: 200, child: Center(child: Text("Cart Empty", style: AppStyles.getMediumTextStyle(fontSize: 18))))
+                      : AppResponsive(
+                          mobile: Column(
+                            children: [
+                              getBody(size, cartData, result, refetch),
+                              const SizedBox(height: 20),
+                              CartSummaryWidget(
+                                buttonText: "Next",
+                                refetch: refetch,
+                                onButtonTap: _showSignInDialog,
+                              ),
+                            ],
+                          ),
+                          desktop: SizedBox(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                getBody(size, cartData, result, refetch),
-                                const SizedBox(height: 20),
-                                CartSummaryWidget(
-                                  buttonText: "Next",
-                                  refetch: refetch,
-                                  onButtonTap: _showSignInDialog,
-                                ),
+                                Expanded(flex: 75, child: getBody(size, cartData, result, refetch)),
+                                const SizedBox(width: 20),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 350),
+                                  child: CartSummaryWidget(refetch: refetch, buttonText: "Next", onButtonTap: _showSignInDialog),
+                                )
                               ],
                             ),
-                            desktop: SizedBox(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(flex: 75, child: getBody(size, cartData, result, refetch)),
-                                  const SizedBox(width: 20),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 350),
-                                    child: CartSummaryWidget(refetch: refetch, buttonText: "Next", onButtonTap: _showSignInDialog),
-                                  )
-                                ],
-                              ),
-                            ),
                           ),
-                  ],
-                );
-              });
-        });
+                        ),
+                ],
+              );
+            });
       }),
     );
   }

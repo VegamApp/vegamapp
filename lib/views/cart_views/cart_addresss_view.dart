@@ -8,6 +8,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
 import 'package:m2/services/app_responsive.dart';
+import 'package:m2/services/models/user.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
@@ -191,7 +192,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                               ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 350),
                                 child: CartSummaryWidget(
-                                  refetch: null,
+                                  refetch: () => cartData.getCartData(context, token),
                                   buttonText: "Go to Checkout",
                                   onButtonTap: () {
                                     // log(jsonEncode(cartData.cartData));
@@ -747,6 +748,15 @@ class _CartAddressViewState extends State<CartAddressView> {
                     ),
                   ),
                 ),
+                if (cartData.cartData['cart']?['shipping_addresses'] != null && cartData.cartData['cart']['shipping_addresses'].isNotEmpty)
+                  InkWell(
+                    onTap: () => context.pushNamed(CartPayment.route),
+                    child: BuildAddressContainer(
+                      addressModel: Addresses.fromJson(cartData.cartData['cart']['shipping_addresses'][0]),
+                      size: size,
+                      fromCart: true,
+                    ),
+                  ),
                 if (userData.data.addresses != null)
                   ...userData.data.addresses!
                       .map(

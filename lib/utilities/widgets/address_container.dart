@@ -4,13 +4,7 @@ import 'package:m2/services/models/user.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class BuildAddressContainer extends StatefulWidget {
-  const BuildAddressContainer(
-      {Key? key,
-      required this.addressModel,
-      required this.size,
-      this.fromCart = false,
-      this.onRemove})
-      : super(key: key);
+  const BuildAddressContainer({Key? key, required this.addressModel, required this.size, this.fromCart = false, this.onRemove}) : super(key: key);
   final Addresses addressModel;
   final Size size;
   final bool fromCart;
@@ -34,8 +28,7 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
       // height: 320,
       decoration: BoxDecoration(
         color: const Color(0xffffffff),
-        borderRadius: BorderRadius.circular(
-            widget.size.width * .025 > 20 ? 20 : widget.size.width * 0.025),
+        borderRadius: BorderRadius.circular(widget.size.width * .025 > 20 ? 20 : widget.size.width * 0.025),
         border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
         boxShadow: const [
           BoxShadow(
@@ -45,15 +38,12 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(
-          widget.size.width * 0.05 > 30 ? 30 : widget.size.width * 0.05),
+      padding: EdgeInsets.all(widget.size.width * 0.05 > 30 ? 30 : widget.size.width * 0.05),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${addressModel.firstname} ${addressModel.lastname}',
-              style: AppStyles.getSemiBoldTextStyle(
-                  fontSize: 16, color: AppColors.fadedText)),
+          Text('${addressModel.firstname} ${addressModel.lastname}', style: AppStyles.getSemiBoldTextStyle(fontSize: 16, color: AppColors.fadedText)),
           if (addressModel.street != null) const SizedBox(height: 10),
           if (addressModel.street != null)
             ListView.separated(
@@ -61,25 +51,19 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
               shrinkWrap: true,
               itemCount: addressModel.street!.length,
               separatorBuilder: (context, index) => const SizedBox(height: 10),
-              itemBuilder: (context, index) => Text(addressModel.street![index],
-                  style: AppStyles.getRegularTextStyle(
-                      fontSize: 16, color: AppColors.fadedText)),
+              itemBuilder: (context, index) => Text(addressModel.street![index], style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
             ),
           const SizedBox(height: 10),
           // Text(addressModel.addressType == AddressType.office ? "Office" : 'Home',
           //     style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
           const SizedBox(height: 10),
-          Text('Mob: ${addressModel.telephone}',
-              style: AppStyles.getRegularTextStyle(
-                  fontSize: 16, color: AppColors.fadedText)),
+          Text('Mob: ${addressModel.telephone}', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
           const SizedBox(height: 10),
-          Text('PIN: ${addressModel.postcode}',
-              style: AppStyles.getRegularTextStyle(
-                  fontSize: 16, color: AppColors.fadedText)),
-          const SizedBox(height: 20),
-          Divider(height: 1, color: AppColors.evenFadedText),
-          const SizedBox(height: 10),
-          if (!widget.fromCart)
+          Text('PIN: ${addressModel.postcode}', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
+          if (!widget.fromCart) ...[
+            const SizedBox(height: 20),
+            Divider(height: 1, color: AppColors.evenFadedText),
+            const SizedBox(height: 10),
             SizedBox(
               width: widget.size.width * 0.9,
               child: Wrap(
@@ -95,11 +79,8 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(FontAwesomeIcons.penToSquare,
-                            color: AppColors.buttonColor, size: 20),
-                        Text('Edit',
-                            style: AppStyles.getRegularTextStyle(
-                                fontSize: 16, color: AppColors.fadedText))
+                        Icon(FontAwesomeIcons.penToSquare, color: AppColors.buttonColor, size: 20),
+                        Text('Edit', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText))
                       ],
                     ),
                   ),
@@ -112,17 +93,15 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(FontAwesomeIcons.xmark,
-                            color: Colors.red, size: 20),
-                        Text('Remove',
-                            style: AppStyles.getRegularTextStyle(
-                                fontSize: 16, color: AppColors.fadedText))
+                        const Icon(FontAwesomeIcons.xmark, color: Colors.red, size: 20),
+                        Text('Remove', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText))
                       ],
                     ),
                   )
                 ],
               ),
-            )
+            ),
+          ],
         ],
       ),
     );

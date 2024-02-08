@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
@@ -29,7 +30,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
     if (productModel.items![0].variants != null && productModel.items![0].variants!.isNotEmpty) {
       mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
     }
-    print(jsonEncode(widget.data));
+    log(jsonEncode(widget.data));
     price = productModel.items![0].specialPrice ?? productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff;
