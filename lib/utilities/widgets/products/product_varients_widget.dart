@@ -256,7 +256,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
 
   Widget buildQuantityChanger() {
     return SizedBox(
-      height: 40,
+      height: 45,
       child: Row(
         children: [
           SizedBox(
@@ -272,7 +272,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 40,
+                  width: 60,
                   padding: const EdgeInsets.symmetric(vertical: 7.5, horizontal: 10),
                   alignment: Alignment.center,
                   child: Text(
@@ -286,8 +286,9 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                     Expanded(
                       child: InkWell(
                         onTap: () => setState(() => quantity++),
-                        child: SizedBox(
-                          width: 30,
+                        child: Container(
+                          width: 50,
+                          height: 40,
                           child: Center(child: Icon(Icons.expand_less, size: 17.5, color: AppColors.evenFadedText)),
                         ),
                       ),
@@ -298,7 +299,8 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                           if (quantity > 1) quantity--;
                         }),
                         child: SizedBox(
-                          width: 30,
+                          width: 50,
+                          height: 40,
                           child: Center(child: Icon(Icons.expand_more, size: 17.5, color: AppColors.evenFadedText)),
                         ),
                       ),
