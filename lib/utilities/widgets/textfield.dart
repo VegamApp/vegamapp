@@ -19,7 +19,9 @@ class BuildTextField extends StatefulWidget {
     this.padding,
     this.suffixIcon,
     this.maxLines,
+    this.maxLength,
     this.textCapitalization,
+    this.showLength = true,
   }) : super(key: key);
   final TextEditingController controller;
   final String? hint;
@@ -35,6 +37,8 @@ class BuildTextField extends StatefulWidget {
   final EdgeInsets? padding;
   final Widget? suffixIcon;
   final int? maxLines;
+  final int? maxLength;
+  final bool showLength;
   final TextCapitalization? textCapitalization;
   @override
   State<BuildTextField> createState() => _BuildTextFieldState();
@@ -80,16 +84,17 @@ class _BuildTextFieldState extends State<BuildTextField> with AutomaticKeepAlive
                           obscureText = !obscureText;
                         }),
                     child: Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: Icon(obscureText ? Icons.visibility : Icons.visibility_off, color: AppColors.buttonColor, size: 20)))
+                        padding: const EdgeInsets.only(right: 15), child: Icon(obscureText ? Icons.visibility : Icons.visibility_off, color: AppColors.buttonColor, size: 20)))
                 : null),
         disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
         border: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColors.evenFadedText)),
         hintText: widget.hint,
         hintStyle: widget.hintStyle ?? AppStyles.getLightTextStyle(fontSize: 13, color: AppColors.fadedText),
+        counterText: widget.showLength ? null : "",
       ),
       maxLines: widget.maxLines ?? 1,
+      maxLength: widget.maxLength,
       onChanged: widget.onChanged,
       textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
     );

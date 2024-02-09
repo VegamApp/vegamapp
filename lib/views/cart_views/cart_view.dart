@@ -93,7 +93,7 @@ class _CartViewState extends State<CartView> {
                 // );
               }
               cartData.setCartData(result.data!);
-
+              cartData.putCartCount(result.data!['cart']['total_quantity']);
               return ListView(
                 controller: scrollController,
                 padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
@@ -122,7 +122,7 @@ class _CartViewState extends State<CartView> {
                               getBody(size, cartData, result, refetch),
                               const SizedBox(height: 20),
                               CartSummaryWidget(
-                                buttonText: "Next",
+                                buttonText: "Proceed To Checkout",
                                 refetch: refetch,
                                 onButtonTap: _showSignInDialog,
                               ),
@@ -437,7 +437,7 @@ class _CartViewState extends State<CartView> {
                       BuildPriceWithOffer(
                         price: f.format(item['product']['special_price'] ?? item['product']['price_range']['minimum_price']['regular_price']['value']),
                         originalPrice: item['product']['price_range']['maximum_price']['regular_price']['value'].toString(),
-                        offer: item['product']['price_range']['maximum_price']['discount']['percent_off'],
+                        offer: item['product']['price_range']['maximum_price']['discount']['percent_off'] * 1.0,
                         priceSize: 17,
                         currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
                       ),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -84,6 +85,26 @@ showSnackBar({required context, required String message, required Color backgrou
     textColor: textColor,
     timeInSecForIosWeb: 2,
     // webBgColor: "linear-gradient(to right, #31ACA0, #187B71)",
+  );
+}
+
+showDeleteDialog(BuildContext context, {required String type, required Function() onDelete}) async {
+  return await showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text("Delete this $type?", style: AppStyles.getSemiBoldTextStyle(fontSize: 16)),
+            content: Text("Are you sure you want to delete this ${type.toLowerCase()}?. This action cannot be undone."),
+            actions: [
+              TextButton(onPressed: onDelete, child: Text("Delete", style: AppStyles.getMediumTextStyle(fontSize: 14))),
+              TextButton(onPressed: () => context.pop(), child: Text("Cancel", style: AppStyles.getMediumTextStyle(fontSize: 14))),
+            ],
+          );
+        },
+      );
+    },
   );
 }
 

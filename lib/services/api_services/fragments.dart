@@ -171,7 +171,7 @@ class Fragments {
           firstname
           lastname
           city
-          street 
+          street
           region
           country_code
           __typename
@@ -180,7 +180,7 @@ class Fragments {
           firstname
           lastname
           city
-          street 
+          street
           region
           country_code
           __typename
@@ -270,10 +270,9 @@ class Fragments {
       uid
       __typename
     }
-    wishlists @include(if: $showWishlist) {
+    wishlists {
       id
       items_count
-      __typename
     }
 
     allow_remote_shopping_assistance

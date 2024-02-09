@@ -158,13 +158,13 @@ class _CartAddressViewState extends State<CartAddressView> {
                                   )
                                 : getExistingAddress(user, size, token, cartData),
                             const SizedBox(height: 20),
-                            CartSummaryWidget(
-                              buttonText: "Go to Checkout",
-                              refetch: () => cartData.getCartData(context, token),
-                              onButtonTap: () {
-                                context.go("/${CartView.route}/${CartPayment.route}");
-                              },
-                            ),
+                            // CartSummaryWidget(
+                            //   buttonText: "Go to Checkout",
+                            //   refetch: () => cartData.getCartData(context, token),
+                            //   onButtonTap: () {
+                            //     context.go("/${CartView.route}/${CartPayment.route}");
+                            //   },
+                            // ),
                           ],
                         ),
                         desktop: SizedBox(
@@ -189,21 +189,21 @@ class _CartAddressViewState extends State<CartAddressView> {
                                     : getExistingAddress(user, size, token, cartData),
                               ),
                               const SizedBox(width: 20),
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 350),
-                                child: CartSummaryWidget(
-                                  refetch: () => cartData.getCartData(context, token),
-                                  buttonText: "Go to Checkout",
-                                  onButtonTap: () {
-                                    // log(jsonEncode(cartData.cartData));
-                                    if (cartData.cartData['shipping_addresses'] == null || cartData.cartData['shipping_addresses'].isEmpty) {
-                                      showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
-                                      return;
-                                    }
-                                    context.go("/${CartView.route}/${CartPayment.route}");
-                                  },
-                                ),
-                              )
+                              // ConstrainedBox(
+                              //   constraints: const BoxConstraints(maxWidth: 350),
+                              //   child: CartSummaryWidget(
+                              //     refetch: () => cartData.getCartData(context, token),
+                              //     buttonText: "Go to Checkout",
+                              //     onButtonTap: () {
+                              //       // log(jsonEncode(cartData.cartData));
+                              //       if (cartData.cartData['shipping_addresses'] == null || cartData.cartData['shipping_addresses'].isEmpty) {
+                              //         showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
+                              //         return;
+                              //       }
+                              //       context.go("/${CartView.route}/${CartPayment.route}");
+                              //     },
+                              //   ),
+                              // )
                             ],
                           ),
                         ),

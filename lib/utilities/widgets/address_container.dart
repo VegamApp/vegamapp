@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/services/api_services/customer_apis.dart';
 import 'package:m2/services/models/user.dart';
 import 'package:m2/utilities/utilities.dart';
 
@@ -85,20 +88,41 @@ class _BuildAddressContainerState extends State<BuildAddressContainer> {
                       ],
                     ),
                   ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      fixedSize: const Size(110, 20),
-                      shape: const StadiumBorder(),
-                    ),
-                    onPressed: widget.onRemove,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Icon(FontAwesomeIcons.xmark, color: Colors.red, size: 20),
-                        Text('Remove', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText))
-                      ],
-                    ),
-                  )
+                  Mutation(
+                      options: MutationOptions(
+                        document: CustomerApis.deleteCustomerAddress,
+                        onCompleted: (data) {
+                          print(data);
+                          if (data?['deleteCustomerAddress'] == true) {
+                            showSnackBar(context: context, message: "Address deleted!", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
+                          }
+                          if (widget.onRemove != null) {
+                            widget.onRemove!();
+                          }
+                        },
+                        onError: (error) {
+                          print(error);
+                        },
+                      ),
+                      builder: (rm, mresult) {
+                        return TextButton(
+                          style: TextButton.styleFrom(
+                            fixedSize: const Size(110, 20),
+                            shape: const StadiumBorder(),
+                          ),
+                          onPressed: () => showDeleteDialog(context, type: "address", onDelete: () {
+                            context.pop();
+                            return rm({"id": addressModel.id});
+                          }),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Icon(FontAwesomeIcons.xmark, color: Colors.red, size: 20),
+                              Text('Remove', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText))
+                            ],
+                          ),
+                        );
+                      })
                 ],
               ),
             ),

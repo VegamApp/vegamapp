@@ -74,25 +74,6 @@ class ProductApi {
         uid
         name
       }
-      ... on SimpleProduct {
-        options {
-          title
-          required
-          sort_order
-          option_id
-          ... on CustomizableDropDownOption {
-            value {
-              option_type_id
-              uid
-              price
-              price_type
-              sku
-              sort_order
-              title
-            }
-          }
-        }
-      }
       ... on ConfigurableProduct {
         configurable_options {
           id

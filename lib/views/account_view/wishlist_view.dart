@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +15,7 @@ import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/auth/auth.dart';
+import 'package:m2/views/product_views/product_view.dart';
 import 'package:provider/provider.dart';
 
 class WishlistView extends StatefulWidget {
@@ -30,123 +34,124 @@ class _WishlistViewState extends State<WishlistView> {
     cartData = Provider.of<CartData>(context);
     authToken = Provider.of<AuthToken>(context);
     return BuildScaffold(
-      currentIndex: 3,
-      child: LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
+      currentIndex: -1,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
               horizontal: AppResponsive.isMobile(context)
                   ? 20
                   : constraints.maxWidth > 1400
                       ? (constraints.maxWidth - 1400) / 2
                       : 60,
-              vertical: 20),
-          child: AppResponsive(
-            desktop: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  flex: 3,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: AccountSideBar(currentPage: AccountInformationView.route),
-                  ),
-                ),
-                Expanded(
-                  flex: 7,
-                  child: Container(
-                      margin: const EdgeInsets.only(top: 40),
-                      decoration: BoxDecoration(
-                        color: AppColors.scaffoldColor,
-                        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
-                      ),
-                      child: getBody(context, size)),
-                ),
-              ],
+              vertical: 20,
             ),
-            mobile: getBody(context, size),
-          ),
-        );
-      }),
+            child: AppResponsive(
+              desktop: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    flex: 3,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: AccountSideBar(currentPage: AccountInformationView.route),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 7,
+                    child: Container(
+                        margin: const EdgeInsets.only(top: 40),
+                        decoration: BoxDecoration(
+                          color: AppColors.scaffoldColor,
+                          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+                        ),
+                        child: getBody(context, size)),
+                  ),
+                ],
+              ),
+              mobile: getBody(context, size),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Padding getBody(BuildContext context, Size size) {
-    return Padding(
-      padding: AppResponsive.isDesktop(context) ? const EdgeInsets.symmetric(horizontal: 60, vertical: 50) : EdgeInsets.symmetric(horizontal: size.width * 0.05),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text('Wishlist', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.primaryColor)),
-          ),
-          const SizedBox(height: 20),
-          Query(
-            options: QueryOptions(document: gql(CustomerApis.wishList)),
-            builder: (result, {fetchMore, refetch}) {
-              authToken.getUser(context, GraphQLProvider.of(context));
-              if (result.isLoading) {
-                return BuildLoadingWidget(color: AppColors.primaryColor);
-              }
-
-              try {
-                authToken.putWishlistCount(result.data!['wishlist']['items_count']);
-              } catch (e) {
-                //print(e);
-              }
-              if (authToken.loginToken == null || result.data == null || result.data!['wishlist']['items'].isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // LottieBuilder.asset('assets/animations/heart.json'),
-                        const Icon(Icons.favorite_outline, size: 100),
-                        // SizedBox(height: 300, width: 300, child: Image.asset('assets/images/20-love-heart-outline.gif')),
-                        const SizedBox(height: 20),
-                        if (authToken.loginToken == null) ...[
-                          Text('Login to add items to wishlist.', style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
-                          const SizedBox(height: 10),
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                            ),
-                            onPressed: () => context.pushNamed(Auth.route),
-                            child: Text('LOGIN', style: AppStyles.getRegularTextStyle(fontSize: 16, color: Colors.white)),
-                          )
-                        ] else
-                          Text('Your shopping list is empty.', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
-                      ],
-                    ),
+  Widget getBody(BuildContext context, Size size) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text('Wishlist', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.primaryColor)),
+        ),
+        const SizedBox(height: 20),
+        Query(
+          options: QueryOptions(document: gql(CustomerApis.wishList)),
+          builder: (result, {fetchMore, refetch}) {
+            authToken.getUser(context, GraphQLProvider.of(context));
+            if (result.isLoading) {
+              return BuildLoadingWidget(color: AppColors.primaryColor);
+            }
+            try {
+              authToken.putWishlistCount(result.data!['wishlist']['items_count']);
+            } catch (e) {
+              //print(e);
+            }
+            if (authToken.loginToken == null || result.data == null || result.data!['wishlist']['items'].isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // LottieBuilder.asset('assets/animations/heart.json'),
+                      const Icon(Icons.favorite_outline, size: 100),
+                      // SizedBox(height: 300, width: 300, child: Image.asset('assets/images/20-love-heart-outline.gif')),
+                      const SizedBox(height: 20),
+                      if (authToken.loginToken == null) ...[
+                        Text('Login to add items to wishlist.', style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                          ),
+                          onPressed: () => context.pushNamed(Auth.route),
+                          child: Text('LOGIN', style: AppStyles.getRegularTextStyle(fontSize: 16, color: Colors.white)),
+                        )
+                      ] else
+                        Text('Your wishlist is empty.', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)),
+                    ],
                   ),
-                );
-              }
-              if (result.hasException || authToken.user.wishlists == null) {
-                return Center(
-                  child: BuildErrorWidget(
-                    onRefresh: () => authToken.getUser(context, GraphQLProvider.of(context)),
-                  ),
-                );
-              }
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 140, horizontal: 20),
-                itemCount: result.data!['wishlist']['items'].length,
-                separatorBuilder: (context, index) => Divider(thickness: 1, color: AppColors.dividerColor),
-                itemBuilder: (context, index) => BuildWishlistItem(
-                  wishlistId: authToken.user.wishlists![0].id!,
-                  data: result.data!['wishlist']['items'][index],
-                  refetch: refetch,
-                  authToken: authToken,
                 ),
               );
-            },
-          )
-        ],
-      ),
+            }
+            if (result.hasException || authToken.user.wishlists == null) {
+              return Center(
+                child: BuildErrorWidget(onRefresh: refetch),
+              );
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: result.data!['wishlist']['items'].length,
+              separatorBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Divider(thickness: 1, color: AppColors.dividerColor),
+              ),
+              itemBuilder: (context, index) => BuildWishlistItem(
+                wishlistId: authToken.user.wishlists![0].id!,
+                data: result.data!['wishlist']['items'][index],
+                refetch: refetch,
+                authToken: authToken,
+              ),
+            );
+          },
+        )
+      ],
     );
   }
 }
@@ -169,10 +174,11 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
   Widget build(BuildContext context) {
     CartData cartData = Provider.of<CartData>(context);
     return InkWell(
-      onTap: () {
-        // log(jsonEncode(widget.data));
-        context.push('/${widget.data['product']['url_key']}');
-      },
+      onTap: () => context.push('/${ProductView.route}/${widget.data['product']['url_key']}'),
+      // onTap: () {
+      // log(jsonEncode(widget.data));
+      //   context.push('/product/${widget.data['product']['url_key']}');
+      // },
       child: SizedBox(
         height: 150,
         child: Row(
@@ -253,8 +259,9 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
                           return ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 100),
                             child: ButtonTheme(
+                              layoutBehavior: ButtonBarLayoutBehavior.constrained,
                               alignedDropdown: true,
-                              height: 20,
+                              height: 15,
                               child: DropdownButtonFormField<String>(
                                 isExpanded: true,
                                 value: varientData[index],
@@ -273,7 +280,7 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
                                   data['values'].length,
                                   (configIndex) => DropdownMenuItem(
                                     value: data['values'][configIndex]['uid'],
-                                    child: Text(data['values'][configIndex]['label'], style: AppStyles.getRegularTextStyle(fontSize: 14)),
+                                    child: Text(data['values'][configIndex]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
                                   ),
                                 ),
                               ),
@@ -291,22 +298,22 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
                               if (widget.data['product']['special_price'] != null)
                                 TextSpan(
                                   text: '$currency ${widget.data['product']['special_price'].toStringAsFixed(2)}\n',
-                                  style: AppStyles.getRegularTextStyle(fontSize: 16, color: Colors.black),
+                                  style: AppStyles.getMediumTextStyle(fontSize: 16, color: Colors.black),
                                   children: [
                                     TextSpan(
                                       text: '$currency ${widget.data['product']['price_range']['minimum_price']['regular_price']['value'].toStringAsFixed(2)}',
-                                      style: AppStyles.getRegularTextStyle(fontSize: 14, color: Colors.black).copyWith(decoration: TextDecoration.lineThrough),
+                                      style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.black).copyWith(decoration: TextDecoration.lineThrough),
                                     ),
                                     TextSpan(
-                                      text: '${widget.data['product']['price_range']['maximum_price']['discount']['percent_off']}% off',
-                                      style: const TextStyle(fontSize: 14),
+                                      text: ' ${widget.data['product']['price_range']['maximum_price']['discount']['percent_off']}% off',
+                                      style: AppStyles.getRegularTextStyle(fontSize: 12, color: Colors.black),
                                     ),
                                   ],
                                 )
                               else
                                 TextSpan(
                                   text: '$currency ${widget.data['product']['price_range']['minimum_price']['regular_price']['value'].toStringAsFixed(2)}',
-                                  style: AppStyles.getRegularTextStyle(fontSize: 16, color: Colors.black),
+                                  style: AppStyles.getMediumTextStyle(fontSize: 16, color: Colors.black),
                                 ),
                             ],
                           ),
@@ -336,7 +343,7 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
                                       backgroundColor: AppColors.primaryColor,
                                     );
                                   } catch (e) {
-                                    cartData.putCartCount(result!['addProductsToCart']['cart']['total_quantity'].ceil());
+                                    cartData.putCartCount(result!['addProductsToCart']['cart']['total_quantity']);
                                     cartData.putCartPrice(result['addProductsToCart']['cart']['prices']['grand_total']['value'].toDouble());
                                     showSnackBar(context: context, message: "Added to cart", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
                                     // await Future.delayed(const Duration(milliseconds: 300), () async {
@@ -357,6 +364,7 @@ class _BuildWishlistItemState extends State<BuildWishlistItem> {
                             ),
                             builder: (RunMutation runMutation, QueryResult? result) {
                               return TextButton(
+                                style: AppStyles.filledButtonStyle,
                                 onPressed: () {
                                   String sku;
                                   if (widget.data['product']['__typename'] == 'SimpleProduct') {

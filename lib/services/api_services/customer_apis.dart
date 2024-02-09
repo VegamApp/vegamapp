@@ -54,17 +54,18 @@ class CustomerApis {
         description
         added_at
         product{
-          __typename
           name
           sku
           url_key
-          size_chart
-          rating_summary
-          review_count
-          stock_status
-          image{
+          url_suffix
+          image {
             url
           }
+          stock_status
+          #wishlistData{
+          #  wishlistItem
+          #}
+          __typename
           special_price
           price_range {
             minimum_price {
@@ -79,58 +80,43 @@ class CustomerApis {
                 currency
               }
               discount {
-                  amount_off
-                  percent_off
-              }
-            }
-          }
-          ... on CustomizableProductInterface {
-            options {
-              title
-              required
-              sort_order
-              option_id
-              uid
-              ... on CustomizableDropDownOption {
-                value {
-                  option_type_id
-                  price
-                  price_type
-                  sku
-                  sort_order
-                  title
-                  uid
-                }
+                amount_off
+                percent_off
               }
             }
           }
           ... on ConfigurableProduct {
             configurable_options {
               id
+              attribute_id_v2
               label
               position
               use_default
               attribute_code
               values {
-                store_label
-                store_label
-                label
                 uid
+                value_index
+                label
                 swatch_data {
                   value
                 }
               }
+              product_id
             }
             variants {
               product {
+                id
                 name
                 sku
-                id
+                attribute_set_id
                 media_gallery {
                   url
                   label
                 }
-                special_price
+                ... on PhysicalProductInterface {
+                  weight
+                }
+
                 price_range {
                   minimum_price {
                     regular_price {
@@ -144,17 +130,17 @@ class CustomerApis {
                       currency
                     }
                     discount {
-                        amount_off
-                        percent_off
+                      amount_off
+                      percent_off
                     }
                   }
                 }
               }
               attributes {
+                uid
                 label
                 code
                 value_index
-                uid
               }
             }
           }
@@ -163,7 +149,7 @@ class CustomerApis {
     }
   }''';
   static final requestUserData = addFragments(gql(r'''
-  query GetCustomer($showWishlist: Boolean = true) {
+{
   customer {
     ...Customer
     __typename
@@ -219,6 +205,18 @@ class CustomerApis {
       }
     }
   ''';
+  static final updateCustomerAddress = addFragments(gql(r'''
+    mutation updateCustomerAddress($addressId: Int!, $input: CustomerAddressInput!) {
+      updateCustomerAddress(id: $addressId, input: $input) {
+      ...CAddress
+      }
+    }'''), [Fragments.CAddress]);
+
+  static final deleteCustomerAddress = gql(r'''
+    mutation deleteAddress($id: Int!){
+      deleteCustomerAddress(id: $id)
+    }
+  ''');
 
   static String createCustomerAddress = r'''
   mutation createCustomerAddress($street:[String], $telephone:String, $postcode:String, $city:String, $firstname:String!, $lastname:String!, $default_shipping: Boolean, $default_billing: Boolean){

@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
@@ -11,19 +13,18 @@ import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 
 class AddressView extends StatefulWidget {
   const AddressView({super.key});
   static String route = 'address';
   @override
-  State<AddressView> createState() => _AddressViewState();
+  State<AddressView> createState() => AddressViewState();
 }
 
-class _AddressViewState extends State<AddressView> {
+class AddressViewState extends State<AddressView> {
   final ScrollController scrollController = ScrollController();
-  bool isDefaultShipping = false;
-  bool isDefaultBilling = false;
   bool regAsUser = false;
   late UserData userData;
   @override
@@ -37,44 +38,42 @@ class _AddressViewState extends State<AddressView> {
     userData = Provider.of<UserData>(context);
 
     return BuildScaffold(
-      child: Observer(builder: (_) {
-        return LayoutBuilder(builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppResponsive.isMobile(context)
-                  ? 20
-                  : constraints.maxWidth > 1400
-                      ? (constraints.maxWidth - 1400) / 2
-                      : 20,
-              vertical: 20,
-            ),
-            child: AppResponsive(
-              desktop: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    flex: 3,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      child: AccountSideBar(currentPage: AddressView.route),
-                    ),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppResponsive.isMobile(context)
+                ? 20
+                : constraints.maxWidth > 1400
+                    ? (constraints.maxWidth - 1400) / 2
+                    : 20,
+            vertical: 20,
+          ),
+          child: AppResponsive(
+            desktop: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: AccountSideBar(currentPage: AddressView.route),
                   ),
-                  Expanded(
-                    flex: 7,
-                    child: Container(
-                        margin: const EdgeInsets.only(top: 40),
-                        decoration: BoxDecoration(
-                          color: AppColors.scaffoldColor,
-                          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
-                        ),
-                        child: getBody(context, size)),
-                  ),
-                ],
-              ),
-              mobile: getBody(context, size),
+                ),
+                Expanded(
+                  flex: 7,
+                  child: Container(
+                      margin: const EdgeInsets.only(top: 40),
+                      decoration: BoxDecoration(
+                        color: AppColors.scaffoldColor,
+                        boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 50, offset: const Offset(0, 10))],
+                      ),
+                      child: getBody(context, size)),
+                ),
+              ],
             ),
-          );
-        });
+            mobile: getBody(context, size),
+          ),
+        );
       }),
     );
   }
@@ -91,61 +90,79 @@ class _AddressViewState extends State<AddressView> {
             child: Text('Manage Addresses', style: AppStyles.getMediumTextStyle(fontSize: 18, color: AppColors.primaryColor)),
           ),
           const SizedBox(height: 30),
-          Observer(builder: (_) {
-            return Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                InkWell(
-                  onTap: () => showAddAddressDialog(size, userData),
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
-                      border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x0a000000),
-                          offset: Offset(0, 10),
-                          blurRadius: 40,
+          Query(
+              options: QueryOptions(document: CustomerApis.requestUserData),
+              builder: (result, {fetchMore, refetch}) {
+                if (result.isLoading) {
+                  return Center(child: BuildLoadingWidget(color: AppColors.primaryColor));
+                }
+                if (result.hasException) {
+                  return Center(
+                    child: BuildErrorWidget(onRefresh: refetch),
+                  );
+                }
+                // log(jsonEncode(result.data!['customer']));
+                userData.putData(User.fromJson(result.data!['customer']));
+                userData.addressesList.clear();
+                userData.addressesList.addAll(ObservableList<Addresses>.of(userData.data.addresses ?? <Addresses>[]));
+
+                return Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: [
+                    InkWell(
+                      onTap: () => showAddAddressDialog(context, size, userData).then((value) => refetch!()),
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffffffff),
+                          borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                          border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x0a000000),
+                              offset: Offset(0, 10),
+                              blurRadius: 40,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.add_circle_outline,
-                            color: AppColors.primaryColor,
-                            size: 50,
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.add_circle_outline,
+                                color: AppColors.primaryColor,
+                                size: 50,
+                              ),
+                              Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
+                            ],
                           ),
-                          Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                ...userData.addressesList
-                    .map((e) => BuildAddressContainer(
-                          addressModel: e,
-                          size: size,
-                          onRemove: () => userData.removeAddress(e),
-                        ))
-                    .toList(),
-              ],
-            );
-          })
+                    ...userData.addressesList
+                        .map(
+                          (e) => BuildAddressContainer(
+                            addressModel: e,
+                            size: size,
+                            onRemove: () => refetch!(),
+                            onEdit: () => showAddAddressDialog(context, size, userData, addressModel: e).then((value) => refetch!()),
+                          ),
+                        )
+                        .toList(),
+                  ],
+                );
+              })
         ],
       ),
     );
   }
 
-  Map<String, dynamic> countries = {};
-  Map<String, dynamic> regions = {};
-
-  showAddAddressDialog(Size size, UserData userData, {Addresses? addressModel}) {
+  static Future<void> showAddAddressDialog(BuildContext context, Size size, UserData userData, {Addresses? addressModel}) {
     final formKey = GlobalKey<FormState>();
+    log(jsonEncode(addressModel?.toJson()));
+    Map<String, dynamic> countries = {};
+    Map<String, dynamic> regions = {};
     // For new addresses
     TextEditingController fName = TextEditingController(text: addressModel?.firstname);
     TextEditingController lName = TextEditingController(text: addressModel?.lastname);
@@ -154,9 +171,18 @@ class _AddressViewState extends State<AddressView> {
     TextEditingController city = TextEditingController(text: addressModel?.city);
     TextEditingController contact = TextEditingController(text: addressModel?.telephone);
     TextEditingController pin = TextEditingController(text: addressModel?.postcode);
+
+    bool isDefaultShipping = addressModel?.defaultShipping ?? false;
+    bool isDefaultBilling = addressModel?.defaultBilling ?? false;
+
     // TextEditingController state = TextEditingController();
     Map selectedCountry = {'id': "IN", 'full_name_english': 'India'};
-    Map<String, dynamic> selectedRegion = {"name": "Kerala", "region_code": "KL", "id": 502, "__typename": "CustomerAddressRegion"};
+    Map<String, dynamic> selectedRegion = {
+      "name": addressModel?.region?.region ?? "Kerala",
+      "region_code": addressModel?.region?.regionCode ?? "KL",
+      "id": addressModel?.region?.regionId ?? 502,
+      "__typename": "CustomerAddressRegion"
+    };
 
     return showDialog(
       context: context,
@@ -174,28 +200,33 @@ class _AddressViewState extends State<AddressView> {
                 child: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Center(child: Text('Add a New Address', style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.primaryColor))),
+                    Center(
+                        child: Text(addressModel != null ? "Edit address" : 'Add a New Address', style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.primaryColor))),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: fName,
                       hint: 'First name',
+                      textCapitalization: TextCapitalization.words,
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: lName,
                       hint: 'Last name',
+                      textCapitalization: TextCapitalization.words,
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid name',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: appartNo,
+                      textCapitalization: TextCapitalization.words,
                       hint: 'Appartment Number',
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid appartment number',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: street,
+                      textCapitalization: TextCapitalization.words,
                       hint: 'Street',
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid street name',
                     ),
@@ -203,18 +234,27 @@ class _AddressViewState extends State<AddressView> {
                     BuildTextField(
                       controller: city,
                       hint: 'City',
+                      textCapitalization: TextCapitalization.words,
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid city',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: contact,
                       hint: 'Contact Number',
-                      validator: (value) => value != null && value != '' ? null : 'Enter a valid contact number',
+                      maxLength: 14,
+                      showLength: false,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      keyboardType: TextInputType.number,
+                      validator: (value) => value != null && value.length > 5 ? null : 'Enter a valid contact number',
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: pin,
                       hint: 'PIN Code',
+                      maxLength: 6,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      showLength: false,
+                      keyboardType: TextInputType.number,
                       validator: (value) => value != null && value != '' ? null : 'Enter a valid PIN code',
                     ),
                     const SizedBox(height: 20),
@@ -254,13 +294,13 @@ class _AddressViewState extends State<AddressView> {
                                               child: ListView.separated(
                                                 // shrinkWrap: true,
                                                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                                                itemCount: getCountryList(countrySearch.text).length,
+                                                itemCount: getCountryList(countries, countrySearch.text).length,
                                                 separatorBuilder: (context, index) => const SizedBox(height: 20),
                                                 itemBuilder: (context, index) {
-                                                  List countries = getCountryList(countrySearch.text);
+                                                  List countriesList = getCountryList(countries, countrySearch.text);
                                                   return InkWell(
                                                     onTap: () {
-                                                      selectedCountry = countries[index];
+                                                      selectedCountry = countriesList[index];
                                                       //print(selectedCountry);
                                                       FocusManager.instance.primaryFocus?.unfocus();
                                                       countrySearch.clear();
@@ -268,7 +308,7 @@ class _AddressViewState extends State<AddressView> {
                                                       setState(() {});
                                                     },
                                                     child: Text(
-                                                      countries[index]['full_name_english'],
+                                                      countriesList[index]['full_name_english'],
                                                       style: AppStyles.getRegularTextStyle(fontSize: 16),
                                                     ),
                                                   );
@@ -333,20 +373,20 @@ class _AddressViewState extends State<AddressView> {
                                                   child: ListView.separated(
                                                     // shrinkWrap: true,
                                                     padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                                                    itemCount: getRegionList(countrySearch.text).length,
+                                                    itemCount: getCountryList(countries, countrySearch.text).length,
                                                     separatorBuilder: (context, index) => const SizedBox(height: 20),
                                                     itemBuilder: (context, index) {
-                                                      List countries = getRegionList(countrySearch.text);
+                                                      List countriesList = getCountryList(countries, countrySearch.text);
                                                       return InkWell(
                                                         onTap: () {
                                                           FocusManager.instance.primaryFocus?.unfocus();
-                                                          selectedRegion = countries[index];
+                                                          selectedRegion = countriesList[index];
                                                           //print(selectedRegion);
                                                           countrySearch.clear();
                                                           Navigator.pop(context);
                                                         },
                                                         child: Text(
-                                                          countries[index]['name'],
+                                                          countriesList[index]['name'],
                                                           style: AppStyles.getRegularTextStyle(fontSize: 16),
                                                         ),
                                                       );
@@ -408,10 +448,12 @@ class _AddressViewState extends State<AddressView> {
                     const SizedBox(height: 10),
                     Mutation(
                       options: MutationOptions(
-                        document: gql(CustomerApis.createCustomerAddress),
+                        document: addressModel != null ? CustomerApis.updateCustomerAddress : gql(CustomerApis.createCustomerAddress),
                         onCompleted: (data) {
+                          print(data);
                           Navigator.pop(context);
                           userData.getUserData(context);
+                          showSnackBar(context: context, message: "Address updated Successfully", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
                         },
                         onError: (error) {
                           print(error);
@@ -460,7 +502,15 @@ class _AddressViewState extends State<AddressView> {
                                   'default_billing': isDefaultBilling,
                                 };
                                 print(addressMap);
-                                runMutation(addressMap);
+                                if (addressModel != null) {
+                                  var data = {
+                                    "addressId": addressModel.id,
+                                    "input": addressMap,
+                                  };
+                                  runMutation(data);
+                                } else {
+                                  runMutation(addressMap);
+                                }
                               }
                             },
                             child: Text(
@@ -481,31 +531,23 @@ class _AddressViewState extends State<AddressView> {
     );
   }
 
-  getCountryList(String text) {
+  static getCountryList(Map<String, dynamic> countries, searchQuery) {
     List region = [];
     for (int i = 0; i < countries['countries'].length; i++) {
-      try {
-        if (countries['countries'][i]['full_name_english'].toLowerCase().contains(text.toLowerCase())) {
-          region.add(countries['countries'][i]);
-        }
-      } catch (e) {
-        print(e);
-        print(countries['countries'][i]);
+      if (countries['countries'][i]['full_name_english'].toLowerCase().contains(searchQuery.toLowerCase())) {
+        region.add(countries['countries'][i]);
       }
     }
     return region;
   }
 
-  getRegionList(String text) {
+  static getRegionList(Map<String, dynamic> regions, searchQuery) {
     List region = [];
-    for (int i = 0; i < regions['country']['available_regions'].length; i++) {
-      try {
-        if (regions['country']['available_regions'][i]['name'].toLowerCase().contains(text.toLowerCase())) {
+    if (regions['country']?['available_regions'] != null) {
+      for (int i = 0; i < regions['country']['available_regions'].length; i++) {
+        if (regions['country']['available_regions'][i]['name'].toLowerCase().contains(searchQuery.toLowerCase())) {
           region.add(regions['country']['available_regions'][i]);
         }
-      } catch (e) {
-        print(e);
-        print(regions['country']['available_regions'][i]);
       }
     }
 

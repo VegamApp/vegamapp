@@ -79,6 +79,17 @@ mixin _$UserData on _UserDataBase, Store {
   }
 
   @override
+  dynamic putData(User data) {
+    final _$actionInfo = _$_UserDataBaseActionController.startAction(
+        name: '_UserDataBase.putData');
+    try {
+      return super.putData(data);
+    } finally {
+      _$_UserDataBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   dynamic clearUserData() {
     final _$actionInfo = _$_UserDataBaseActionController.startAction(
         name: '_UserDataBase.clearUserData');

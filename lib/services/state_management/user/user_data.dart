@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:m2/services/api_services/customer_apis.dart';
 import 'package:m2/services/models/user.dart';
 import 'package:mobx/mobx.dart';
@@ -23,11 +26,17 @@ abstract class _UserDataBase with Store {
   void setLoading(bool value) => _isLoading = value;
 
   @action
+  putData(User data) {
+    _data = data;
+  }
+
+  @action
   Future<bool> getUserData(BuildContext context) async {
     setLoading(true);
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: CustomerApis.requestUserData));
-    print(result);
+    // log(result.toString());
+    // log(jsonEncode(result.data));
     if (result.hasException) {
       setLoading(false);
       return false;

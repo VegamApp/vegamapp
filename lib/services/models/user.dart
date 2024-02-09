@@ -81,35 +81,35 @@ class User {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.orders != null) {
-      data['orders'] = this.orders!.toJson();
+    if (orders != null) {
+      data['orders'] = orders!.toJson();
     }
-    if (this.addresses != null) {
-      data['addresses'] = this.addresses!.map((v) => v.toJson()).toList();
+    if (addresses != null) {
+      data['addresses'] = addresses!.map((v) => v.toJson()).toList();
     }
-    data['compare_list'] = this.compareList;
-    if (this.wishlists != null) {
-      data['wishlists'] = this.wishlists!.map((v) => v.toJson()).toList();
+    data['compare_list'] = compareList;
+    if (wishlists != null) {
+      data['wishlists'] = wishlists!.map((v) => v.toJson()).toList();
     }
-    data['allow_remote_shopping_assistance'] = this.allowRemoteShoppingAssistance;
-    data['created_at'] = this.createdAt;
-    data['date_of_birth'] = this.dateOfBirth;
-    data['default_billing'] = this.defaultBilling;
-    data['default_shipping'] = this.defaultShipping;
-    data['email'] = this.email;
-    data['firstname'] = this.firstname;
-    data['gender'] = this.gender;
-    data['is_subscribed'] = this.isSubscribed;
-    data['lastname'] = this.lastname;
-    data['middlename'] = this.middlename;
-    data['prefix'] = this.prefix;
-    data['suffix'] = this.suffix;
-    data['taxvat'] = this.taxvat;
-    data['mobilenumber'] = this.mobilenumber;
+    data['allow_remote_shopping_assistance'] = allowRemoteShoppingAssistance;
+    data['created_at'] = createdAt;
+    data['date_of_birth'] = dateOfBirth;
+    data['default_billing'] = defaultBilling;
+    data['default_shipping'] = defaultShipping;
+    data['email'] = email;
+    data['firstname'] = firstname;
+    data['gender'] = gender;
+    data['is_subscribed'] = isSubscribed;
+    data['lastname'] = lastname;
+    data['middlename'] = middlename;
+    data['prefix'] = prefix;
+    data['suffix'] = suffix;
+    data['taxvat'] = taxvat;
+    data['mobilenumber'] = mobilenumber;
     // if (this.reviews != null) {
     //   data['reviews'] = this.reviews!.toJson();
     // }
-    data['__typename'] = this.sTypename;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -136,14 +136,14 @@ class Orders {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.items != null) {
-      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
     }
-    data['total_count'] = this.totalCount;
-    if (this.pageInfo != null) {
-      data['page_info'] = this.pageInfo!.toJson();
+    data['total_count'] = totalCount;
+    if (pageInfo != null) {
+      data['page_info'] = pageInfo!.toJson();
     }
-    data['__typename'] = this.sTypename;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -200,27 +200,27 @@ class OrderItems {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['number'] = this.number;
-    if (this.total != null) {
-      data['total'] = this.total!.toJson();
+    data['number'] = number;
+    if (total != null) {
+      data['total'] = total!.toJson();
     }
-    if (this.shippingAddress != null) {
-      data['shipping_address'] = this.shippingAddress!.toJson();
+    if (shippingAddress != null) {
+      data['shipping_address'] = shippingAddress!.toJson();
     }
-    if (this.billingAddress != null) {
-      data['billing_address'] = this.billingAddress!.toJson();
+    if (billingAddress != null) {
+      data['billing_address'] = billingAddress!.toJson();
     }
-    data['order_date'] = this.orderDate;
-    data['order_number'] = this.orderNumber;
-    if (this.items != null) {
-      data['items'] = this.items!.map((v) => v.toJson()).toList();
+    data['order_date'] = orderDate;
+    data['order_number'] = orderNumber;
+    if (items != null) {
+      data['items'] = items!.map((v) => v.toJson()).toList();
     }
-    data['shipping_method'] = this.shippingMethod;
-    data['status'] = this.status;
-    if (this.paymentMethods != null) {
-      data['payment_methods'] = this.paymentMethods!.map((v) => v.toJson()).toList();
+    data['shipping_method'] = shippingMethod;
+    data['status'] = status;
+    if (paymentMethods != null) {
+      data['payment_methods'] = paymentMethods!.map((v) => v.toJson()).toList();
     }
-    data['__typename'] = this.sTypename;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -238,10 +238,10 @@ class Total {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.grandTotal != null) {
-      data['grand_total'] = this.grandTotal!.toJson();
+    if (grandTotal != null) {
+      data['grand_total'] = grandTotal!.toJson();
     }
-    data['__typename'] = this.sTypename;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -259,8 +259,8 @@ class GrandTotal {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['value'] = this.value;
-    data['__typename'] = this.sTypename;
+    data['value'] = value;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -290,16 +290,16 @@ class Items {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.productSalePrice != null) {
-      data['product_sale_price'] = this.productSalePrice!.toJson();
+    if (productSalePrice != null) {
+      data['product_sale_price'] = productSalePrice!.toJson();
     }
-    data['id'] = this.id;
-    data['product_url_key'] = this.productUrlKey;
-    data['product_sku'] = this.productSku;
-    data['quantity_ordered'] = this.quantityOrdered;
-    data['product_name'] = this.productName;
-    data['product_image'] = this.productImage;
-    data['__typename'] = this.sTypename;
+    data['id'] = id;
+    data['product_url_key'] = productUrlKey;
+    data['product_sku'] = productSku;
+    data['quantity_ordered'] = quantityOrdered;
+    data['product_name'] = productName;
+    data['product_image'] = productImage;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -317,8 +317,8 @@ class PaymentMethods {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['__typename'] = this.sTypename;
+    data['name'] = name;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -346,12 +346,12 @@ class OrderAddress {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['firstname'] = this.firstname;
-    data['lastname'] = this.lastname;
-    data['city'] = this.city;
-    data['region'] = this.region;
-    data['country_code'] = this.countryCode;
-    data['__typename'] = this.sTypename;
+    data['firstname'] = firstname;
+    data['lastname'] = lastname;
+    data['city'] = city;
+    data['region'] = region;
+    data['country_code'] = countryCode;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -373,10 +373,10 @@ class PageInfo {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page_size'] = this.pageSize;
-    data['total_pages'] = this.totalPages;
-    data['current_page'] = this.currentPage;
-    data['__typename'] = this.sTypename;
+    data['page_size'] = pageSize;
+    data['total_pages'] = totalPages;
+    data['current_page'] = currentPage;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -444,26 +444,26 @@ class Addresses {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['city'] = this.city;
-    data['company'] = this.company;
-    data['country_code'] = this.countryCode;
-    data['default_billing'] = this.defaultBilling;
-    data['default_shipping'] = this.defaultShipping;
-    data['extension_attributes'] = this.extensionAttributes;
-    data['fax'] = this.fax;
-    data['firstname'] = this.firstname;
-    data['id'] = this.id;
-    data['lastname'] = this.lastname;
-    data['middlename'] = this.middlename;
-    data['postcode'] = this.postcode;
-    data['prefix'] = this.prefix;
-    if (this.region != null) {
-      data['region'] = this.region!.toJson();
+    data['city'] = city;
+    data['company'] = company;
+    data['country_code'] = countryCode;
+    data['default_billing'] = defaultBilling;
+    data['default_shipping'] = defaultShipping;
+    data['extension_attributes'] = extensionAttributes;
+    data['fax'] = fax;
+    data['firstname'] = firstname;
+    data['id'] = id;
+    data['lastname'] = lastname;
+    data['middlename'] = middlename;
+    data['postcode'] = postcode;
+    data['prefix'] = prefix;
+    if (region != null) {
+      data['region'] = region!.toJson();
     }
-    data['street'] = this.street;
-    data['suffix'] = this.suffix;
-    data['telephone'] = this.telephone;
-    data['__typename'] = this.sTypename;
+    data['street'] = street;
+    data['suffix'] = suffix;
+    data['telephone'] = telephone;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -485,10 +485,10 @@ class Region {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['region'] = this.region;
-    data['region_code'] = this.regionCode;
-    data['region_id'] = this.regionId;
-    data['__typename'] = this.sTypename;
+    data['region'] = region;
+    data['region_code'] = regionCode;
+    data['region_id'] = regionId;
+    data['__typename'] = sTypename;
     return data;
   }
 }
@@ -508,9 +508,9 @@ class Wishlists {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['items_count'] = this.itemsCount;
-    data['__typename'] = this.sTypename;
+    data['id'] = id;
+    data['items_count'] = itemsCount;
+    data['__typename'] = sTypename;
     return data;
   }
 }

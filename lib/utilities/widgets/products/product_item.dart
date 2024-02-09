@@ -7,6 +7,7 @@ import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/product_model.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/product_views/product_view.dart';
@@ -43,12 +44,13 @@ class _ProductItemState extends State<ProductItem> {
   bool isWishlistLoading = false;
   late AuthToken authToken;
   late CartData cartData;
-
+  late UserData userData;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     cartData = Provider.of<CartData>(context);
     authToken = Provider.of<AuthToken>(context);
+    userData = Provider.of<UserData>(context);
   }
 
   @override
@@ -102,6 +104,7 @@ class _ProductItemState extends State<ProductItem> {
                         } catch (e) {}
                       },
                       onCompleted: (data) {
+                        print(data);
                         isWishlistLoading = true;
                         setState(() {});
                         if (data != null) {
@@ -116,7 +119,7 @@ class _ProductItemState extends State<ProductItem> {
                           } catch (e) {
                             showSnackBar(
                               context: context,
-                              message: data['removeProductsFromWishlist'] != null ? "Removed from shopping list" : "Added to shopping list",
+                              message: data['removeProductsFromWishlist'] != null ? "Removed from wishlist" : "Added to wishlist",
                               backgroundColor: AppColors.snackbarSuccessBackgroundColor,
                             );
                             if (widget.productModel.wishlistItem == null) {
@@ -140,18 +143,18 @@ class _ProductItemState extends State<ProductItem> {
                     builder: (RunMutation runMutation, QueryResult? mResult) {
                       return InkWell(
                         onTap: () {
-                          if (authToken.user.wishlists?[0].id != null) {
-                            var variables;
+                          if (userData.data.wishlists?[0].id != null) {
+                            Map<String, dynamic> variables = {};
 
                             if (widget.productModel.wishlistItem != null) {
                               variables = {
-                                'wishlistId': authToken.user.wishlists?[0].id,
+                                'wishlistId': userData.data.wishlists?[0].id,
                                 'wishlistItemsIds': [widget.productModel.wishlistItem]
                               };
                               // runMutation(variables);
                             } else {
                               variables = {
-                                'id': authToken.user.wishlists?[0].id,
+                                'id': userData.data.wishlists?[0].id,
                                 'wishlistItems': [
                                   {'sku': widget.sku, 'quantity': 1}
                                 ]
@@ -162,7 +165,7 @@ class _ProductItemState extends State<ProductItem> {
                           } else {
                             showSnackBar(
                               context: context,
-                              message: "You must login to add items to shopping list",
+                              message: "You must login to add items to wishlist",
                               backgroundColor: Colors.red,
                             );
                           }
