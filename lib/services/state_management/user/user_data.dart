@@ -41,6 +41,7 @@ abstract class _UserDataBase with Store {
       setLoading(false);
       return false;
     } else {
+      addressesList.clear();
       _data = User.fromJson(result.data!['customer']);
       addressesList.addAll(ObservableList<Addresses>.of(_data.addresses ?? <Addresses>[]));
     }

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
+import 'package:m2/services/state_management/token/token.dart';
+import 'package:m2/services/state_management/user/user_data.dart';
+import 'package:m2/utilities/widgets/loading_builder.dart';
+import 'package:provider/provider.dart';
 import '../utilities.dart';
 
 class NewsSub extends StatefulWidget {
@@ -19,7 +24,6 @@ class _NewsSubState extends State<NewsSub> {
     setState(() {
       buttonLabel = buttonLoading;
     });
-    //TODO: APIService
     bool i = await ApiServices().sendNewsLetter('email');
     if (i) {
       buttonLabel = const Icon(Icons.check, color: Colors.white);
@@ -38,6 +42,18 @@ class _NewsSubState extends State<NewsSub> {
   void initState() {
     super.initState();
     buttonLabel = buttonText;
+  }
+
+  late UserData userData;
+  late AuthToken authToken;
+  bool newsletter = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    userData = Provider.of<UserData>(context);
+    authToken = Provider.of<AuthToken>(context);
+    newsletter = userData.data.isSubscribed == true;
   }
 
   @override
@@ -96,4 +112,12 @@ class _NewsSubState extends State<NewsSub> {
       ],
     );
   }
+
+  String mutationStirng = """mutation {
+            subscribeEmailToNewsletter(
+              email: "email@example.com"
+            ) {
+              status
+            }
+          }""";
 }

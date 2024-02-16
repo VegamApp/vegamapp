@@ -453,10 +453,19 @@ class AddressViewState extends State<AddressView> {
                           print(data);
                           Navigator.pop(context);
                           userData.getUserData(context);
-                          showSnackBar(context: context, message: "Address updated Successfully", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
+                          showSnackBar(
+                            context: context,
+                            message: addressModel != null ? "Address updated Successfully" : "Address added sucessfully",
+                            backgroundColor: AppColors.snackbarSuccessBackgroundColor,
+                          );
                         },
                         onError: (error) {
                           print(error);
+                          showSnackBar(
+                            context: context,
+                            message: error?.graphqlErrors.first.message ?? error!.linkException!.originalException.toString(),
+                            backgroundColor: AppColors.snackbarErrorBackgroundColor,
+                          );
                         },
                       ),
                       builder: (RunMutation runMutation, QueryResult? result) {

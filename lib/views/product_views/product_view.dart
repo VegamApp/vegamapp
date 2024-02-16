@@ -50,7 +50,7 @@ class _ProductViewState extends State<ProductView> {
   void initState() {
     super.initState();
     dController.addListener(() {
-      if (dController.isAttached) {
+      if (dController.isAttached && variables.isEmpty) {
         dController.reset();
       }
       log('dController.pixels ${dController.pixels}');
@@ -231,7 +231,6 @@ class _ProductViewState extends State<ProductView> {
                   : dController.isAttached && dController.size <= 0.1
                       ? FloatingActionButton.extended(
                           onPressed: () async {
-                            print(dController.size);
                             await dController.animateTo(1, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
                           },
@@ -241,7 +240,6 @@ class _ProductViewState extends State<ProductView> {
                         )
                       : FloatingActionButton(
                           onPressed: () async {
-                            print(dController.size);
                             await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
                           },
@@ -323,19 +321,19 @@ class _ProductViewState extends State<ProductView> {
                                 const SizedBox(height: 20),
                               ],
                             ),
-                            // if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
-                            //   DraggableScrollableActuator(
-                            //     child: DraggableScrollableSheet(
-                            //       controller: dController,
-                            //       initialChildSize: 0,
-                            //       minChildSize: 0,
-                            //       maxChildSize: 1,
-                            //       snap: true,
-                            //       builder: (context, scrollController) {
-                            //         return getFilter(size, result, refetch, scrollController: scrollController);
-                            //       },
-                            //     ),
-                            //   )
+                            if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
+                              DraggableScrollableActuator(
+                                child: DraggableScrollableSheet(
+                                  controller: dController,
+                                  initialChildSize: 0,
+                                  minChildSize: 0,
+                                  maxChildSize: 1,
+                                  snap: true,
+                                  builder: (context, scrollController) {
+                                    return getFilter(size, result, refetch, scrollController: scrollController);
+                                  },
+                                ),
+                              )
                           ],
                         );
                       },

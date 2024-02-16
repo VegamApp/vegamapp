@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/app_responsive.dart';
+import 'package:m2/services/state_management/cache_clear/cache_manager.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
@@ -25,6 +27,8 @@ class _BuildScaffoldState extends State<BuildScaffold> {
     var categories = Provider.of<CategoriesData>(context, listen: false);
     var homeData = Provider.of<HomeData>(context, listen: false);
     var userData = Provider.of<UserData>(context, listen: false);
+    var cacheManager = Provider.of<CacheManager>(context, listen: false);
+    cacheManager.checkCache(context);
 
     if (cart.cartId == null) {
       if (token.loginToken == null) {

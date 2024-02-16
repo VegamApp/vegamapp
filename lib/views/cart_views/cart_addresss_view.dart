@@ -14,6 +14,7 @@ import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
+import 'package:m2/views/account_view/address_view.dart';
 import 'package:m2/views/cart_views/cart_payment.dart';
 import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:provider/provider.dart';
@@ -90,129 +91,125 @@ class _CartAddressViewState extends State<CartAddressView> {
     return BuildScaffold(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return Observer(
-            builder: (_) {
-              var cartData = Provider.of<CartData>(context);
-              var token = Provider.of<AuthToken>(context);
-              var user = Provider.of<UserData>(context);
+          var cartData = Provider.of<CartData>(context);
+          var token = Provider.of<AuthToken>(context);
+          var user = Provider.of<UserData>(context);
 
-              if (cartData.cartData.isEmpty) {
-                return BuildErrorWidget(
-                  errorMsg: 'An error occured, please try again.',
-                  onRefresh: () => cartData.getCartData(context, token),
-                );
+          if (cartData.cartData.isEmpty) {
+            return BuildErrorWidget(
+              errorMsg: 'An error occured, please try again.',
+              onRefresh: () => cartData.getCartData(context, token),
+            );
+          }
+          if (newAddress == null) {
+            newAddress = user.data.addresses == null || user.data.addresses!.isEmpty;
+            if (newAddress!) {
+              newAddress = cartData.cartData['cart']['shipping_addresses'].isEmpty;
+            }
+          }
+          print(((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+              ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+              newAddress!));
+          return WillPopScope(
+            onWillPop: () async {
+              if (newAddress! && (user.data.addresses != null || user.data.addresses!.isNotEmpty)) {
+                setState(() {
+                  newAddress = false;
+                });
+                return false;
               }
-              if (newAddress == null) {
-                newAddress = user.data.addresses == null || user.data.addresses!.isEmpty;
-                if (newAddress!) {
-                  newAddress = cartData.cartData['cart']['shipping_addresses'].isEmpty;
-                }
-              }
-              print(((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                  ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                  newAddress!));
-              return WillPopScope(
-                onWillPop: () async {
-                  if (newAddress! && (user.data.addresses != null || user.data.addresses!.isNotEmpty)) {
-                    setState(() {
-                      newAddress = false;
-                    });
-                    return false;
-                  }
-                  return true;
-                },
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    controller: scrollController,
-                    padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
-                    children: [
-                      // const SizedBox(height: 20),
-                      // Align(
-                      //   alignment: Alignment.centerLeft,
-                      //   child: Container(
-                      //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
-                      //     decoration: AppResponsive.isDesktop(context)
-                      //         ? BoxDecoration(
-                      //             color: AppColors.shadowColor,
-                      //             borderRadius: BorderRadius.circular(30),
-                      //           )
-                      //         : null,
-                      //     child: const BuildCartSteps(currentCartIndex: 1),
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 20),
-                      AppResponsive(
-                        mobile: Column(
-                          children: [
-                            ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+              return true;
+            },
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
+                children: [
+                  // const SizedBox(height: 20),
+                  // Align(
+                  //   alignment: Alignment.centerLeft,
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  //     width: AppResponsive.isDesktop(context) ? constraints.maxWidth - 430 : constraints.maxWidth,
+                  //     decoration: AppResponsive.isDesktop(context)
+                  //         ? BoxDecoration(
+                  //             color: AppColors.shadowColor,
+                  //             borderRadius: BorderRadius.circular(30),
+                  //           )
+                  //         : null,
+                  //     child: const BuildCartSteps(currentCartIndex: 1),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 20),
+                  AppResponsive(
+                    mobile: Column(
+                      children: [
+                        ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
+                                newAddress!)
+                            ? Column(
+                                children: [
+                                  getAddressForm1(const BoxConstraints.expand(), token),
+                                  const SizedBox(height: 20),
+                                  getAddressForm2(const BoxConstraints.expand(), size, token, cartData),
+                                ],
+                              )
+                            : getExistingAddress(user, size, token, cartData),
+                        const SizedBox(height: 20),
+                        // CartSummaryWidget(
+                        //   buttonText: "Go to Checkout",
+                        //   refetch: () => cartData.getCartData(context, token),
+                        //   onButtonTap: () {
+                        //     context.go("/${CartView.route}/${CartPayment.route}");
+                        //   },
+                        // ),
+                      ],
+                    ),
+                    desktop: SizedBox(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 75,
+                            // child: getBody(size, cartData, result, refetch),
+                            child: ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
                                     ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
                                     newAddress!)
-                                ? Column(
+                                ? Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: 20,
+                                    runSpacing: 20,
                                     children: [
-                                      getAddressForm1(const BoxConstraints.expand(), token),
-                                      const SizedBox(height: 20),
-                                      getAddressForm2(const BoxConstraints.expand(), size, token, cartData),
+                                      getAddressForm1(constraints, token),
+                                      getAddressForm2(constraints, size, token, cartData),
                                     ],
                                   )
                                 : getExistingAddress(user, size, token, cartData),
-                            const SizedBox(height: 20),
-                            // CartSummaryWidget(
-                            //   buttonText: "Go to Checkout",
-                            //   refetch: () => cartData.getCartData(context, token),
-                            //   onButtonTap: () {
-                            //     context.go("/${CartView.route}/${CartPayment.route}");
-                            //   },
-                            // ),
-                          ],
-                        ),
-                        desktop: SizedBox(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 75,
-                                // child: getBody(size, cartData, result, refetch),
-                                child: ((token.loginToken == null && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                                        ((user.data.addresses == null || user.data.addresses!.isEmpty) && cartData.cartData['cart']['shipping_addresses'].isEmpty) ||
-                                        newAddress!)
-                                    ? Wrap(
-                                        alignment: WrapAlignment.center,
-                                        spacing: 20,
-                                        runSpacing: 20,
-                                        children: [
-                                          getAddressForm1(constraints, token),
-                                          getAddressForm2(constraints, size, token, cartData),
-                                        ],
-                                      )
-                                    : getExistingAddress(user, size, token, cartData),
-                              ),
-                              const SizedBox(width: 20),
-                              // ConstrainedBox(
-                              //   constraints: const BoxConstraints(maxWidth: 350),
-                              //   child: CartSummaryWidget(
-                              //     refetch: () => cartData.getCartData(context, token),
-                              //     buttonText: "Go to Checkout",
-                              //     onButtonTap: () {
-                              //       // log(jsonEncode(cartData.cartData));
-                              //       if (cartData.cartData['shipping_addresses'] == null || cartData.cartData['shipping_addresses'].isEmpty) {
-                              //         showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
-                              //         return;
-                              //       }
-                              //       context.go("/${CartView.route}/${CartPayment.route}");
-                              //     },
-                              //   ),
-                              // )
-                            ],
                           ),
-                        ),
+                          const SizedBox(width: 20),
+                          // ConstrainedBox(
+                          //   constraints: const BoxConstraints(maxWidth: 350),
+                          //   child: CartSummaryWidget(
+                          //     refetch: () => cartData.getCartData(context, token),
+                          //     buttonText: "Go to Checkout",
+                          //     onButtonTap: () {
+                          //       // log(jsonEncode(cartData.cartData));
+                          //       if (cartData.cartData['shipping_addresses'] == null || cartData.cartData['shipping_addresses'].isEmpty) {
+                          //         showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
+                          //         return;
+                          //       }
+                          //       context.go("/${CartView.route}/${CartPayment.route}");
+                          //     },
+                          //   ),
+                          // )
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              );
-            },
+                ],
+              ),
+            ),
           );
         },
       ),
@@ -662,126 +659,136 @@ class _CartAddressViewState extends State<CartAddressView> {
   }
 
   getExistingAddress(UserData userData, Size size, AuthToken authToken, CartData cartData) {
-    return Mutation(
-      options: MutationOptions(
-          document: gql(CartApis.setBillingAddressesOnCart),
-          onCompleted: (result) {
-            print('complete $result');
-            cartData.getCartData(context, authToken);
+    return Observer(builder: (_) {
+      return Mutation(
+        options: MutationOptions(
+            document: gql(CartApis.setBillingAddressesOnCart),
+            onCompleted: (result) {
+              print('complete $result');
+              cartData.getCartData(context, authToken);
 
-            if (result != null) {
-              context.go("/${CartView.route}/${CartPayment.route}");
-            }
-          },
-          onError: (error) {
-            print('error billing $error');
-          }),
-      builder: (RunMutation runMutationBilling, QueryResult? billingResult) {
-        return Mutation(
-          options: MutationOptions(
-              document: gql(CartApis.setShippingAddressesOnCart),
-              onCompleted: (result) {
-                print(result);
-                //print(user.addresses![index].region!.regionId);
+              if (result != null) {
+                context.go("/${CartView.route}/${CartPayment.route}");
+              }
+            },
+            onError: (error) {
+              print('error billing $error');
+            }),
+        builder: (RunMutation runMutationBilling, QueryResult? billingResult) {
+          return Mutation(
+            options: MutationOptions(
+                document: gql(CartApis.setShippingAddressesOnCart),
+                onCompleted: (result) {
+                  print(result);
+                  //print(user.addresses![index].region!.regionId);
 
-                runMutationBilling({
-                  'input': {
-                    'cart_id': cartData.cartId,
-                    'billing_address': {'same_as_shipping': true}
-                  }
-                });
-                // refetch!();
-              },
-              onError: (error) {
-                print('error shipping $error');
-              }),
-          builder: (RunMutation runMutationShipping, QueryResult? shippingResult) {
-            if (billingResult!.isLoading || shippingResult!.isLoading) {
-              return Container(
-                constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
-                decoration: BoxDecoration(
-                  color: const Color(0xffffffff),
-                  borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
-                  border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0a000000),
-                      offset: Offset(0, 10),
-                      blurRadius: 40,
-                    ),
-                  ],
-                ),
-                child: Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
-              );
-            }
-            return Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                InkWell(
-                  onTap: () => setState(() => newAddress = true),
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
-                      border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x0a000000),
-                          offset: Offset(0, 10),
-                          blurRadius: 40,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.add_circle_outline,
-                            color: AppColors.primaryColor,
-                            size: 50,
+                  runMutationBilling({
+                    'input': {
+                      'cart_id': cartData.cartId,
+                      'billing_address': {'same_as_shipping': true}
+                    }
+                  });
+                  // refetch!();
+                },
+                onError: (error) {
+                  print('error shipping $error');
+                }),
+            builder: (RunMutation runMutationShipping, QueryResult? shippingResult) {
+              if (billingResult!.isLoading || shippingResult!.isLoading) {
+                return Container(
+                  constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                    border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x0a000000),
+                        offset: Offset(0, 10),
+                        blurRadius: 40,
+                      ),
+                    ],
+                  ),
+                  child: Center(child: BuildLoadingWidget(color: AppColors.primaryColor)),
+                );
+              }
+              return Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                children: [
+                  InkWell(
+                    onTap: () => setState(() => newAddress = true),
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 400, minHeight: 255),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffffffff),
+                        borderRadius: BorderRadius.circular(size.width * .025 > 20 ? 20 : size.width * 0.025),
+                        border: Border.all(width: 1.0, color: const Color(0xffa0dcd6)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x0a000000),
+                            offset: Offset(0, 10),
+                            blurRadius: 40,
                           ),
-                          Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
                         ],
+                      ),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.add_circle_outline,
+                              color: AppColors.primaryColor,
+                              size: 50,
+                            ),
+                            Text("Add New Address", style: AppStyles.getMediumTextStyle(fontSize: 20, color: AppColors.fadedText)),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                if (cartData.cartData['cart']?['shipping_addresses'] != null && cartData.cartData['cart']['shipping_addresses'].isNotEmpty)
-                  InkWell(
-                    onTap: () => context.pushNamed(CartPayment.route),
-                    child: BuildAddressContainer(
-                      addressModel: Addresses.fromJson(cartData.cartData['cart']['shipping_addresses'][0]),
-                      size: size,
-                      fromCart: true,
+                  if (cartData.cartData['cart']?['shipping_addresses'] != null && cartData.cartData['cart']['shipping_addresses'].isNotEmpty)
+                    InkWell(
+                      onTap: () => context.pushNamed(CartPayment.route),
+                      child: BuildAddressContainer(
+                        addressModel: Addresses.fromJson(cartData.cartData['cart']['shipping_addresses'][0]),
+                        size: size,
+                        fromCart: true,
+                      ),
                     ),
-                  ),
-                if (userData.data.addresses != null)
-                  ...userData.data.addresses!
-                      .map(
-                        (e) => InkWell(
-                          onTap: () {
-                            runMutationShipping({
-                              "input": {
-                                "cart_id": cartData.cartId,
-                                "shipping_addresses": [
-                                  {"customer_address_id": e.id, "customer_notes": ""}
-                                ]
-                              }
-                            });
-                          },
-                          child: BuildAddressContainer(addressModel: e, size: size),
-                        ),
-                      )
-                      .toList(),
-              ],
-            );
-          },
-        );
-      },
-    );
+                  if (userData.addressesList.isNotEmpty)
+                    ...userData.addressesList
+                        .map(
+                          (e) => InkWell(
+                            onTap: () {
+                              runMutationShipping({
+                                "input": {
+                                  "cart_id": cartData.cartId,
+                                  "shipping_addresses": [
+                                    {"customer_address_id": e.id, "customer_notes": ""}
+                                  ]
+                                }
+                              });
+                            },
+                            child: BuildAddressContainer(
+                              addressModel: e,
+                              size: size,
+                              fromCart: true,
+                              onEdit: () => AddressViewState.showAddAddressDialog(context, size, userData, addressModel: e).then((value) => userData.getUserData(context)),
+                              onRemove: () => userData.getUserData(context),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                ],
+              );
+            },
+          );
+        },
+      );
+    });
   }
+
+  refreshUserAddress() {}
 
   getCountryList(String text) {
     List region = [];

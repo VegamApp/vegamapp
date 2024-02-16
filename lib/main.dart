@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
+import 'package:m2/services/state_management/cache_clear/cache_manager.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
@@ -29,6 +30,7 @@ void main() async {
       Provider<CategoriesData>(create: (context) => CategoriesData()),
       Provider<HomeData>(create: (context) => HomeData()),
       Provider<UserData>(create: (context) => UserData()),
+      Provider<CacheManager>(create: (context) => CacheManager()),
     ], child: MyApp(token: key, cartId: cart)),
   );
 }

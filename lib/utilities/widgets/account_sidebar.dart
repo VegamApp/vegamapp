@@ -222,16 +222,16 @@ class _AccountSideBarState extends State<AccountSideBar> {
                       //   // child: const StoredPayment(),
                       //   isBold: widget.currentPage == 'Stored Payment Methods' && !AppResponsive.isMobile(context),
                       // ),
-                      BuilProfileButtons(
-                        title: 'Billing Agreements',
-                        svgUrl: 'billing',
-                        url: "/account/${BillingAgreementsView.route}",
-                        isBold: widget.currentPage == BillingAgreementsView.route && !AppResponsive.isMobile(context),
-                      ),
-                      const BuilProfileButtons(
-                        title: 'Need Help',
-                        // child: ExamplePage(),
-                      ),
+                      // BuilProfileButtons(
+                      //   title: 'Billing Agreements',
+                      //   svgUrl: 'billing',
+                      //   url: "/account/${BillingAgreementsView.route}",
+                      //   isBold: widget.currentPage == BillingAgreementsView.route && !AppResponsive.isMobile(context),
+                      // ),
+                      // const BuilProfileButtons(
+                      //   title: 'Need Help',
+                      //   // child: ExamplePage(),
+                      // ),
                     ],
                   ),
                 ),
