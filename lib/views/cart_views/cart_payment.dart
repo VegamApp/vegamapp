@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -34,6 +35,7 @@ class _CartPaymentState extends State<CartPayment> {
   String? selectedShippingMethod;
   late CartData cartData;
   late AuthToken authToken;
+  String? brainTreeToken;
   var _razorPay = Razorpay();
 
   @override
@@ -133,7 +135,7 @@ class _CartPaymentState extends State<CartPayment> {
                   onRefresh: refetch,
                 );
               }
-              log(jsonEncode(result.data));
+              // log(jsonEncode(result.data));
               cartData.setCartData(cartData.cartData);
               cartData.putCartCount(cartData.cartData['cart']['total_quantity']);
 
@@ -197,10 +199,10 @@ class _CartPaymentState extends State<CartPayment> {
                                   showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
                                   return;
                                 }
-                                if (paymentCode == 'braintree') {
-                                  print('object');
-                                  return;
-                                }
+                                // if (paymentCode == 'braintree') {
+                                //   // brainTreeSetup(token);
+                                //   return;
+                                // }
                                 runMutation({
                                   'cartId': cartData.cartId,
                                 });
@@ -369,7 +371,7 @@ class _CartPaymentState extends State<CartPayment> {
                     var paymentMethod = cartData.cartData['cart']['available_payment_methods'][index];
                     return InkWell(
                       splashColor: Colors.transparent,
-                      onTap: () {
+                      onTap: () async {
                         // Clipboard.setData(ClipboardData(text: jsonEncode(cartData.cartData)));
                         setState(() => paymentCode = paymentMethod['code']);
                         Map<String, dynamic> mutationParams = {
@@ -377,14 +379,13 @@ class _CartPaymentState extends State<CartPayment> {
                           'paymentMethod': {'code': paymentCode}
                         };
                         if (paymentCode == "braintree") {
+                          brainTreeToken = await createBraintreeToken();
                           mutationParams["paymentMethod"] = {
                             'code': paymentCode,
-                            "braintree": {"payment_method_nonce": "fake-nonce", "is_active_payment_token_enabler": false}
+                            "braintree": {"payment_method_nonce": brainTreeToken, "is_active_payment_token_enabler": false}
                           };
                         }
                         runMutation(mutationParams);
-                        log('hii $mutationParams');
-                        log('hii ${mutationResult}');
 
                         // setState(() {});
                       },
@@ -426,6 +427,47 @@ class _CartPaymentState extends State<CartPayment> {
       ),
     );
   }
+
+  Future<String?> createBraintreeToken() async {
+    var graphqlClient = GraphQLProvider.of(context);
+    var data = await graphqlClient.value.mutate(MutationOptions(document: gql(PaymentServices.createBraintreeClientToken)));
+    log(data.toString());
+    if (data.hasException) {
+      try {
+        showSnackBar(context: context, message: data.exception!.graphqlErrors[0].message, backgroundColor: AppColors.snackbarErrorBackgroundColor);
+      } catch (e) {
+        showSnackBar(context: context, message: "An error occured! Please try later.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
+      }
+      return null;
+    }
+
+    var token = data.data?['createBraintreeClientToken'];
+    final request = BraintreeDropInRequest(
+      clientToken: token,
+      amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
+      collectDeviceData: true,
+      googlePaymentRequest: BraintreeGooglePaymentRequest(
+        totalPrice: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
+        currencyCode: cartData.cartData['cart']['prices']['grand_total']['currency'].toString(),
+        billingAddressRequired: false,
+      ),
+      // paypalRequest: BraintreePayPalRequest(
+      //   amount: '4.20',
+      //   displayName: 'Example company',
+      // ),
+    );
+
+    BraintreeDropInResult? result = await BraintreeDropIn.start(request);
+    if (result != null) {
+      print('Nonce: ${result.paymentMethodNonce.nonce}');
+      return result.paymentMethodNonce.nonce;
+    } else {
+      print('Selection was canceled.');
+      return null;
+    }
+  }
+
+  Future<String?> brainTreeSetup(String token) async {}
 
   getRazorPay(data, AuthToken authToken) async {
     // KalyanStoreConfig storeConfig = Provider.of<KalyanStoreConfig>(context, listen: false);

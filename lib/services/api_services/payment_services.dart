@@ -70,4 +70,6 @@ mutation ($cartId: String!){
     }
   }
 ''';
+
+  static String createBraintreeClientToken = r'''mutation { createBraintreeClientToken }''';
 }
