@@ -197,6 +197,10 @@ class _CartPaymentState extends State<CartPayment> {
                                   showSnackBar(context: context, message: 'Select a payment method', backgroundColor: Colors.red);
                                   return;
                                 }
+                                if (paymentCode == 'braintree') {
+                                  print('object');
+                                  return;
+                                }
                                 runMutation({
                                   'cartId': cartData.cartId,
                                 });
@@ -368,10 +372,19 @@ class _CartPaymentState extends State<CartPayment> {
                       onTap: () {
                         // Clipboard.setData(ClipboardData(text: jsonEncode(cartData.cartData)));
                         setState(() => paymentCode = paymentMethod['code']);
-                        runMutation({
+                        Map<String, dynamic> mutationParams = {
                           'cartId': cartData.cartId,
                           'paymentMethod': {'code': paymentCode}
-                        });
+                        };
+                        if (paymentCode == "braintree") {
+                          mutationParams["paymentMethod"] = {
+                            'code': paymentCode,
+                            "braintree": {"payment_method_nonce": "fake-nonce", "is_active_payment_token_enabler": false}
+                          };
+                        }
+                        runMutation(mutationParams);
+                        log('hii $mutationParams');
+                        log('hii ${mutationResult}');
 
                         // setState(() {});
                       },
