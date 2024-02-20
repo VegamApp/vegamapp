@@ -33,6 +33,7 @@ class _CartPaymentState extends State<CartPayment> {
   ScrollController scrollController = ScrollController();
   String? paymentCode;
   String? selectedShippingMethod;
+  String? orderId;
   late CartData cartData;
   late AuthToken authToken;
   String? brainTreeToken;
@@ -67,29 +68,28 @@ class _CartPaymentState extends State<CartPayment> {
 
     var graphqlClient = GraphQLProvider.of(context);
     var input = {
-      'cart_id': cartData.cartId,
-      'rzp_order_id': response.orderId,
+      'order_id': orderId,
       'rzp_payment_id': response.paymentId,
       'rzp_signature': response.signature,
     };
     log(input.toString());
     QueryResult? result = await graphqlClient.value.mutate(
-      MutationOptions(document: gql(PaymentServices.setRazorOnCart), variables: {"input": input}),
+      MutationOptions(document: gql(PaymentServices.setRzpPaymentDetailsForOrder), variables: {"input": input}),
     );
-
+    log(result.toString());
     try {} catch (e) {}
     if (!result.hasException) {
-      QueryResult? placeOrderresult = await graphqlClient.value.mutate(
-        MutationOptions(document: gql(PaymentServices.placeOrder), variables: {'cartId': cartData.cartId}),
+      QueryResult? newResult = await graphqlClient.value.mutate(
+        MutationOptions(document: gql(PaymentServices.resetCart), variables: {"id": orderId}),
       );
-      if (!placeOrderresult.hasException) {
-        CartData cartData = Provider.of<CartData>(context, listen: false);
-        AuthToken authToken = Provider.of<AuthToken>(context, listen: false);
-        await cartData.getCustomerCart(context, authToken);
-        context.push("/${CartView.route}/${OrderPlacedView.route}?orderid=${placeOrderresult.data?['placeOrder']['order']['order_number']}");
+      if (!newResult.hasException) {
+        context.go("/${CartView.route}/${OrderPlacedView.route}?orderid=$orderId");
+      } else {
+        cartData.getCartData(context, authToken);
       }
     } else {
       showSnackBar(context: context, message: result.exception!.graphqlErrors[0].message, backgroundColor: Colors.red);
+      cartData.getCartData(context, authToken);
     }
     setState(() {
       isLoading = false;
@@ -167,11 +167,7 @@ class _CartPaymentState extends State<CartPayment> {
                       if (data != null) {
                         log(data.toString());
                         if (paymentCode == 'razorpay') {
-                          // if (data['placeRazorpayOrder']['success']) {
-                          //   getRazorPay(data, authToken);
-                          // } else {
-                          //   showSnackBar(context: context, message: data['placeRazorpayOrder']['message'], backgroundColor: Colors.red);
-                          // }
+                          getRazorPayId(data);
                         } else {
                           await cartData.getCustomerCart(context, authToken);
                           cartData.getCartData(context, authToken);
@@ -451,10 +447,10 @@ class _CartPaymentState extends State<CartPayment> {
         currencyCode: cartData.cartData['cart']['prices']['grand_total']['currency'].toString(),
         billingAddressRequired: false,
       ),
-      // paypalRequest: BraintreePayPalRequest(
-      //   amount: '4.20',
-      //   displayName: 'Example company',
-      // ),
+      paypalRequest: BraintreePayPalRequest(
+        amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
+        displayName: 'Vegam',
+      ),
     );
 
     BraintreeDropInResult? result = await BraintreeDropIn.start(request);
@@ -467,18 +463,21 @@ class _CartPaymentState extends State<CartPayment> {
     }
   }
 
-  Future<String?> brainTreeSetup(String token) async {}
+  getRazorPayId(data) async {
+    final graphqlClient = GraphQLProvider.of(context);
+    orderId = data['placeOrder']['order']['order_number'];
+    var rzrData = await graphqlClient.value.mutate(MutationOptions(document: gql(PaymentServices.placeRazorpayOrder), variables: {'id': orderId}));
+    log(rzrData.toString());
+    if (!rzrData.hasException) {
+      getRazorPayInterface(orderId: rzrData.data!['placeRazorpayOrder']['rzp_order_id'], amountData: rzrData.data!['placeRazorpayOrder']['amount']);
+    }
+  }
 
-  getRazorPay(data, AuthToken authToken) async {
-    // KalyanStoreConfig storeConfig = Provider.of<KalyanStoreConfig>(context, listen: false);
+  getRazorPayInterface({var orderId, var amountData}) async {
     var userData = Provider.of<UserData>(context, listen: false);
-    print(data);
-    // log(jsonEncode(cartData.cartData));
     try {
-      double amount = double.parse(data['placeRazorpayOrder']['amount']);
-      ////print('amount $amount');
+      double amount = double.parse(amountData.toString());
       amount = amount * 100;
-      amount.floor();
 
       var options = {
         //test
@@ -487,8 +486,8 @@ class _CartPaymentState extends State<CartPayment> {
         // 'key': 'rzp_live_1LicnHl9VVn03e',
         // "description": storeConfig.storeData.storeConfig?.defaultDescription ?? "",
         'amount': amount.floor(), //in the smallest currency sub-unit.
-        'name': 'M2',
-        'order_id': data['placeRazorpayOrder']['rzp_order_id'],
+        'name': 'Vegam',
+        'order_id': orderId,
         // 'order': {"order_id": data['placeRazorpayOrder']['rzp_order_id']},
         // Generate order_id using Orders API
         // 'description': 'Fine T-Shirt',
@@ -498,14 +497,14 @@ class _CartPaymentState extends State<CartPayment> {
           // 'contact': userData.data.,
           'email': userData.data.email,
         },
-        "theme": {"color": "#0E887C"}
+        "theme": {"color": '#${AppColors.primaryColor.value.toRadixString(16)}'}
       };
       log(jsonEncode(options));
 
       _razorPay.open(options);
     } catch (e) {
       print(e);
-      // await APIServices().refreshCart();
+      await cartData.getCartData(context, Provider.of<AuthToken>(context, listen: false));
     }
   }
 }

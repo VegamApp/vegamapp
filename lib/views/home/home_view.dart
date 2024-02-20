@@ -5,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2/services/app_responsive.dart';
-import 'package:m2/services/models/product_model.dart';
-import 'package:m2/services/scroll_behavoir.dart';
-import 'package:m2/services/state_management/cart/cart_data.dart';
-import 'package:m2/services/state_management/home/home_data.dart';
-import 'package:m2/services/state_management/token/token.dart';
-import 'package:m2/utilities/utilities.dart';
-import 'package:m2/utilities/widgets/footbar.dart';
-import 'package:m2/utilities/widgets/widgets.dart';
-import 'package:m2/views/product_views/product_view.dart';
+import '../../services/app_responsive.dart';
+import '../../services/models/product_model.dart';
+import '../../services/scroll_behavoir.dart';
+import '../../services/state_management/cart/cart_data.dart';
+import '../../services/state_management/home/home_data.dart';
 import 'package:provider/provider.dart';
+
+import '../../services/state_management/token/token.dart';
+import '../../utilities/utilities.dart';
+import '../../utilities/widgets/footbar.dart';
+import '../../utilities/widgets/widgets.dart';
+import '../product_views/product_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -90,7 +91,6 @@ class _HomeViewState extends State<HomeView> {
   }
 
   getWidgets(Map<String, dynamic> data, BoxConstraints constraints) {
-    print(data['desktop_status']);
     if (AppResponsive.isMobile(context) && !data['mobile_status']) {
       return const SizedBox();
     }
@@ -112,7 +112,6 @@ class _HomeViewState extends State<HomeView> {
                     data['products'].length,
                     (index) {
                       var productModel = Items.fromJson(data['products'][index]);
-                      print(productModel.specialPrice);
                       var price = productModel.specialPrice ?? productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
                       var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
                       var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;

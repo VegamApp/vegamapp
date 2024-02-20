@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:m2/utilities/utilities.dart';
+
+import 'utilities.dart';
 
 class AppStyles {
   static TextStyle getExtraLightTextStyle({required double fontSize, Color? color, bool isCurrency = false}) {

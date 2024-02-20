@@ -48,9 +48,7 @@ class MiniAppBar extends StatelessWidget {
                     child: Center(
                       child: Text(
                         navigationChild[index]['name'],
-                        style: index == navigationChild.length - 1
-                            ? AppStyles.getMediumTextStyle(fontSize: 14)
-                            : AppStyles.getLightTextStyle(fontSize: 14),
+                        style: index == navigationChild.length - 1 ? AppStyles.getMediumTextStyle(fontSize: 14) : AppStyles.getLightTextStyle(fontSize: 14),
                       ),
                     ),
                   ),

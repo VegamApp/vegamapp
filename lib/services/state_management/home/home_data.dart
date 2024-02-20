@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
-import 'package:m2/services/api_services/api_services.dart';
+import '../../api_services/api_services.dart';
 import 'package:mobx/mobx.dart';
 part 'home_data.g.dart';
 

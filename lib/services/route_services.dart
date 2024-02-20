@@ -17,6 +17,8 @@ import 'package:m2/views/cart_views/cart_addresss_view.dart';
 import 'package:m2/views/cart_views/cart_payment.dart';
 import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:m2/views/cart_views/payment_complete_view.dart';
+import 'package:m2/views/cms_view.dart';
+import 'package:m2/views/contact_view.dart';
 import 'package:m2/views/example.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:m2/views/home/search_view.dart';
@@ -150,38 +152,55 @@ final router = GoRouter(
           ],
         ),
         GoRoute(
-            path: CartView.route,
-            name: CartView.route,
-            pageBuilder: (context, state) {
-              return getCustomTransition(state, const CartView());
-            },
-            routes: [
-              GoRoute(
-                path: CartAddressView.route,
-                name: CartAddressView.route,
-                pageBuilder: (context, state) {
-                  return getCustomTransition(state, const CartAddressView());
-                },
-              ),
-              GoRoute(
-                path: CartPayment.route,
-                name: CartPayment.route,
-                pageBuilder: (context, state) {
-                  return getCustomTransition(state, const CartPayment());
-                },
-              ),
-              GoRoute(
-                path: OrderPlacedView.route,
-                name: OrderPlacedView.route,
-                pageBuilder: (context, state) {
-                  return getCustomTransition(
-                      state,
-                      OrderPlacedView(
-                        orderId: state.queryParameters['orderid'],
-                      ));
-                },
-              ),
-            ]),
+          path: CartView.route,
+          name: CartView.route,
+          pageBuilder: (context, state) {
+            return getCustomTransition(state, const CartView());
+          },
+          routes: [
+            GoRoute(
+              path: CartAddressView.route,
+              name: CartAddressView.route,
+              pageBuilder: (context, state) {
+                return getCustomTransition(state, const CartAddressView());
+              },
+            ),
+            GoRoute(
+              path: CartPayment.route,
+              name: CartPayment.route,
+              pageBuilder: (context, state) {
+                return getCustomTransition(state, const CartPayment());
+              },
+            ),
+            GoRoute(
+              path: OrderPlacedView.route,
+              name: OrderPlacedView.route,
+              pageBuilder: (context, state) {
+                return getCustomTransition(
+                  state,
+                  OrderPlacedView(
+                    orderId: state.queryParameters['orderid'],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+          path: CmsView.route,
+          name: CmsView.route,
+          pageBuilder: (context, state) {
+            final id = state.queryParameters['id'];
+            return getCustomTransition(state, CmsView(id: id));
+          },
+        ),
+        GoRoute(
+          path: ContactView.route,
+          name: ContactView.route,
+          pageBuilder: (context, state) {
+            return getCustomTransition(state, const ContactView());
+          },
+        ),
       ],
     ),
     GoRoute(

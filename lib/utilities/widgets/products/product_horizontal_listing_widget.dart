@@ -107,7 +107,6 @@ class _ProductHorizontalListingState extends State<ProductHorizontalListing> {
                     if (totalConstraints.maxWidth >= 720) leftArrow(constraints: totalConstraints),
                     Expanded(
                       child: LayoutBuilder(builder: (context, constraints) {
-                        print(constraints.maxWidth);
                         return ScrollConfiguration(
                           behavior: MyCustomScrollBehavior(),
                           child: ListView.separated(
