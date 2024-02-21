@@ -7,8 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:m2/services/state_management/categories/categories_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/custom_expanded_tile.dart';
+import 'package:m2/views/cms_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
 import 'package:provider/provider.dart';
+
+import '../../views/contact_view.dart';
 
 // Build drawer side bar for mobile view
 class DrawerContainer extends StatelessWidget {
@@ -39,7 +42,7 @@ class DrawerContainer extends StatelessWidget {
                       height: double.infinity,
                       child: Text('No items to show', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)))
                   : ListView(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       children: [
                         Row(
                           children: [
@@ -54,7 +57,7 @@ class DrawerContainer extends StatelessWidget {
                           itemCount: categories.data['categories']['items'][0]['children'].length,
                           itemBuilder: (context, index) {
                             if (categories.data['categories']['items'][0]['children'][index]['include_in_menu'] == 0) {
-                              return SizedBox();
+                              return const SizedBox();
                             }
                             if (categories.data['categories']['items'][0]['children'][index]['children'] == null ||
                                 categories.data['categories']['items'][0]['children'][index]['children'].isEmpty) {
@@ -110,118 +113,46 @@ class DrawerContainer extends StatelessWidget {
                         const SizedBox(height: 10),
                         Divider(color: AppColors.fadedText.withOpacity(0.2)),
                         const SizedBox(height: 10),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=about-us');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "About us",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=delivery');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Delivery",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=payment');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Payment",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=career');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Career",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=fin-docs');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Annual Return",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=csr');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Corporate Social Responsibility",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=latest');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "News",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=exchange_or_return');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Exchange or Return",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=privacy-policy');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Privacy Policy",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${CMSPage.route}?id=showroom');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Store locater",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
-                        // ListTile(
-                        //   onTap: () {
-                        //     context.push('/${ContactView.route}');
-                        //   },
-                        //   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        //   title: Text(
-                        //     "Contact Us",
-                        //     style: AppStyles.getMediumTextStyle(fontSize: 15),
-                        //   ),
-                        // ),
+                        ListTile(
+                          onTap: () {
+                            context.push('/${CmsView.route}?id=about-us');
+                          },
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          title: Text(
+                            "About us",
+                            style: AppStyles.getMediumTextStyle(fontSize: 15),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            context.push('/${CmsView.route}?id=customer-service');
+                          },
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          title: Text(
+                            "Customer Service",
+                            style: AppStyles.getMediumTextStyle(fontSize: 15),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            context.push('/${CmsView.route}?id=privacy-policy-cookie-restriction-mode');
+                          },
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          title: Text(
+                            "Privacy and Cookie Policy",
+                            style: AppStyles.getMediumTextStyle(fontSize: 15),
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () {
+                            context.pushNamed(ContactView.route);
+                          },
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          title: Text(
+                            "Contact Us",
+                            style: AppStyles.getMediumTextStyle(fontSize: 15),
+                          ),
+                        ),
                         // const SizedBox(height: 10),
                         // Divider(color: AppColors.fadedText.withOpacity(0.2)),
                         // const SizedBox(height: 10),
@@ -233,7 +164,7 @@ class DrawerContainer extends StatelessWidget {
   }
 
   Widget getChild(Map data) {
-    return SizedBox();
+    return const SizedBox();
   }
 
   ListTile getListTile(String title, void Function()? onTap) {

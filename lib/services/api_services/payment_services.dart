@@ -35,39 +35,43 @@ class PaymentServices {
     }
   }''';
 
-  static String placeRazorPayOrder = r'''
- mutation placeRazorPayOrder($cartId: String!) {
-  placeRazorpayOrder(cart_id: $cartId) {
-    amount
-    currency
-    message
-    order_quote_id
-    rzp_order_id
-    success
-    __typename
-  }
-}''';
-
   static String placeOrder = r'''
-mutation ($cartId: String!){
-  placeOrder(input: { cart_id: $cartId }) {
-    order {
-      order_number
-    }
-  }
-}
-''';
-
-  static String setRazorOnCart = r'''
-  mutation SetRzpPaymentDetailsOnCart($input: SetRzpPaymentDetailsOnCartInput!){
-    setRzpPaymentDetailsOnCart(
-      input: $input
-    ) {
-      cart {
-        id
-        total_quantity
+  mutation ($cartId: String!){
+    placeOrder(input: { cart_id: $cartId }) {
+      order {
+        order_number
       }
     }
   }
-''';
+  ''';
+  static String placeRazorpayOrder = r'''
+  mutation placeRazorpayOrder($id: String!){
+    placeRazorpayOrder (
+        order_id: $id
+        referrer: "www.m2.festa.wiki"
+    ){
+      success
+      rzp_order_id
+      order_id
+      amount
+      currency
+      message
+    }
+  }''';
+  static String setRzpPaymentDetailsForOrder = r'''
+  mutation setRzpPaymentDetailsForOrder($input: SetRzpPaymentDetailsForOrderInput!){
+    setRzpPaymentDetailsForOrder(input:$input){
+      order{
+        order_id
+      }
+    }
+  }''';
+
+  static String resetCart = r'''mutation resetCart($id: String!){
+  resetCart(order_id: $id){
+      success
+    }
+  }''';
+
+  static String createBraintreeClientToken = r'''mutation { createBraintreeClientToken }''';
 }

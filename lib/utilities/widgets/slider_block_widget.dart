@@ -19,8 +19,7 @@ class _SliderBlockState extends State<SliderBlock> {
     return AppResponsive(
       mobile: widget.data['mobile_status'] ? getChild(size) : const SizedBox(),
       tablet: widget.data['desktop_status'] ? getChild(size) : const SizedBox(),
-      desktop:
-          widget.data['desktop_status'] ? getChild(size) : const SizedBox(),
+      desktop: widget.data['desktop_status'] ? getChild(size) : const SizedBox(),
     );
   }
 

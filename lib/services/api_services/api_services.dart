@@ -375,6 +375,21 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
       }
     }''';
 
+  static String getCmsInfo = r'''
+  query cmsPage ($id: String!){
+    cmsPage(identifier: $id) {
+    identifier
+    url_key
+    title
+    content
+    content_heading
+    page_layout
+    meta_title
+    meta_description
+    meta_keywords
+    }
+  }''';
+
   Future<bool> sendNewsLetter(String email) async {
     Random random = Random();
     await Future.delayed(Duration(seconds: 3));

@@ -1,20 +1,23 @@
 import 'dart:math';
-import 'package:flutter_mobx/flutter_mobx.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:m2/services/api_services/api_services.dart';
-import 'package:m2/services/state_management/cache_clear/cache_manager.dart';
-import 'package:m2/services/state_management/cart/cart_data.dart';
-import 'package:m2/services/state_management/categories/categories_data.dart';
-import 'package:m2/services/state_management/home/home_data.dart';
-import 'package:m2/services/state_management/token/token.dart';
-import 'package:m2/services/state_management/user/user_data.dart';
-import 'package:m2/utilities/app_colors.dart';
-import 'package:m2/utilities/app_style.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:m2/services/route_services.dart' as routes;
+
+import 'services/route_services.dart' as routes;
+
+import 'services/api_services/api_services.dart';
+import 'services/state_management/cache_clear/cache_manager.dart';
+import 'services/state_management/cart/cart_data.dart';
+import 'services/state_management/categories/categories_data.dart';
+import 'services/state_management/home/home_data.dart';
+import 'services/state_management/token/token.dart';
+import 'services/state_management/user/user_data.dart';
+import 'utilities/app_colors.dart';
+import 'utilities/app_style.dart';
 
 void main() async {
   await initHiveForFlutter();
