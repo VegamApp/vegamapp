@@ -133,6 +133,37 @@ class ProductApi {
           }
         }
       }
+       ... on BundleProduct {
+          dynamic_sku
+          dynamic_price
+          dynamic_weight
+          price_view
+          ship_bundle_items
+          items {
+            uid
+            title
+            required
+            type
+            position
+            sku
+            options {
+              uid
+              quantity
+              position
+              is_default
+              price
+              price_type
+              can_change_quantity
+              label
+              product {
+                uid
+                name
+                sku
+                __typename
+              }
+            }
+          }
+        }
       
       media_gallery {
         url
@@ -376,7 +407,7 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
   }
   ''';
 
-  static String removeProductsFromWishlist = r''' 
+  static String removeProductsFromWishlist = r'''
   mutation removeProductsFromWishlist($wishlistId: ID!,$wishlistItemsIds: [ID!]!){
     removeProductsFromWishlist(wishlistId: $wishlistId, wishlistItemsIds: $wishlistItemsIds) {
       user_errors {
@@ -389,7 +420,7 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
       }
     }
   }''';
-  static String addToWishList = r''' 
+  static String addToWishList = r'''
   mutation addProductsToWishlist($id: ID!,$wishlistItems: [WishlistItemInput!]!){
     addProductsToWishlist(
       wishlistId: $id,

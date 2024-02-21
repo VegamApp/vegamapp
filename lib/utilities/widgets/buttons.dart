@@ -137,7 +137,8 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
             statesController: statesController,
             onHover: (value) => setState(() {}),
             onPressed: () {
-              print(widget.typeName);
+              print('data ${cart.cartId}');
+              print("ifbewifwrgiurwu ${widget.typeName}");
               // print(widget.parentSku);
               // print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
@@ -151,10 +152,16 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                     }
                   ]
                 };
-                print('data $data');
                 runMutation(data);
               } else if (widget.typeName == 'SimpleProduct') {
                 //print(loginToken.cartId);
+                runMutation({
+                  'cartIdString': '${cart.cartId}',
+                  'cartItemsMap': [
+                    {'quantity': widget.quantity, 'sku': widget.parentSku}
+                  ]
+                });
+              } else if (widget.typeName == 'BundleProduct') {
                 runMutation({
                   'cartIdString': '${cart.cartId}',
                   'cartItemsMap': [

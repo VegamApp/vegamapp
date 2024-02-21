@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,7 @@ class _HomeViewState extends State<HomeView> {
                     (index) {
                       var productModel = Items.fromJson(data['products'][index]);
                       print(productModel.specialPrice);
+                      log('TYPE NAME OF PRODUCT ${productModel.sTypename}');
                       var price = productModel.specialPrice ?? productModel.priceRange!.minimumPrice!.regularPrice!.value.toString();
                       var originalPrice = productModel.priceRange!.maximumPrice!.regularPrice!.value.toString();
                       var offer = productModel.priceRange!.maximumPrice!.discount!.percentOff;
