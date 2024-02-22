@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/services/state_management/wishlist/wishlist_dart.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,6 +35,7 @@ void main() async {
       Provider<HomeData>(create: (context) => HomeData()),
       Provider<UserData>(create: (context) => UserData()),
       Provider<CacheManager>(create: (context) => CacheManager()),
+      Provider<WishlistData>(create: (context) => WishlistData()),
     ], child: MyApp(token: key, cartId: cart)),
   );
 }

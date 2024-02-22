@@ -447,10 +447,10 @@ class _CartPaymentState extends State<CartPayment> {
         currencyCode: cartData.cartData['cart']['prices']['grand_total']['currency'].toString(),
         billingAddressRequired: false,
       ),
-      paypalRequest: BraintreePayPalRequest(
-        amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
-        displayName: 'Vegam',
-      ),
+      // paypalRequest: BraintreePayPalRequest(
+      //   amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
+      //   displayName: 'Vegam',
+      // ),
     );
 
     BraintreeDropInResult? result = await BraintreeDropIn.start(request);

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart' hide Store;
 import 'package:m2/services/api_services/customer_apis.dart';
@@ -60,7 +63,6 @@ abstract class _AuthTokenBase with Store {
     // ValueNotifier<GraphQLClient> graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.mutate(MutationOptions(document: CustomerApis.requestUserData));
     if (result.hasException) {
-      print(result);
       try {
         if (result.exception!.graphqlErrors[0].extensions!['category'] == 'graphql-authorization') {
           clearLoginToken();
