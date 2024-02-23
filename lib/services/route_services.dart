@@ -72,14 +72,14 @@ final router = GoRouter(
           name: ProductView.route,
           path: ProductView.route,
           pageBuilder: (context, state) {
-            print(state.queryParameters);
+            print(state.uri.queryParameters);
             return getCustomTransition(
               state,
               ProductView(
-                categoryId: state.queryParameters['categoryId'],
-                categoryUid: state.queryParameters['categoryUid'],
-                viewAll: state.queryParameters['viewAll'] == 'true',
-                searchQuery: state.queryParameters['search'],
+                categoryId: state.uri.queryParameters['categoryId'],
+                categoryUid: state.uri.queryParameters['categoryUid'],
+                viewAll: state.uri.queryParameters['viewAll'] == 'true',
+                searchQuery: state.uri.queryParameters['search'],
               ),
             );
           },
@@ -179,7 +179,7 @@ final router = GoRouter(
                 return getCustomTransition(
                   state,
                   OrderPlacedView(
-                    orderId: state.queryParameters['orderid'],
+                    orderId: state.uri.queryParameters['orderid'],
                   ),
                 );
               },
@@ -190,7 +190,7 @@ final router = GoRouter(
           path: CmsView.route,
           name: CmsView.route,
           pageBuilder: (context, state) {
-            final id = state.queryParameters['id'];
+            final id = state.uri.queryParameters['id'];
             return getCustomTransition(state, CmsView(id: id));
           },
         ),

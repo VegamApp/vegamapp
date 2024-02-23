@@ -15,7 +15,6 @@ import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/appbar_searchfield.dart';
-import 'package:m2/utilities/widgets/delivery_hover.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';

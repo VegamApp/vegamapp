@@ -3,7 +3,7 @@ import 'package:flutter/material.dart ';
 import 'package:m2/utilities/utilities.dart';
 
 class ProductMediaContainer extends StatefulWidget {
-  const ProductMediaContainer({Key? key, required this.width, required this.data}) : super(key: key);
+  const ProductMediaContainer({super.key, required this.width, required this.data});
   final double width;
   final List<Map<String, dynamic>> data;
   @override

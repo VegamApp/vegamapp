@@ -282,9 +282,6 @@ class ProductApi {
       name
       sku
       url_key
-      wishlistData{
-        wishlistItem
-      }
       url_suffix
       image{
         url
@@ -301,9 +298,9 @@ class ProductApi {
       ... on PhysicalProductInterface{
         weight
       }
-       wishlistData{
-         wishlistItem
-       }
+      # wishlistData{
+      #   wishlistItem
+      # }
       description {
         html
       }
@@ -376,7 +373,7 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
   }
   ''';
 
-  static String removeProductsFromWishlist = r''' 
+  static String removeProductsFromWishlist = r'''
   mutation removeProductsFromWishlist($wishlistId: ID!,$wishlistItemsIds: [ID!]!){
     removeProductsFromWishlist(wishlistId: $wishlistId, wishlistItemsIds: $wishlistItemsIds) {
       user_errors {
@@ -389,7 +386,7 @@ mutation createProductReview($name:String!, $sku: String!, $summary: String!, $t
       }
     }
   }''';
-  static String addToWishList = r''' 
+  static String addToWishList = r'''
   mutation addProductsToWishlist($id: ID!,$wishlistItems: [WishlistItemInput!]!){
     addProductsToWishlist(
       wishlistId: $id,

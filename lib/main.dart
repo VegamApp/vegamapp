@@ -23,12 +23,15 @@ import 'utilities/app_style.dart';
 void main() async {
   await initHiveForFlutter();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // To store token even when app closed
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? key = sharedPreferences.getString('token');
   String? cart = sharedPreferences.getString('cartId');
 
   runApp(
     MultiProvider(providers: [
+      // Initializing state management models
       Provider<AuthToken>(create: (context) => AuthToken(key)),
       Provider<CartData>(create: (context) => CartData(cart)),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
@@ -41,7 +44,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, this.signIn = false, this.token, this.cartId}) : super(key: key);
+  const MyApp({super.key, this.signIn = false, this.token, this.cartId});
   final bool signIn;
   final String? token;
   final String? cartId;
@@ -53,7 +56,6 @@ class _MyAppState extends State<MyApp> {
   getToken() {
     final loginToken = Provider.of<AuthToken>(context, listen: false);
     final cartData = Provider.of<CartData>(context, listen: false);
-
     loginToken.putLoginToken(widget.token);
     cartData.putCartId(widget.cartId);
   }
@@ -69,14 +71,12 @@ class _MyAppState extends State<MyApp> {
     return Observer(builder: (_) {
       Link link;
       final loginToken = Provider.of<AuthToken>(context);
-      // final cartData = Provider.of<CartData>(context);
-      // getToken(loginToken, cartData);
 
+      // Initialising graphql
       final HttpLink httpLink = HttpLink(ApiServices.path, defaultHeaders: {'Content-Type': 'application/json'});
 
       if (loginToken.loginToken != null) {
         print('auth key initiated');
-        // print(loginToken.loginToken);
         final AuthLink authLink = AuthLink(
           getToken: () => 'Bearer ${loginToken.loginToken}',
         );

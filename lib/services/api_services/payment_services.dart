@@ -1,4 +1,6 @@
+// Queries related to payment are listed here.
 class PaymentServices {
+  // Available payment methods on cart
   static String getAvailablePaymentMethods(String cartId) => '''
   {
     cart(cart_id: "$cartId") {

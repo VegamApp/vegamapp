@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/api_services/customer_apis.dart';
@@ -149,7 +148,7 @@ class AddressViewState extends State<AddressView> {
                             onEdit: () => showAddAddressDialog(context, size, userData, addressModel: e).then((value) => refetch!()),
                           ),
                         )
-                        .toList(),
+                        ,
                   ],
                 );
               })

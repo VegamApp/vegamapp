@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/models/footer_button_model.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/copyright.dart';
 import 'package:m2/utilities/widgets/news_sub.dart';
-import 'package:m2/utilities/widgets/stamp_widget.dart';
 import 'package:m2/views/home/home_view.dart';
 import 'package:page_transition/page_transition.dart';
 
 // Build footbar widget for all pages
 
 class FootBar extends StatefulWidget {
-  const FootBar({Key? key, required this.width, required this.screenWidth}) : super(key: key);
+  const FootBar({super.key, required this.width, required this.screenWidth});
   final double width;
   final double screenWidth;
   @override
@@ -152,7 +150,7 @@ class _FootBarState extends State<FootBar> {
 }
 
 class DesktopContactContainer extends StatelessWidget {
-  const DesktopContactContainer({Key? key, required this.width}) : super(key: key);
+  const DesktopContactContainer({super.key, required this.width});
   final double width;
   @override
   Widget build(BuildContext context) {
@@ -288,7 +286,7 @@ class DesktopContactContainer extends StatelessWidget {
 
 // Widget to display contact information
 class ContactContainer extends StatelessWidget {
-  const ContactContainer({Key? key, required this.width}) : super(key: key);
+  const ContactContainer({super.key, required this.width});
   final double width;
   @override
   Widget build(BuildContext context) {
@@ -315,9 +313,9 @@ class ContactContainer extends StatelessWidget {
 // widget to display app logo
 class LogoContainer extends StatelessWidget {
   const LogoContainer({
-    Key? key,
+    super.key,
     required this.width,
-  }) : super(key: key);
+  });
 
   final double width;
 
@@ -333,7 +331,7 @@ class LogoContainer extends StatelessWidget {
 
 //  Sub widget of contact display with type and detail
 class ContactText extends StatelessWidget {
-  const ContactText({Key? key, required this.title, required this.subtitle}) : super(key: key);
+  const ContactText({super.key, required this.title, required this.subtitle});
   final String title;
   final String subtitle;
   @override
@@ -356,7 +354,7 @@ class ContactText extends StatelessWidget {
 
 // Build a no of text and their navigator
 class BuildColumnText extends StatelessWidget {
-  const BuildColumnText({Key? key, required this.title, required this.list}) : super(key: key);
+  const BuildColumnText({super.key, required this.title, required this.list});
   final List<FooterModel> list;
   final String title;
 
@@ -392,7 +390,7 @@ class BuildColumnText extends StatelessWidget {
 
 // Build the payment method listing
 class BuildPaymentMethodList extends StatelessWidget {
-  const BuildPaymentMethodList({Key? key}) : super(key: key);
+  const BuildPaymentMethodList({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,15 +5,15 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/models/search_model.dart';
 
 class ApiServices {
+  // Headers for the graphql api's are stored in this map
   static Map<String, String> header = {'Content-Type': 'application/json'};
-  static String? storeName;
-  static String? pinCode;
-  // static String baseUrl = 'https://kalyan.ceymox.info/graphql';
-  // static String baseUrl = 'https://kalyanhyper.pwa.ceymox.xyz/api/graphql';
 
+  // Change your domain here. You may need to restart the app if already running.
+  // static String domain = 'https://magento.demo.ceymox.net/';
   static String domain = 'https://flutter.ceymox.net/';
   static String path = '$domain/graphql/';
 
+  // Categories Query
   static String getCategories = r'''
 query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
   categories(filters: $filter, pageSize: $pagesize, currentPage: $page) {
@@ -46,6 +46,8 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
 }
 ''';
 
+  // query for search suggessions in search page.
+  // This query is used to show 5 products as quick suggessions to a search
   static final searchSuggession = gql(r'''
  query Products($searchQuery: String!){   
    products(search: $searchQuery, pageSize: 5) {
@@ -63,6 +65,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
    }
  }''');
 
+  // List the above data in a listview form on an overlay in search page
   Future<List<SearchModel>> searchSuggessionApi({required searchQuery, required BuildContext context}) async {
     var graphqlClient = GraphQLProvider.of(context);
     QueryResult? result = await graphqlClient.value.query(WatchQueryOptions(document: searchSuggession, variables: {"searchQuery": searchQuery}));
@@ -81,11 +84,12 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
     return [];
   }
 
+  // Home Query
   static String queryHome = '''
   {
-  homepage{
+  homepage {
     blocks {
-      data{
+      data {
         id
         desktop_status
         desktop_status
@@ -96,45 +100,46 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
         store
         store_label
         __typename
-        ... on SliderBlock{
-          templateType
-          slider_width
-          autoplay
-          show_slider_title
-          autoplay_timeout
-          autoplay_hover_pause
-          show_dots
-          banners {
-            image
-            layout
-            link_info {
-              category_id
-              external_url
-              link_type
-              link_url
-              open_tab
-              page_id
-              product_id
-              product_sku
-            }
-          }
-          sliders {
-            position
-            description
-            start_date
-            end_date
-            slider_image
-            link_info{
-              link_type
-              category_id
-              link_url
-              external_url
-              product_id
-              product_sku
-            }
-          } 
-        }
-        ...on BannerBlock{
+        # If SliderBlock is available, uncomment this block
+        #... on SliderBlock{
+        #  templateType
+        #  slider_width
+        #  autoplay
+        #  show_slider_title
+        #  autoplay_timeout
+        #  autoplay_hover_pause
+        #  show_dots
+        #  banners {
+        #    image
+        #    layout
+        #    link_info {
+        #      category_id
+        #      external_url
+        #      link_type
+        #      link_url
+        #      open_tab
+        #      page_id
+        #      product_id
+        #      product_sku
+        #    }
+        #  }
+        #  sliders {
+        #    position
+        #    description
+        #    start_date
+        #    end_date
+        #    slider_image
+        #    link_info{
+        #      link_type
+        #      category_id
+        #      link_url
+        #      external_url
+        #      product_id
+        #      product_sku
+        #    }
+        #  }
+        #}
+        ... on BannerBlock {
           banner_template
           banneritems {
             image
@@ -153,11 +158,12 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
             }
           }
         }
-        ...on ContentBlock{
-          content
-          
-        }
-        ...on ProductBlock{
+        # If ContentBlock is available, uncomment this block
+        #...on ContentBlock{
+        #  content
+        #
+        #}
+        ... on ProductBlock {
           show_title
           product_type
           display_style
@@ -170,7 +176,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
             sku
             id
             #wishlistData{
-             # wishlistItem
+            # wishlistItem
             #}
             stock_status
             rating_summary
@@ -191,9 +197,9 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
               __typename
             }
             special_price
-            price_range{
-              minimum_price{
-                regular_price{
+            price_range {
+              minimum_price {
+                regular_price {
                   value
                   currency
                 }
@@ -225,8 +231,8 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
                   uid
                   value_index
                   label
-                  swatch_data{
-                    value 
+                  swatch_data {
+                    value
                   }
                 }
                 product_id
@@ -245,21 +251,21 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
                     weight
                   }
 
-                  price_range{
-                    minimum_price{
-                      regular_price{
+                  price_range {
+                    minimum_price {
+                      regular_price {
                         value
                         currency
                       }
                     }
                     maximum_price {
                       regular_price {
-                          value
-                          currency
-                        }
+                        value
+                        currency
+                      }
                       discount {
-                          amount_off
-                          percent_off
+                        amount_off
+                        percent_off
                       }
                     }
                   }
@@ -273,12 +279,12 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
               }
             }
           }
-           
+
           __typename
         }
-        ... on CategoryBlock{
+        ... on CategoryBlock {
           title
-          category_info{
+          category_info {
             category_id
             url_key
             image
@@ -290,58 +296,61 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
           show_title
           store
           store_label
-          
         }
-        ...on CustomBlock{
-          description
-          viewall_status
-          image
-          link_info {
-            category_id
-            external_url
-            link_type
-            link_url
-            open_tab
-            page_id
-            product_id
-            product_sku
-          }
-          products{
-            name
-          }
-        }
-        ...on PopUp{
-            popup_type
-            popup_image
-            click_url{
-              link_type
-              link_url
-              external_url
-              category_id
-              page_id
-              product_id
-              product_sku
-              page_id
-            }
-            video_thumbnail
-            video_link
-            block_identifier
-            start_date
-            end_date
-          }
 
-        } 
-        page_info{
-          current_page
-          page_size
-          total_pages
-          __typename
-        }
-        total_count
+        # If CustomBlock is available, uncomment this block
+        # ... on CustomBlock {
+        #   description
+        #   viewall_status
+        #   image
+        #   link_info {
+        #     category_id
+        #     external_url
+        #     link_type
+        #     link_url
+        #     open_tab
+        #     page_id
+        #     product_id
+        #     product_sku
+        #   }
+        #   products {
+        #     name
+        #   }
+        # }
+
+        # If PopUp is available, uncomment this block
+        # ... on PopUp {
+        #   popup_type
+        #   popup_image
+        #   click_url {
+        #     link_type
+        #     link_url
+        #     external_url
+        #     category_id
+        #     page_id
+        #     product_id
+        #     product_sku
+        #     page_id
+        #   }
+        #   video_thumbnail
+        #   video_link
+        #   block_identifier
+        #   start_date
+        #   end_date
+        # }
+      }
+      page_info {
+        current_page
+        page_size
+        total_pages
         __typename
       }
+      total_count
+      __typename
     }
   }
+}
+
 ''';
 
   static String getCountries = '''
@@ -392,7 +401,7 @@ query getCategories($filter: CategoryFilterInput, $pagesize: Int, $page: Int) {
 
   Future<bool> sendNewsLetter(String email) async {
     Random random = Random();
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     return (random.nextInt(3) % 2 == 0);
   }
 }

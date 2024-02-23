@@ -23,13 +23,6 @@ mixin _$WishlistData on _WishlistDataBase, Store {
       (_$wishlistComputed ??= Computed<Wishlist?>(() => super.wishlist,
               name: '_WishlistDataBase.wishlist'))
           .value;
-  Computed<bool>? _$isLoadingComputed;
-
-  @override
-  bool get isLoading =>
-      (_$isLoadingComputed ??= Computed<bool>(() => super.isLoading,
-              name: '_WishlistDataBase.isLoading'))
-          .value;
   Computed<bool>? _$hasExceptionsComputed;
 
   @override
@@ -77,19 +70,19 @@ mixin _$WishlistData on _WishlistDataBase, Store {
     });
   }
 
-  late final _$_isLoadingAtom =
-      Atom(name: '_WishlistDataBase._isLoading', context: context);
+  late final _$isLoadingAtom =
+      Atom(name: '_WishlistDataBase.isLoading', context: context);
 
   @override
-  bool get _isLoading {
-    _$_isLoadingAtom.reportRead();
-    return super._isLoading;
+  bool get isLoading {
+    _$isLoadingAtom.reportRead();
+    return super.isLoading;
   }
 
   @override
-  set _isLoading(bool value) {
-    _$_isLoadingAtom.reportWrite(value, super._isLoading, () {
-      super._isLoading = value;
+  set isLoading(bool value) {
+    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
+      super.isLoading = value;
     });
   }
 
@@ -162,9 +155,9 @@ mixin _$WishlistData on _WishlistDataBase, Store {
   @override
   String toString() {
     return '''
+isLoading: ${isLoading},
 wishlistCount: ${wishlistCount},
 wishlist: ${wishlist},
-isLoading: ${isLoading},
 hasExceptions: ${hasExceptions},
 errorMsg: ${errorMsg}
     ''';

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/api_services.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/services/state_management/user/user_data.dart';
-import 'package:m2/utilities/widgets/loading_builder.dart';
 import 'package:provider/provider.dart';
 import '../utilities.dart';
 
 class NewsSub extends StatefulWidget {
-  const NewsSub({Key? key}) : super(key: key);
+  const NewsSub({super.key});
 
   @override
   State<NewsSub> createState() => _NewsSubState();
@@ -86,7 +84,7 @@ class _NewsSubState extends State<NewsSub> {
                   controller: email,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                     hintText: 'Email',
                     hintStyle: AppStyles.getRegularTextStyle(fontSize: 13, color: AppColors.evenFadedText),
                   ),

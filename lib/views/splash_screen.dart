@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/views/auth/auth.dart';
 
+// ! This page is no longer used and will be removed in the future
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   static String route = '/';

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:m2/services/models/product_model.dart' show ProductModel, Items;
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/product_views/product_description_view.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ProductView extends StatefulWidget {
   const ProductView({super.key, this.urlKey, this.categoryId, this.categoryUid, this.viewAll = false, this.searchQuery});
@@ -24,20 +22,34 @@ class ProductView extends StatefulWidget {
 }
 
 class _ProductViewState extends State<ProductView> {
+  // Query string used in the listing/detail page api
   late String queryString;
 
-  final Map<String, dynamic> variables = {};
+  // final filter in query
   final Map<String, dynamic> filter = {};
+
+  // Variables used to filter results
+  final Map<String, dynamic> variables = {};
+
+  // filter keys to use in ui
   final Map<String, String?> filterKeys = {'category_uid': null, 'price': null};
 
+  // Product model includes all products, pages and aggregations.
   ProductModel productModel = ProductModel();
+
+  // All product items
   List<Items> items = <Items>[];
 
+  // Filter is implemented in a DraggableScrollableSheet. This is the controller for the same.
   DraggableScrollableController dController = DraggableScrollableController();
+
+  // Used for pagination
   FetchMoreOptions? opts;
   FetchMore? fetchMore;
 
+  // Scroll controller for product scroll view.
   final ScrollController _scrollController = ScrollController();
+  // Scroll controller for filter scroll view.
   final ScrollController _filterScrollController = ScrollController();
 
   int page = 1;
@@ -49,19 +61,16 @@ class _ProductViewState extends State<ProductView> {
   @override
   void initState() {
     super.initState();
-    dController.addListener(() {
-      if (dController.isAttached && variables.isEmpty) {
-        dController.reset();
-      }
-      log('dController.pixels ${dController.pixels}');
-      setState(() {});
-      dController.removeListener(() {});
-    });
+
+    // initializing variables with 20 products.
     variables.addAll({
       'pageSize': 20,
       'page': page,
     });
+
     getQueryString();
+
+    // For pagination. Listens to scroll controller to check whether the list is at the bottom.
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= (_scrollController.position.maxScrollExtent - 1200) && page <= totalPages && !isLoading) {
         page++;
@@ -73,7 +82,8 @@ class _ProductViewState extends State<ProductView> {
   getQueryString() {
     filterKeys.clear();
     variables.clear();
-    print(widget.searchQuery);
+
+    // If view all query needs to be called
     if (widget.viewAll == true) {
       queryString = ProductApi.viewAllProduct;
       variables.addAll({"pageSize": 20, "page": 1, "id": widget.categoryId});
@@ -85,20 +95,22 @@ class _ProductViewState extends State<ProductView> {
         'pageSize': 20,
         'page': 1,
       });
+
       if (widget.searchQuery != null) {
-        print('classicSearch');
+        // classicSearch
         variables.addAll({'searchQuery': widget.searchQuery});
       } else if (widget.categoryId != null) {
-        print('id');
+        // categoryId list
         variables['filter'] = {
           'category_id': {'eq': widget.categoryId}
         };
       } else if (widget.urlKey != null) {
+        // url_key list
         variables['filter'] = {
           'url_key': {'eq': widget.urlKey!.split('.')[0]}
         };
       } else {
-        print('uid');
+        // category_uid list
         variables['filter'] = {
           'category_uid': {'eq': widget.categoryUid}
         };
@@ -128,6 +140,7 @@ class _ProductViewState extends State<ProductView> {
           // WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
 
           if ((result.isLoading && result.data == null) || isLoading) {
+            // Return loading widget
             return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -136,9 +149,10 @@ class _ProductViewState extends State<ProductView> {
               body: const BuildLoadingWidget(),
             );
           }
-          // log(result.data.toString());
+
           if (result.hasException) {
-            log(result.exception.toString());
+            // return expection widget
+
             return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -151,6 +165,7 @@ class _ProductViewState extends State<ProductView> {
             );
           }
           if ((widget.viewAll != true && result.data!['products']['items'].isEmpty) || (widget.viewAll == true && result.data!['viewallProducts']['products'].isEmpty)) {
+            // return no product widget
             return Scaffold(
                 key: key,
                 appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -159,9 +174,9 @@ class _ProductViewState extends State<ProductView> {
                 body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
           }
 
-          // log(jsonEncode(result.data));
           if (((widget.viewAll != true && result.data!['products']['items'].length == 1) || (widget.viewAll == true && result.data!['viewallProducts']['products'].length == 1)) &&
               widget.urlKey != null) {
+            // return product description view
             return Scaffold(
                 key: key,
                 appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -172,10 +187,6 @@ class _ProductViewState extends State<ProductView> {
           widget.viewAll != true
               ? productModel = ProductModel.fromJson(result.data!['products'])
               : items = (result.data!['viewallProducts']['products'] as List<dynamic>).map((item) => Items.fromJson(item)).toList();
-          // log(jsonEncode(result.data));
-          // print(productModel.pageInfo!.toJson());
-          // page = productModel.pageInfo!.currentPage!;
-          // totalPages = productModel.pageInfo!.totalPages!;
           if (widget.viewAll != true) {
             final Map pageInfo = result.data!['products']['page_info'];
             page = pageInfo['current_page'];
@@ -183,14 +194,8 @@ class _ProductViewState extends State<ProductView> {
           } else {
             totalPages = (result.data!['viewallProducts']['total_count'] / 20).ceil();
           }
-          print('totalPages $totalPages');
-          print('page $page');
-
-          // if (result.isConcrete) {
-          //   isLoading = false;
-          // }
-
           this.fetchMore = fetchMore;
+          // Initializing fetch more for pagination
           opts = FetchMoreOptions(
             document: gql(queryString),
             variables: {'page': ++page},
@@ -209,9 +214,7 @@ class _ProductViewState extends State<ProductView> {
               return fetchMoreResultData;
             },
           );
-          if (dController.isAttached) {
-            log("pixels: ${dController.pixels}");
-          }
+
           return WillPopScope(
             onWillPop: () async {
               // //print(dController.size);
@@ -348,27 +351,13 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
-  getGridViewHeight(double width) {
-    print(width);
-    // if (width > 500) return 400.0;
-    // if (width > 450) return width * 0.9;
-    // if (width > 400) return width;
-    // if (width > 350) return width * 1.05;
-    // if (width > 300) return width * 1.1;
-    // if (width > 250) return width * 1.2;
-    // return width * 1.3;
-    return 400.0;
-  }
-
   getFilter(Size size, QueryResult result, VoidCallback? refetch, {ScrollController? scrollController}) {
-    // //print(jsonEncode(result.data));
     if (result.data!['products']['aggregations'] == null || result.data!['products']['aggregations'].isEmpty) {
       return Center(
         child: Text('No filters available', style: AppStyles.getRegularTextStyle(fontSize: 13)),
       );
     }
     return StatefulBuilder(builder: (context, setState) {
-      // //print(dController.pixels);
       return Container(
         decoration: BoxDecoration(
           color: AppColors.scaffoldColor,

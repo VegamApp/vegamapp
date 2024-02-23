@@ -4,7 +4,7 @@ import 'package:m2/utilities/utilities.dart';
 
 class BuildTextField extends StatefulWidget {
   const BuildTextField({
-    Key? key,
+    super.key,
     required this.controller,
     this.hint,
     this.keyboardType,
@@ -22,7 +22,7 @@ class BuildTextField extends StatefulWidget {
     this.maxLength,
     this.textCapitalization,
     this.showLength = true,
-  }) : super(key: key);
+  });
   final TextEditingController controller;
   final String? hint;
   final TextInputType? keyboardType;

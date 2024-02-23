@@ -10,7 +10,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:m2/views/auth/sign_in.dart';
 
 class BuildDescriptionReview extends StatefulWidget {
-  const BuildDescriptionReview({Key? key, required this.width, required this.description, this.highlight, required this.sku}) : super(key: key);
+  const BuildDescriptionReview({super.key, required this.width, required this.description, this.highlight, required this.sku});
   final double width;
   final String description;
   final String? highlight;
@@ -398,7 +398,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
 }
 
 class BuildTitleDetail extends StatelessWidget {
-  const BuildTitleDetail({Key? key, required this.title, required this.detail}) : super(key: key);
+  const BuildTitleDetail({super.key, required this.title, required this.detail});
   final String title;
   final String detail;
   @override

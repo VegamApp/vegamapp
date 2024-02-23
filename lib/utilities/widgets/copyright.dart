@@ -7,7 +7,7 @@ import '../utilities.dart';
 
 // Copyright widget for the footbar
 class BuildCopyright extends StatelessWidget {
-  const BuildCopyright({Key? key, required this.width}) : super(key: key);
+  const BuildCopyright({super.key, required this.width});
   final double width;
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class BuildCopyright extends StatelessWidget {
 
 // Widget to build avatars for a link
 class BuildCopyRightAvatar extends StatelessWidget {
-  const BuildCopyRightAvatar({Key? key, required this.width, required this.icon, required this.url, required this.color}) : super(key: key);
+  const BuildCopyRightAvatar({super.key, required this.width, required this.icon, required this.url, required this.color});
   final double width;
   final IconData icon;
   final String url;

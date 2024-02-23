@@ -43,7 +43,7 @@ class TextFieldSearch extends StatefulWidget {
 
   /// Creates a TextFieldSearch for displaying selected elements and retrieving a selected element
   const TextFieldSearch(
-      {Key? key,
+      {super.key,
       this.initialList,
       required this.label,
       required this.controller,
@@ -54,8 +54,7 @@ class TextFieldSearch extends StatefulWidget {
       this.scrollbarDecoration,
       this.itemsInView = 3,
       this.onSubmitted,
-      this.minStringLength = 2})
-      : super(key: key);
+      this.minStringLength = 2});
 
   @override
   _TextFieldSearchState createState() => _TextFieldSearchState();
@@ -236,7 +235,7 @@ class _TextFieldSearchState extends State<TextFieldSearch> {
                 onTap: () {
                   // Navigator.push(
                   //     context, PageTransition(child: ProductListingPage.route, (searchQuery: widget.controller.text), type: PageTransitionType.fade));
-                  context.go(Uri(path: ProductView.route, queryParameters: {"search": widget.controller.text}).toString());
+                  context.push(Uri(path: '/${ProductView.route}', queryParameters: {"search": widget.controller.text}).toString());
                   resetList();
                   FocusScope.of(context).unfocus();
                 },

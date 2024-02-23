@@ -10,7 +10,7 @@ import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/auth/sign_in.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({Key? key, required this.size}) : super(key: key);
+  const SignUp({super.key, required this.size});
   final Size size;
   @override
   State<SignUp> createState() => _SignUpState();

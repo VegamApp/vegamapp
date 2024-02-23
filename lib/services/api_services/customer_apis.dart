@@ -2,6 +2,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/fragments.dart';
 import 'package:m2/utilities/utilities.dart';
 
+//Customer api's including auth api's query and mutations are listed here
 class CustomerApis {
   static String signInWithEmail = r'''
     mutation SignInWithEmail($email:String!, $password: String!){

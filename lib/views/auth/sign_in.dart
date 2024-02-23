@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/customer_apis.dart';
-import 'package:m2/services/state_management/cart/cart_data.dart';
 
 // import 'package:m2/services/services.dart';
 import 'package:m2/services/state_management/token/token.dart';
@@ -15,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({Key? key, required this.size}) : super(key: key);
+  const SignIn({super.key, required this.size});
   final Size size;
   @override
   State<SignIn> createState() => _SignInState();
@@ -140,7 +139,7 @@ class _SignInState extends State<SignIn> {
 
 class BuildLoginTextFormField extends StatefulWidget {
   const BuildLoginTextFormField(
-      {Key? key,
+      {super.key,
       required this.controller,
       required this.title,
       this.keyboardType,
@@ -150,8 +149,7 @@ class BuildLoginTextFormField extends StatefulWidget {
       this.maxLines,
       this.textCapitalization,
       this.onFieldSubmitted,
-      this.maxLength})
-      : super(key: key);
+      this.maxLength});
   final TextEditingController controller;
   final String title;
   final TextInputType? keyboardType;

@@ -21,10 +21,7 @@ abstract class _WishlistDataBase with Store {
   Wishlist? get wishlist => _wishlist;
 
   @observable
-  bool _isLoading = false;
-
-  @computed
-  bool get isLoading => _isLoading;
+  bool isLoading = false;
 
   @observable
   bool _hasExceptions = false;
@@ -40,7 +37,7 @@ abstract class _WishlistDataBase with Store {
 
   @action
   putLoading(bool value) {
-    _isLoading = value;
+    isLoading = value;
   }
 
   @action
@@ -51,8 +48,11 @@ abstract class _WishlistDataBase with Store {
   @action
   getWishlistData(BuildContext context) async {
     putLoading(true);
+    print(isLoading);
     final client = GraphQLProvider.of(context);
     var result = await client.value.query(QueryOptions(document: gql(CustomerApis.wishList)));
+    print("exception ${result.hasException}");
+    print(result);
     if (result.hasException) {
       _hasExceptions = true;
       try {
@@ -66,6 +66,7 @@ abstract class _WishlistDataBase with Store {
       }
       return;
     }
+    _wishlist = Wishlist();
     _wishlist = Wishlist.fromJson(result.data!['wishlist']);
     putLoading(false);
   }

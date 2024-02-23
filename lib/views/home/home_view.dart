@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import '../../services/app_responsive.dart';
@@ -63,21 +60,23 @@ class _HomeViewState extends State<HomeView> {
       currentIndex: 0,
       child: LayoutBuilder(builder: (context, constraints) {
         return Observer(builder: (context) {
-          if (homeData.isLoading || homeData.data.isEmpty) {
+          if (homeData.isLoading) {
             return BuildLoadingWidget(color: AppColors.primaryColor);
           }
-          if (homeData.data.isEmpty) return const SizedBox();
+          if (homeData.hasExceptions) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: Text(homeData.errorMsg!, style: AppStyles.getMediumTextStyle(fontSize: 14)),
+              ),
+            );
+          }
           return ListView(
             children: [
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 controller: scrollController,
-                // padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 60, vertical: 20),
-                // itemCount: homeData.data['homepage']['blocks']['data'].length,
-                // separatorBuilder: (context, index) => const SizedBox(height: 20),
-                // itemBuilder: (context, index) => getWidgets(homeData.data['homepage']['blocks']['data'][index]),
-
                 itemCount: homeData.data['homepage']!['blocks']!['data'].length,
                 itemBuilder: (context, index) => getWidgets(homeData.data['homepage']!['blocks']!['data'][index], constraints),
               ),
@@ -91,12 +90,16 @@ class _HomeViewState extends State<HomeView> {
   }
 
   getWidgets(Map<String, dynamic> data, BoxConstraints constraints) {
+    // Check if its not for mobile
     if (AppResponsive.isMobile(context) && !data['mobile_status']) {
       return const SizedBox();
     }
+    // Check if its not for desktop
     if (!AppResponsive.isMobile(context) && !data['desktop_status']) {
       return const SizedBox();
     }
+
+    // Show widget according to the __typename.
     switch (data['__typename']) {
       case 'ProductBlock':
         if (data['display_style'] == 'slider') {
@@ -180,7 +183,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               if (data['show_title']) TwoColoredTitle(title: data['title'], firstHeadColor: AppColors.primaryColor, secondHeadColor: Colors.black),
               if (data['show_title']) const SizedBox(height: 10),
-              Text(data['content'], style: AppStyles.getRegularTextStyle(fontSize: 14)),
+              Text(data['content'] ?? '', style: AppStyles.getRegularTextStyle(fontSize: 14)),
             ],
           ),
         );

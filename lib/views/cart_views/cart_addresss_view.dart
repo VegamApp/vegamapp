@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -161,7 +160,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                         //   buttonText: "Go to Checkout",
                         //   refetch: () => cartData.getCartData(context, token),
                         //   onButtonTap: () {
-                        //     context.go("/${CartView.route}/${CartPayment.route}");
+                        //     context.push("/${CartView.route}/${CartPayment.route}");
                         //   },
                         // ),
                       ],
@@ -199,7 +198,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                           //         showSnackBar(context: context, message: "Please add an address", backgroundColor: Colors.red);
                           //         return;
                           //       }
-                          //       context.go("/${CartView.route}/${CartPayment.route}");
+                          //       context.push("/${CartView.route}/${CartPayment.route}");
                           //     },
                           //   ),
                           // )
@@ -519,7 +518,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                   newAddress = false;
                   setState(() {});
                   cartData.getCartData(context, authToken);
-                  context.go("/${CartView.route}/${CartPayment.route}");
+                  context.push("/${CartView.route}/${CartPayment.route}");
                 },
                 onError: (error) {
                   //print(error);
@@ -538,7 +537,7 @@ class _CartAddressViewState extends State<CartAddressView> {
                       if (authToken.loginToken == null) {
                         runMutationEmail({'cart_id': cartData.cartId, 'email': email.text});
                       } else {
-                        context.go("/${CartView.route}/${CartPayment.route}");
+                        context.push("/${CartView.route}/${CartPayment.route}");
                       }
                     },
                     onError: (error) {
@@ -665,10 +664,10 @@ class _CartAddressViewState extends State<CartAddressView> {
             document: gql(CartApis.setBillingAddressesOnCart),
             onCompleted: (result) {
               print('complete $result');
-              cartData.getCartData(context, authToken);
+              // cartData.getCartData(context, authToken);
 
               if (result != null) {
-                context.go("/${CartView.route}/${CartPayment.route}");
+                context.push("/${CartView.route}/${CartPayment.route}");
               }
             },
             onError: (error) {
@@ -756,29 +755,27 @@ class _CartAddressViewState extends State<CartAddressView> {
                       ),
                     ),
                   if (userData.addressesList.isNotEmpty)
-                    ...userData.addressesList
-                        .map(
-                          (e) => InkWell(
-                            onTap: () {
-                              runMutationShipping({
-                                "input": {
-                                  "cart_id": cartData.cartId,
-                                  "shipping_addresses": [
-                                    {"customer_address_id": e.id, "customer_notes": ""}
-                                  ]
-                                }
-                              });
-                            },
-                            child: BuildAddressContainer(
-                              addressModel: e,
-                              size: size,
-                              fromCart: true,
-                              onEdit: () => AddressViewState.showAddAddressDialog(context, size, userData, addressModel: e).then((value) => userData.getUserData(context)),
-                              onRemove: () => userData.getUserData(context),
-                            ),
-                          ),
-                        )
-                        .toList(),
+                    ...userData.addressesList.map(
+                      (e) => InkWell(
+                        onTap: () {
+                          runMutationShipping({
+                            "input": {
+                              "cart_id": cartData.cartId,
+                              "shipping_addresses": [
+                                {"customer_address_id": e.id, "customer_notes": ""}
+                              ]
+                            }
+                          });
+                        },
+                        child: BuildAddressContainer(
+                          addressModel: e,
+                          size: size,
+                          fromCart: true,
+                          onEdit: () => AddressViewState.showAddAddressDialog(context, size, userData, addressModel: e).then((value) => userData.getUserData(context)),
+                          onRemove: () => userData.getUserData(context),
+                        ),
+                      ),
+                    ),
                 ],
               );
             },

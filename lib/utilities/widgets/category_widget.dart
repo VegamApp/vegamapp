@@ -4,7 +4,7 @@ import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class CatergoryWidget extends StatelessWidget {
-  const CatergoryWidget({Key? key, required this.data}) : super(key: key);
+  const CatergoryWidget({super.key, required this.data});
   final Map<String, dynamic> data;
   @override
   Widget build(BuildContext context) {

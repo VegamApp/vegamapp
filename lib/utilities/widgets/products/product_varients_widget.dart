@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -286,7 +285,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                     Expanded(
                       child: InkWell(
                         onTap: () => setState(() => quantity++),
-                        child: Container(
+                        child: SizedBox(
                           width: 50,
                           height: 40,
                           child: Center(child: Icon(Icons.expand_less, size: 17.5, color: AppColors.evenFadedText)),

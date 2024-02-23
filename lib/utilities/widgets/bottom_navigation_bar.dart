@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:m2/utilities/utilities.dart';
-import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/auth/auth.dart';
 import 'package:m2/views/cart_views/cart_view.dart';
 import 'package:m2/views/home/search_view.dart';

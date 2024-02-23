@@ -3,7 +3,7 @@ import 'package:m2/services/app_responsive.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class BuildCartSteps extends StatelessWidget {
-  const BuildCartSteps({Key? key, required this.currentCartIndex, this.steps = const ['Shopping Cart', 'Address', 'Payment']}) : super(key: key);
+  const BuildCartSteps({super.key, required this.currentCartIndex, this.steps = const ['Shopping Cart', 'Address', 'Payment']});
   final int currentCartIndex;
   final List<String> steps;
 

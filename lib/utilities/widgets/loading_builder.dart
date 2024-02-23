@@ -5,10 +5,10 @@ import 'package:shimmer/shimmer.dart';
 
 class BuildLoadingWidget extends StatelessWidget {
   const BuildLoadingWidget({
-    Key? key,
+    super.key,
     this.color,
     this.size,
-  }) : super(key: key);
+  });
   final double? size;
   final Color? color;
   @override
@@ -18,7 +18,7 @@ class BuildLoadingWidget extends StatelessWidget {
 }
 
 class LoadingWidget extends StatelessWidget {
-  const LoadingWidget({Key? key, this.width, this.height, this.color}) : super(key: key);
+  const LoadingWidget({super.key, this.width, this.height, this.color});
   final double? width;
   final double? height;
   final Color? color;

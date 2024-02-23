@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -16,9 +14,9 @@ import '../../views/contact_view.dart';
 // Build drawer side bar for mobile view
 class DrawerContainer extends StatelessWidget {
   DrawerContainer({
-    Key? key,
+    super.key,
     required this.size,
-  }) : super(key: key);
+  });
   final ValueNotifier<Key> _expanded = ValueNotifier(const ValueKey(0));
 
   final Size size;
