@@ -139,16 +139,14 @@ class AddressViewState extends State<AddressView> {
                         ),
                       ),
                     ),
-                    ...userData.addressesList
-                        .map(
-                          (e) => BuildAddressContainer(
-                            addressModel: e,
-                            size: size,
-                            onRemove: () => refetch!(),
-                            onEdit: () => showAddAddressDialog(context, size, userData, addressModel: e).then((value) => refetch!()),
-                          ),
-                        )
-                        ,
+                    ...userData.addressesList.map(
+                      (e) => BuildAddressContainer(
+                        addressModel: e,
+                        size: size,
+                        onRemove: () => refetch!(),
+                        onEdit: () => showAddAddressDialog(context, size, userData, addressModel: e).then((value) => refetch!()),
+                      ),
+                    ),
                   ],
                 );
               })
@@ -159,7 +157,6 @@ class AddressViewState extends State<AddressView> {
 
   static Future<void> showAddAddressDialog(BuildContext context, Size size, UserData userData, {Addresses? addressModel}) {
     final formKey = GlobalKey<FormState>();
-    log(jsonEncode(addressModel?.toJson()));
     Map<String, dynamic> countries = {};
     Map<String, dynamic> regions = {};
     // For new addresses

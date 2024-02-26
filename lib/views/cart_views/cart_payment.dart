@@ -64,18 +64,22 @@ class _CartPaymentState extends State<CartPayment> {
 
     showSnackBar(context: context, message: "Payment Successfull", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
 
+    // get graphql client
     var graphqlClient = GraphQLProvider.of(context);
+
+    // make input for setRzpPaymentDetailsForOrder mutation
     var input = {
       'order_id': orderId,
       'rzp_payment_id': response.paymentId,
       'rzp_signature': response.signature,
     };
-    log(input.toString());
+
+    // run mutations
     QueryResult? result = await graphqlClient.value.mutate(
       MutationOptions(document: gql(PaymentServices.setRzpPaymentDetailsForOrder), variables: {"input": input}),
     );
-    log(result.toString());
-    try {} catch (e) {}
+
+    // On succes, reset cart.
     if (!result.hasException) {
       QueryResult? newResult = await graphqlClient.value.mutate(
         MutationOptions(document: gql(PaymentServices.resetCart), variables: {"id": orderId}),
@@ -99,18 +103,10 @@ class _CartPaymentState extends State<CartPayment> {
     // Do something when payment fails
     showSnackBar(context: context, message: response.message ?? "An error occured. Please try again.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
     await cartData.getCartData(context, authToken);
-    ////print(response.message);
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message!, style: AppStyles.getRegularTextStyle(fontSize: 14))));
-    // await fetchNewCart();
-    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) async {
     // Do something when an external wallet is selected
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Unknown Error", style: AppStyles.getRegularTextStyle(fontSize: 14))));
-    // await fetchNewCart();
-
-    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
   }
 
   @override
@@ -118,7 +114,6 @@ class _CartPaymentState extends State<CartPayment> {
     final size = MediaQuery.of(context).size;
     cartData = Provider.of<CartData>(context);
     authToken = Provider.of<AuthToken>(context);
-    // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
       child: LayoutBuilder(builder: (context, constraints) {
         return Query(
@@ -150,7 +145,6 @@ class _CartPaymentState extends State<CartPayment> {
 
               return Mutation(
                   options: MutationOptions(
-                    // document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
                     document: gql(PaymentServices.placeOrder),
                     onError: (data) {
                       print(data);
@@ -161,7 +155,6 @@ class _CartPaymentState extends State<CartPayment> {
                       }
                     },
                     onCompleted: (data) async {
-                      print(data);
                       if (data != null) {
                         log(data.toString());
                         if (paymentCode == 'razorpay') {
@@ -255,6 +248,7 @@ class _CartPaymentState extends State<CartPayment> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // show shipping methods
           Text('Shipping Method', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.primaryColor)),
           const SizedBox(height: 20),
           if (cartData.cartData['cart']?['shipping_addresses'] != null && cartData.cartData['cart']?['shipping_addresses'].isNotEmpty)
@@ -284,7 +278,6 @@ class _CartPaymentState extends State<CartPayment> {
                         splashColor: Colors.transparent,
                         onTap: () {
                           setState(() => selectedShippingMethod = shippingMethod['carrier_code']);
-                          print(selectedShippingMethod);
                           runMutation({
                             'cartId': cartData.cartId,
                             'shippingMethod': [
@@ -344,6 +337,7 @@ class _CartPaymentState extends State<CartPayment> {
               },
             ),
           const SizedBox(height: 30),
+          // Show available payment methods
           Text('Payment Method', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.primaryColor)),
           const SizedBox(height: 20),
           if (cartData.cartData['cart']?['available_payment_methods'] != null)
@@ -428,6 +422,7 @@ class _CartPaymentState extends State<CartPayment> {
     );
   }
 
+// Create braintree token
   Future<String?> createBraintreeToken() async {
     var graphqlClient = GraphQLProvider.of(context);
     var data = await graphqlClient.value.mutate(MutationOptions(document: gql(PaymentServices.createBraintreeClientToken)));
@@ -442,6 +437,8 @@ class _CartPaymentState extends State<CartPayment> {
     }
 
     var token = data.data?['createBraintreeClientToken'];
+
+    // Process the token into BraintreeDropInRequest
     final request = BraintreeDropInRequest(
       clientToken: token,
       amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
@@ -485,14 +482,12 @@ class _CartPaymentState extends State<CartPayment> {
 
       var options = {
         //test
+        // Insert your key here
         'key': 'rzp_test_kviuSU4uhhoBlr',
-        // live
-        // 'key': 'rzp_live_1LicnHl9VVn03e',
         // "description": storeConfig.storeData.storeConfig?.defaultDescription ?? "",
         'amount': amount.floor(), //in the smallest currency sub-unit.
         'name': 'Vegam',
         'order_id': orderId,
-        // 'order': {"order_id": data['placeRazorpayOrder']['rzp_order_id']},
         // Generate order_id using Orders API
         // 'description': 'Fine T-Shirt',
         'timeout': 300, // in seconds

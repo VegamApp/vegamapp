@@ -229,8 +229,9 @@ class _ProductViewState extends State<ProductView> {
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
               endDrawer: DrawerContainer(size: size),
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-              floatingActionButton: AppResponsive.isDesktop(context) || widget.viewAll
+              floatingActionButton: AppResponsive.isDesktop(context) || widget.viewAll // Show close button or filter button for filter
                   ? null
+                  // show filter button
                   : dController.isAttached && dController.size <= 0.1
                       ? FloatingActionButton.extended(
                           onPressed: () async {
@@ -241,7 +242,9 @@ class _ProductViewState extends State<ProductView> {
                           isExtended: true,
                           label: Text('Filters', style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.scaffoldColor)),
                         )
-                      : FloatingActionButton(
+                      :
+                      // Show close button
+                      FloatingActionButton(
                           onPressed: () async {
                             await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
@@ -252,6 +255,7 @@ class _ProductViewState extends State<ProductView> {
                         ),
               body: Row(
                 children: [
+                  // shows filter on left as a list if tab
                   if (AppResponsive.isDesktop(context))
                     Container(
                       padding: const EdgeInsets.only(left: 20),
@@ -271,6 +275,7 @@ class _ProductViewState extends State<ProductView> {
                               // crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 20),
+                                // If search query is not null, show search for text
                                 widget.searchQuery != null
                                     ? Text('Search result for "${widget.searchQuery}"', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
                                     : MiniAppBar(
@@ -283,15 +288,13 @@ class _ProductViewState extends State<ProductView> {
                                   itemCount: productModel.items?.length ?? items.length,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
+                                  // If mobile show 2 grids, else show according to screen size
                                   gridDelegate: size.width < 500
                                       ? SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 2,
-                                          // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
                                           crossAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
                                           mainAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
-                                          mainAxisExtent: size.width * 0.8
-                                          // height: getGridViewHeight(constraints.maxWidth),
-                                          )
+                                          mainAxisExtent: size.width * 0.8)
                                       : SliverGridDelegateWithMaxCrossAxisExtent(
                                           maxCrossAxisExtent: 300,
                                           // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
@@ -310,6 +313,7 @@ class _ProductViewState extends State<ProductView> {
                                     var offer = productModel.items == null
                                         ? items[index].priceRange!.maximumPrice!.discount!.percentOff
                                         : productModel.items![index].priceRange!.maximumPrice!.discount!.percentOff;
+
                                     return ProductItem(
                                       productModel: productModel.items?[index] ?? items[index],
                                       price: price,
@@ -325,6 +329,7 @@ class _ProductViewState extends State<ProductView> {
                               ],
                             ),
                             if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
+                              // Filter view
                               DraggableScrollableActuator(
                                 child: DraggableScrollableSheet(
                                   controller: dController,
@@ -351,6 +356,7 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
+  // get Filter widget according to data provided
   getFilter(Size size, QueryResult result, VoidCallback? refetch, {ScrollController? scrollController}) {
     if (result.data!['products']['aggregations'] == null || result.data!['products']['aggregations'].isEmpty) {
       return Center(
@@ -361,12 +367,6 @@ class _ProductViewState extends State<ProductView> {
       return Container(
         decoration: BoxDecoration(
           color: AppColors.scaffoldColor,
-          // gradient: LinearGradient(
-          // colors: const [Colors.transparent, Colors.white],
-          //   begin: Alignment.topCenter,
-          //   end: Alignment.bottomCenter,
-          //   stops: dController.isAttached ? [dController.pixels > 100 ? 0.3 : 0.7, dController.pixels > 100 ? 0.3 : 0.7] : [0.3, 0.7],
-          // ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
@@ -379,6 +379,7 @@ class _ProductViewState extends State<ProductView> {
                 const SizedBox(height: 20),
                 Text('Filters', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
                 const SizedBox(height: 20),
+                // Generates widget accoriding to no of data in products->aggregations
                 Container(
                   color: Colors.white,
                   child: ListView.builder(
@@ -409,16 +410,12 @@ class _ProductViewState extends State<ProductView> {
                             shape: StadiumBorder(side: BorderSide(color: AppColors.fadedText)),
                           ),
                           onPressed: () {
+                            // clear all filter data and fetch the products
                             getQueryString();
-                            // isLoading = true;
-                            //print(variables);
                             refetch!();
                             try {
                               dController.reset();
                             } catch (e) {}
-
-                            // Navigator.pop(context);
-                            // clearFilter(result);
                           },
                           child: Text(
                             'Clear',
@@ -432,16 +429,9 @@ class _ProductViewState extends State<ProductView> {
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                             backgroundColor: AppColors.primaryColor,
                             shape: const StadiumBorder(),
-                            // fixedSize: Size(size.width * 0.4, 50),
-                            // maximumSize: const Size(150, 50),
                           ),
                           onPressed: () {
-                            //print(variables);
-
-                            // queryString = ProductQueries.filterProduct(filterAttribute: filteringAttributes.toString());
-                            // Navigator.pop(context);
-                            print(filter);
-                            // isLoading = true;
+                            // Apply filter data and reload products
                             refetch!();
                             try {
                               dController.reset();
@@ -464,12 +454,14 @@ class _ProductViewState extends State<ProductView> {
     });
   }
 
+// Get type of filter widget according to attribute_code
   getFilterWiget(var data, Size size) {
     return StatefulBuilder(builder: (context, setState) {
       if (data['attribute_code'] == 'price' && data['options'].length > 1) {
+        // get price slider
         return getPriceSlider(data);
       }
-      //print(filter);
+      // get all other filter widgets
       return ExpansionTile(
           initiallyExpanded: false,
           // tilePadding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -497,88 +489,76 @@ class _ProductViewState extends State<ProductView> {
               ],
             ),
           ),
+          // Generate radio buttons from children of the current attribute
           children: List.generate(
             data['options'].length,
-            (index) => data['attribute_code'] != 'category_uid' && data['attribute_code'] != 'category_id'
-                ? RadioListTile<String>(
-                    contentPadding: EdgeInsets.zero,
-                    value: data['options'][index]['value'].toString(),
-                    groupValue: filterKeys[data['attribute_code']],
-                    onChanged: (value) {
-                      // log(jsonEncode(data));
+            (index) =>
+                // If attribute_code != 'category_uid' or 'category_id' show normal radio button
+                data['attribute_code'] != 'category_uid' && data['attribute_code'] != 'category_id'
+                    ? RadioListTile<String>(
+                        contentPadding: EdgeInsets.zero,
+                        value: data['options'][index]['value'].toString(),
+                        groupValue: filterKeys[data['attribute_code']],
+                        onChanged: (value) {
+                          filter[data['attribute_code']] = {'eq': data['options'][index]['value']};
+                          variables['filter'] = filter;
+                          filterKeys[data['attribute_code']] = data['options'][index]['value'];
 
-                      //print(data['attribute_code']);
-                      //print(filter);
-                      // filter.clear();
-                      filter[data['attribute_code']] = {'eq': data['options'][index]['value']};
-                      variables['filter'] = filter;
-                      filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                      //print('variables $variables');
+                          setState(() {});
+                        },
+                        title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
+                      )
+                    :
+                    // else show special list with check option
+                    ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: SizedBox(height: 30, width: 30, child: Image.asset('assets/images/categoryicon.png')),
+                        trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']] ? Icon(Icons.check, color: AppColors.primaryColor) : null,
+                        // value: data['options'][index]['value'].toString(),
+                        // groupValue: filterKeys[data['attribute_code']],
+                        onTap: () {
+                          if (data['attribute_code'] == 'category_uid') {
+                            if (variables['filter']['category_uid'] != null) {
+                              variables['filter'].remove('category_uid');
+                            }
+                            filter.addAll({
+                              'category_uid': {'eq': data['options'][index]['value']}
+                            });
+                            variables['filter'] = filter;
+                            try {
+                              variables['filter'].remove("category_id");
+                            } catch (e) {
+                              //print(e);
+                            }
+                            filterKeys[data['attribute_code']] = data['options'][index]['value'];
+                            //print(variables);
+                            queryString = ProductApi.products;
+                          } else {
+                            if (variables['filter']['category_id'] != null) {
+                              variables['filter'].remove('category_id');
+                            }
+                            filter.addAll({
+                              'category_id': {'eq': data['options'][index]['value']}
+                            });
+                            try {
+                              variables['filter'].remove("category_uid");
+                            } catch (e) {}
+                            variables['filter'] = filter;
+                            filterKeys[data['attribute_code']] = data['options'][index]['value'];
+                            queryString = ProductApi.products;
+                          }
 
-                      //print(variables);
-                      setState(() {});
-                    },
-                    title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
-                  )
-                : ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: SizedBox(height: 30, width: 30, child: Image.asset('assets/images/categoryicon.png')),
-                    trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']] ? Icon(Icons.check, color: AppColors.primaryColor) : null,
-                    // value: data['options'][index]['value'].toString(),
-                    // groupValue: filterKeys[data['attribute_code']],
-                    onTap: () {
-                      //print(data);
-                      if (data['attribute_code'] == 'category_uid') {
-                        if (variables['filter']['category_uid'] != null) {
-                          variables['filter'].remove('category_uid');
-                        }
-                        filter.addAll({
-                          'category_uid': {'eq': data['options'][index]['value']}
-                        });
-                        variables['filter'] = filter;
-                        try {
-                          variables['filter'].remove("category_id");
-                        } catch (e) {
-                          //print(e);
-                        }
-                        filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                        //print(variables);
-                        queryString = ProductApi.products;
-                      } else {
-                        if (variables['filter']['category_id'] != null) {
-                          variables['filter'].remove('category_id');
-                        }
-                        filter.addAll({
-                          'category_id': {'eq': data['options'][index]['value']}
-                        });
-                        try {
-                          variables['filter'].remove("category_uid");
-                        } catch (e) {
-                          //print(e);
-                        }
-                        variables['filter'] = filter;
-                        filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                        //print(variables);
-                        queryString = ProductApi.products;
-                      }
-
-                      //print(variables);
-                      setState(() {});
-                    },
-                    title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
-                  ),
+                          setState(() {});
+                        },
+                        title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
+                      ),
           ));
     });
-    // } catch (e) {
-    //   //print(e);
-    //   return const SizedBox();
-    // }
-    // }
   }
 
   RangeValues? rangeValues;
   getPriceSlider(var data) {
-    // //print(jsonEncode(data));
+    // make rangevalues according to min and max data
     if (rangeValues == null ||
         rangeValues != RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]))) {
       rangeValues = RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]));
@@ -613,10 +593,10 @@ class _ProductViewState extends State<ProductView> {
               filter.addAll(Map<String, dynamic>.from(variables['filter']));
 
               variables['filter'] = filter;
-              // //print(variables);
             },
           ),
           const SizedBox(height: 10),
+          // show min and max price from the slider
           Text(
             'Price: $currency${rangeValues!.start.round()} - $currency${rangeValues!.end.round()}',
             style: AppStyles.getRegularTextStyle(fontSize: 14, isCurrency: true),

@@ -239,9 +239,12 @@ class CategoryBlock extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               image: DecorationImage(
-                                image: CachedNetworkImageProvider(
-                                  data['category_info'][index]['image'] ?? "https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png",
-                                ),
+                                image: data['category_info'][index]['image'] == null
+                                    ? const AssetImage('assets/images/categoryicon.png')
+                                    : CachedNetworkImageProvider(
+                                        // data['category_info'][index]['image'] ?? "https://www.contentviewspro.com/wp-content/uploads/2017/07/default_image.png",
+                                        data['category_info'][index]['image'],
+                                      ) as ImageProvider,
                                 fit: BoxFit.contain,
                               ),
                             ),
