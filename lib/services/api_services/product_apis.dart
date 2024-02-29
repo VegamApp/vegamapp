@@ -1,6 +1,6 @@
 class ProductApi {
   static String products = r'''
-  query products(
+ query products(
   $pageSize: Int!
   $page: Int!
   $filter: ProductAttributeFilterInput!
@@ -133,38 +133,37 @@ class ProductApi {
           }
         }
       }
-       ... on BundleProduct {
-          dynamic_sku
-          dynamic_price
-          dynamic_weight
-          price_view
-          ship_bundle_items
-          items {
+      ... on BundleProduct {
+        dynamic_sku
+        dynamic_price
+        dynamic_weight
+        price_view
+        ship_bundle_items
+        items {
+          uid
+          title
+          required
+          type
+          position
+          sku
+          options {
             uid
-            title
-            required
-            type
+            quantity
             position
-            sku
-            options {
+            is_default
+            price
+            price_type
+            can_change_quantity
+            label
+            product {
               uid
-              quantity
-              position
-              is_default
-              price
-              price_type
-              can_change_quantity
-              label
-              product {
-                uid
-                name
-                sku
-                __typename
-              }
+              name
+              sku
+              __typename
             }
           }
         }
-      
+      }
       media_gallery {
         url
         label
@@ -298,6 +297,7 @@ class ProductApi {
     }
   }
 }
+
 ''';
 
   static String viewAllProduct = r'''

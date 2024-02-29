@@ -73,16 +73,17 @@ class _ProductDescriptionState extends State<ProductDescription> {
         const SizedBox(height: 30),
         Divider(height: 1, color: AppColors.dividerColor),
         const SizedBox(height: 20),
-        ProductVarientWidget(
-          productModel: productModel,
-          onUpdated: (newMedia) {
-            if (newMedia != null) {
-              setState(() => mediaGallery = newMedia);
-              ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
-            }
-          },
-        ),
-        const SizedBox(height: 30),
+        if (productModel.items![0].sTypename == 'ConfigurableProduct')
+          ProductVarientWidget(
+            productModel: productModel,
+            onUpdated: (newMedia) {
+              if (newMedia != null) {
+                setState(() => mediaGallery = newMedia);
+                ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
+              }
+            },
+          ),
+        if (productModel.items![0].sTypename == 'BundleProduct') const SizedBox(height: 30),
         BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!), const SizedBox(height: 20),
         if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
           TwoColoredTitle(title: 'Related Products', firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
