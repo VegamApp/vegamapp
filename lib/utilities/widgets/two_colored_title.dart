@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class TwoColoredTitle extends StatelessWidget {
-  const TwoColoredTitle({Key? key, required this.title, required this.firstHeadColor, required this.secondHeadColor, this.subtitle}) : super(key: key);
+  const TwoColoredTitle({super.key, required this.title, required this.firstHeadColor, required this.secondHeadColor, this.subtitle});
   final String title;
 
   final Color firstHeadColor;

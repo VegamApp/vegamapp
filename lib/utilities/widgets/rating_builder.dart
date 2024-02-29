@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class BuildRating extends StatelessWidget {
-  const BuildRating({Key? key, required this.rating, this.noOfReviews}) : super(key: key);
+  const BuildRating({super.key, required this.rating, this.noOfReviews});
   final int? rating;
   final int? noOfReviews;
   @override

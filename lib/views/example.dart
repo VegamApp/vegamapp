@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:m2/services/state_management/token/token.dart';
 import 'package:provider/provider.dart';
 
+// ! This page is no longer used and will be removed in the future
 class ExPage extends StatefulWidget {
   const ExPage({super.key});
   static String route = '/expage';
@@ -17,7 +18,6 @@ class _ExPageState extends State<ExPage> {
       body: Center(
         child: TextButton(
           onPressed: () async {
-            authToken.putLoginToken('Jabaaa');
             setState(() {});
             // print(graphqlToken.);
             // await SharedPreferences.getInstance().then((value) => value.clear());

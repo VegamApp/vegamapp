@@ -4,7 +4,7 @@ import '../utilities.dart';
 
 // show stamps in the footbar
 class StampContainer extends StatelessWidget {
-  const StampContainer({Key? key, required this.width}) : super(key: key);
+  const StampContainer({super.key, required this.width});
   final double width;
   @override
   Widget build(BuildContext context) {

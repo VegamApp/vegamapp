@@ -3,7 +3,7 @@ import 'package:m2/utilities/app_colors.dart';
 import 'package:m2/utilities/app_style.dart';
 
 class BuildErrorWidget extends StatelessWidget {
-  const BuildErrorWidget({Key? key, this.onRefresh, this.buttonColor, this.textColor, this.buttonTextColor, this.errorMsg}) : super(key: key);
+  const BuildErrorWidget({super.key, this.onRefresh, this.buttonColor, this.textColor, this.buttonTextColor, this.errorMsg});
   final Function()? onRefresh;
   final Color? buttonColor;
   final Color? textColor;

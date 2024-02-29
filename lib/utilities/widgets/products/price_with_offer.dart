@@ -4,7 +4,7 @@ import 'package:m2/utilities/utilities.dart';
 // Widget to show the price of the product with offer, if any, under product listing
 class BuildPriceWithOffer extends StatelessWidget {
   const BuildPriceWithOffer({
-    Key? key,
+    super.key,
     this.price,
     required this.priceSize,
     this.originalPrice,
@@ -12,7 +12,7 @@ class BuildPriceWithOffer extends StatelessWidget {
     this.offer,
     this.offerSize,
     this.currency,
-  }) : super(key: key);
+  });
 
   final String? price;
   final double priceSize;

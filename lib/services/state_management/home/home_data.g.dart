@@ -23,6 +23,20 @@ mixin _$HomeData on _HomeDataBase, Store {
       (_$isLoadingComputed ??= Computed<bool>(() => super.isLoading,
               name: '_HomeDataBase.isLoading'))
           .value;
+  Computed<bool>? _$hasExceptionsComputed;
+
+  @override
+  bool get hasExceptions =>
+      (_$hasExceptionsComputed ??= Computed<bool>(() => super.hasExceptions,
+              name: '_HomeDataBase.hasExceptions'))
+          .value;
+  Computed<String?>? _$errorMsgComputed;
+
+  @override
+  String? get errorMsg =>
+      (_$errorMsgComputed ??= Computed<String?>(() => super.errorMsg,
+              name: '_HomeDataBase.errorMsg'))
+          .value;
   Computed<double>? _$homeCarouselAspectRatioComputed;
 
   @override
@@ -79,6 +93,38 @@ mixin _$HomeData on _HomeDataBase, Store {
     });
   }
 
+  late final _$_errorMsgAtom =
+      Atom(name: '_HomeDataBase._errorMsg', context: context);
+
+  @override
+  String? get _errorMsg {
+    _$_errorMsgAtom.reportRead();
+    return super._errorMsg;
+  }
+
+  @override
+  set _errorMsg(String? value) {
+    _$_errorMsgAtom.reportWrite(value, super._errorMsg, () {
+      super._errorMsg = value;
+    });
+  }
+
+  late final _$_hasExceptionsAtom =
+      Atom(name: '_HomeDataBase._hasExceptions', context: context);
+
+  @override
+  bool get _hasExceptions {
+    _$_hasExceptionsAtom.reportRead();
+    return super._hasExceptions;
+  }
+
+  @override
+  set _hasExceptions(bool value) {
+    _$_hasExceptionsAtom.reportWrite(value, super._hasExceptions, () {
+      super._hasExceptions = value;
+    });
+  }
+
   late final _$getHomeDataAsyncAction =
       AsyncAction('_HomeDataBase.getHomeData', context: context);
 
@@ -117,6 +163,8 @@ mixin _$HomeData on _HomeDataBase, Store {
     return '''
 data: ${data},
 isLoading: ${isLoading},
+hasExceptions: ${hasExceptions},
+errorMsg: ${errorMsg},
 homeCarouselAspectRatio: ${homeCarouselAspectRatio}
     ''';
   }

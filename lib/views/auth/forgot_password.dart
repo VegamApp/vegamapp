@@ -10,7 +10,7 @@ import '../../utilities/utilities.dart';
 
 // Password reset page
 class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({Key? key}) : super(key: key);
+  const ForgotPassword({super.key});
   static String route = 'passwordreset';
   @override
   State<ForgotPassword> createState() => _ForgotPasswordState();

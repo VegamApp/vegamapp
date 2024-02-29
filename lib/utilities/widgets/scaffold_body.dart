@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/cache_clear/cache_manager.dart';
 import 'package:m2/services/state_management/cart/cart_data.dart';

@@ -1,8 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
@@ -16,7 +13,7 @@ import 'package:provider/provider.dart';
 
 class BuildButtonSingle extends StatefulWidget {
   const BuildButtonSingle({
-    Key? key,
+    super.key,
     required this.typeName,
     required this.width,
     required this.title,
@@ -28,7 +25,7 @@ class BuildButtonSingle extends StatefulWidget {
     this.isBuyNow = false,
     this.margin,
     required this.quantity,
-  }) : super(key: key);
+  });
 
   final EdgeInsets? margin;
   final String typeName;

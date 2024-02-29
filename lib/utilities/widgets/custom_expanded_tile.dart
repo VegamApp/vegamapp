@@ -4,7 +4,7 @@ const Duration _kExpand = Duration(milliseconds: 200);
 
 class CustomExpansionTile extends StatefulWidget {
   const CustomExpansionTile({
-    Key? key,
+    super.key,
     this.leading,
     required this.title,
     this.backgroundColor,
@@ -12,7 +12,7 @@ class CustomExpansionTile extends StatefulWidget {
     this.trailing,
     required this.expandedItem,
     this.padding,
-  }) : super(key: key);
+  });
 
   /// A widget to display before the title.
   ///

@@ -12,7 +12,6 @@ import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/views/account_view/account_information_view.dart';
 import 'package:m2/views/account_view/address_view.dart';
-import 'package:m2/views/account_view/billing_agreement_view.dart';
 import 'package:m2/views/account_view/downloadable_products_view.dart';
 import 'package:m2/views/account_view/newsletter_view.dart';
 import 'package:m2/views/account_view/orders_view.dart';
@@ -177,12 +176,12 @@ class _AccountSideBarState extends State<AccountSideBar> {
                         isBold: widget.currentPage == AccountInformationView.route && !AppResponsive.isMobile(context),
                         url: "/account/${AccountInformationView.route}",
                       ),
-                      BuilProfileButtons(
-                        title: 'My Downloadable Products',
-                        svgUrl: 'downloadable',
-                        url: "/account/${DownloadableProductsView.route}",
-                        isBold: widget.currentPage == DownloadableProductsView.route && !AppResponsive.isMobile(context),
-                      ),
+                      // BuilProfileButtons(
+                      //   title: 'My Downloadable Products',
+                      //   svgUrl: 'downloadable',
+                      //   url: "/account/${DownloadableProductsView.route}",
+                      //   isBold: widget.currentPage == DownloadableProductsView.route && !AppResponsive.isMobile(context),
+                      // ),
                       BuilProfileButtons(
                         title: 'Address Book',
                         svgUrl: 'location_on',
@@ -265,7 +264,7 @@ class _AccountSideBarState extends State<AccountSideBar> {
 }
 
 class BuilProfileButtons extends StatelessWidget {
-  const BuilProfileButtons({Key? key, required this.title, this.svgUrl, this.child, this.isBold = false, this.url}) : super(key: key);
+  const BuilProfileButtons({super.key, required this.title, this.svgUrl, this.child, this.isBold = false, this.url});
   final String title;
   final String? svgUrl;
   final Widget? child;

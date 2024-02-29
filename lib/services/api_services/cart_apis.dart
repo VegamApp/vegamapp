@@ -3,6 +3,7 @@ import 'package:m2/services/api_services/fragments.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class CartApis {
+  // Cart query
   static final cart = addFragments(gql(r'''
   query getCart($id: String!) {
   cart(cart_id: $id) {
@@ -54,6 +55,7 @@ class CartApis {
     __typename
   }
 }'''), [
+    //All fragments used here
     Fragments.appliedCouponFragment,
     Fragments.availablePaymentMethodFragment,
     Fragments.billingAddressFragment,

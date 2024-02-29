@@ -7,7 +7,7 @@ import 'package:m2/views/auth/sign_up.dart';
 // import 'package:m2/views/home.dart';
 
 class Auth extends StatefulWidget {
-  const Auth({Key? key}) : super(key: key);
+  const Auth({super.key});
   static String route = 'auth';
   @override
   State<Auth> createState() => _AuthState();
@@ -130,7 +130,7 @@ class _AuthState extends State<Auth> with TickerProviderStateMixin {
 }
 
 class BuildLoginSocialButton extends StatelessWidget {
-  const BuildLoginSocialButton({Key? key, required this.size, required this.onPressed, required this.icon, required this.color}) : super(key: key);
+  const BuildLoginSocialButton({super.key, required this.size, required this.onPressed, required this.icon, required this.color});
 
   final Size size;
   final Function()? onPressed;

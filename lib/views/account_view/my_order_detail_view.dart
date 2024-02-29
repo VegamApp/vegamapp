@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/app_responsive.dart';
-import 'package:m2/utilities/app_style.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
@@ -14,7 +10,7 @@ import 'package:m2/views/account_view/orders_view.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class MyOrderDetailView extends StatefulWidget {
-  const MyOrderDetailView({Key? key, required this.orderId}) : super(key: key);
+  const MyOrderDetailView({super.key, required this.orderId});
   final String orderId;
   @override
   State<MyOrderDetailView> createState() => _MyOrderDetailViewState();
@@ -144,7 +140,7 @@ class _MyOrderDetailViewState extends State<MyOrderDetailView> {
 }
 
 class BuildOrderDetailContainer extends StatefulWidget {
-  const BuildOrderDetailContainer({Key? key, required this.size, required this.orderId, this.isReturn = false, required this.data}) : super(key: key);
+  const BuildOrderDetailContainer({super.key, required this.size, required this.orderId, this.isReturn = false, required this.data});
   final Size size;
   final String orderId;
   final bool isReturn;

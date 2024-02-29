@@ -4,9 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:m2/services/api_services/cart_apis.dart';
@@ -37,7 +35,7 @@ class _CartPaymentState extends State<CartPayment> {
   late CartData cartData;
   late AuthToken authToken;
   String? brainTreeToken;
-  var _razorPay = Razorpay();
+  final _razorPay = Razorpay();
 
   @override
   void initState() {
@@ -66,18 +64,22 @@ class _CartPaymentState extends State<CartPayment> {
 
     showSnackBar(context: context, message: "Payment Successfull", backgroundColor: AppColors.snackbarSuccessBackgroundColor);
 
+    // get graphql client
     var graphqlClient = GraphQLProvider.of(context);
+
+    // make input for setRzpPaymentDetailsForOrder mutation
     var input = {
       'order_id': orderId,
       'rzp_payment_id': response.paymentId,
       'rzp_signature': response.signature,
     };
-    log(input.toString());
+
+    // run mutations
     QueryResult? result = await graphqlClient.value.mutate(
       MutationOptions(document: gql(PaymentServices.setRzpPaymentDetailsForOrder), variables: {"input": input}),
     );
-    log(result.toString());
-    try {} catch (e) {}
+
+    // On succes, reset cart.
     if (!result.hasException) {
       QueryResult? newResult = await graphqlClient.value.mutate(
         MutationOptions(document: gql(PaymentServices.resetCart), variables: {"id": orderId}),
@@ -101,18 +103,10 @@ class _CartPaymentState extends State<CartPayment> {
     // Do something when payment fails
     showSnackBar(context: context, message: response.message ?? "An error occured. Please try again.", backgroundColor: AppColors.snackbarErrorBackgroundColor);
     await cartData.getCartData(context, authToken);
-    ////print(response.message);
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.message!, style: AppStyles.getRegularTextStyle(fontSize: 14))));
-    // await fetchNewCart();
-    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) async {
     // Do something when an external wallet is selected
-    // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Unknown Error", style: AppStyles.getRegularTextStyle(fontSize: 14))));
-    // await fetchNewCart();
-
-    // Navigator.pushAndRemoveUntil(context, PageTransition(child: HomeView(), type: PageTransitionType.fade), (route) => false);
   }
 
   @override
@@ -120,7 +114,6 @@ class _CartPaymentState extends State<CartPayment> {
     final size = MediaQuery.of(context).size;
     cartData = Provider.of<CartData>(context);
     authToken = Provider.of<AuthToken>(context);
-    // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
       child: LayoutBuilder(builder: (context, constraints) {
         return Query(
@@ -152,7 +145,6 @@ class _CartPaymentState extends State<CartPayment> {
 
               return Mutation(
                   options: MutationOptions(
-                    // document: gql(paymentCode == 'razorpay' ? PaymentServices.placeRazorPayOrder : PaymentServices.placeOrder),
                     document: gql(PaymentServices.placeOrder),
                     onError: (data) {
                       print(data);
@@ -163,13 +155,16 @@ class _CartPaymentState extends State<CartPayment> {
                       }
                     },
                     onCompleted: (data) async {
-                      print(data);
                       if (data != null) {
                         log(data.toString());
                         if (paymentCode == 'razorpay') {
                           getRazorPayId(data);
                         } else {
-                          await cartData.getCustomerCart(context, authToken);
+                          if (authToken.loginToken == null) {
+                            cartData.getGuestCart(context);
+                          } else {
+                            await cartData.getCustomerCart(context, authToken);
+                          }
                           cartData.getCartData(context, authToken);
                           context.go("/${CartView.route}/${OrderPlacedView.route}");
                         }
@@ -253,177 +248,181 @@ class _CartPaymentState extends State<CartPayment> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // show shipping methods
           Text('Shipping Method', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.primaryColor)),
           const SizedBox(height: 20),
-          Mutation(
-            options: MutationOptions(
-                document: gql(CartApis.setShippingMethod),
-                onError: (data) {
-                  print(data);
-                },
-                onCompleted: (data) {
-                  print(data);
-                  refetch!();
-                }),
-            builder: (runMutation, mutationResult) {
-              return Wrap(
-                spacing: 20,
-                runSpacing: 20,
-                alignment: WrapAlignment.start,
-                runAlignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: List.generate(
-                  // cardUrls.length,
-                  cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'].length,
-                  (index) {
-                    var shippingMethod = cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index];
-                    return InkWell(
-                      splashColor: Colors.transparent,
-                      onTap: () {
-                        setState(() => selectedShippingMethod = shippingMethod['carrier_code']);
-                        print(selectedShippingMethod);
-                        runMutation({
-                          'cartId': cartData.cartId,
-                          'shippingMethod': [
-                            {
-                              'carrier_code': cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index]['carrier_code'],
-                              'method_code': cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index]['method_code']
-                            }
-                          ]
-                        });
+          if (cartData.cartData['cart']?['shipping_addresses'] != null && cartData.cartData['cart']?['shipping_addresses'].isNotEmpty)
+            Mutation(
+              options: MutationOptions(
+                  document: gql(CartApis.setShippingMethod),
+                  onError: (data) {
+                    print(data);
+                  },
+                  onCompleted: (data) {
+                    print(data);
+                    refetch!();
+                  }),
+              builder: (runMutation, mutationResult) {
+                return Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  alignment: WrapAlignment.start,
+                  runAlignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: List.generate(
+                    // cardUrls.length,
+                    cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'].length,
+                    (index) {
+                      var shippingMethod = cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index];
+                      return InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () {
+                          setState(() => selectedShippingMethod = shippingMethod['carrier_code']);
+                          runMutation({
+                            'cartId': cartData.cartId,
+                            'shippingMethod': [
+                              {
+                                'carrier_code': cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index]['carrier_code'],
+                                'method_code': cartData.cartData['cart']['shipping_addresses'][0]['available_shipping_methods'][index]['method_code']
+                              }
+                            ]
+                          });
 
-                        // setState(() {});
-                      },
-                      child: Container(
-                        width: size.width * 0.35,
-                        height: size.width * 0.2,
-                        constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffffffff),
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            width: 2.0,
-                            color: selectedShippingMethod == shippingMethod['carrier_code'] ? const Color(0xff31aca0) : AppColors.evenFadedText,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x03000000),
-                              offset: Offset(0, 30),
-                              blurRadius: 50,
+                          // setState(() {});
+                        },
+                        child: Container(
+                          width: size.width * 0.35,
+                          height: size.width * 0.2,
+                          constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              width: 2.0,
+                              color: selectedShippingMethod == shippingMethod['carrier_code'] ? const Color(0xff31aca0) : AppColors.evenFadedText,
                             ),
-                          ],
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x03000000),
+                                offset: Offset(0, 30),
+                                blurRadius: 50,
+                              ),
+                            ],
+                          ),
+                          // child: Image.asset('assets/images/${cardUrls[index]}'),
+                          child: mutationResult!.isLoading && selectedShippingMethod != shippingMethod['carrier_code']
+                              ? BuildLoadingWidget(color: AppColors.primaryColor)
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      shippingMethod['carrier_title'],
+                                      textAlign: TextAlign.center,
+                                      style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      '${shippingMethod['amount']['currency']} ${shippingMethod['amount']['value']}',
+                                      textAlign: TextAlign.center,
+                                      style: AppStyles.getMediumTextStyle(fontSize: 12, color: AppColors.primaryColor),
+                                    ),
+                                  ],
+                                ),
                         ),
-                        // child: Image.asset('assets/images/${cardUrls[index]}'),
-                        child: mutationResult!.isLoading && selectedShippingMethod != shippingMethod['carrier_code']
-                            ? BuildLoadingWidget(color: AppColors.primaryColor)
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    shippingMethod['carrier_title'],
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          const SizedBox(height: 30),
+          // Show available payment methods
+          Text('Payment Method', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.primaryColor)),
+          const SizedBox(height: 20),
+          if (cartData.cartData['cart']?['available_payment_methods'] != null)
+            Mutation(
+              options: MutationOptions(
+                  document: gql(CartApis.setPaymentMethodOnCart),
+                  onError: (data) {
+                    print(data);
+                  },
+                  onCompleted: (data) {
+                    print(data);
+                    refetch!();
+                  }),
+              builder: (runMutation, mutationResult) {
+                return Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  alignment: WrapAlignment.start,
+                  runAlignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: List.generate(
+                    // cardUrls.length,
+                    cartData.cartData['cart']['available_payment_methods'].length,
+                    (index) {
+                      var paymentMethod = cartData.cartData['cart']['available_payment_methods'][index];
+                      return InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () async {
+                          // Clipboard.setData(ClipboardData(text: jsonEncode(cartData.cartData)));
+                          setState(() => paymentCode = paymentMethod['code']);
+                          Map<String, dynamic> mutationParams = {
+                            'cartId': cartData.cartId,
+                            'paymentMethod': {'code': paymentCode}
+                          };
+                          if (paymentCode == "braintree") {
+                            brainTreeToken = await createBraintreeToken();
+                            mutationParams["paymentMethod"] = {
+                              'code': paymentCode,
+                              "braintree": {"payment_method_nonce": brainTreeToken, "is_active_payment_token_enabler": false}
+                            };
+                          }
+                          runMutation(mutationParams);
+
+                          // setState(() {});
+                        },
+                        child: Container(
+                          width: size.width * 0.35,
+                          height: size.width * 0.2,
+                          constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(width: 2.0, color: paymentCode == paymentMethod['code'] ? const Color(0xff31aca0) : AppColors.evenFadedText),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x03000000),
+                                offset: Offset(0, 30),
+                                blurRadius: 50,
+                              ),
+                            ],
+                          ),
+                          // child: Image.asset('assets/images/${cardUrls[index]}'),
+                          child: mutationResult!.isLoading && paymentCode == paymentMethod['code']
+                              ? BuildLoadingWidget(color: AppColors.primaryColor)
+                              : Center(
+                                  child: Text(
+                                    paymentMethod['title'],
                                     textAlign: TextAlign.center,
                                     style: AppStyles.getMediumTextStyle(fontSize: 14),
                                   ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    '${shippingMethod['amount']['currency']} ${shippingMethod['amount']['value']}',
-                                    textAlign: TextAlign.center,
-                                    style: AppStyles.getMediumTextStyle(fontSize: 12, color: AppColors.primaryColor),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 30),
-          Text('Payment Method', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.primaryColor)),
-          const SizedBox(height: 20),
-          Mutation(
-            options: MutationOptions(
-                document: gql(CartApis.setPaymentMethodOnCart),
-                onError: (data) {
-                  print(data);
-                },
-                onCompleted: (data) {
-                  print(data);
-                  refetch!();
-                }),
-            builder: (runMutation, mutationResult) {
-              return Wrap(
-                spacing: 20,
-                runSpacing: 20,
-                alignment: WrapAlignment.start,
-                runAlignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: List.generate(
-                  // cardUrls.length,
-                  cartData.cartData['cart']['available_payment_methods'].length,
-                  (index) {
-                    var paymentMethod = cartData.cartData['cart']['available_payment_methods'][index];
-                    return InkWell(
-                      splashColor: Colors.transparent,
-                      onTap: () async {
-                        // Clipboard.setData(ClipboardData(text: jsonEncode(cartData.cartData)));
-                        setState(() => paymentCode = paymentMethod['code']);
-                        Map<String, dynamic> mutationParams = {
-                          'cartId': cartData.cartId,
-                          'paymentMethod': {'code': paymentCode}
-                        };
-                        if (paymentCode == "braintree") {
-                          brainTreeToken = await createBraintreeToken();
-                          mutationParams["paymentMethod"] = {
-                            'code': paymentCode,
-                            "braintree": {"payment_method_nonce": brainTreeToken, "is_active_payment_token_enabler": false}
-                          };
-                        }
-                        runMutation(mutationParams);
-
-                        // setState(() {});
-                      },
-                      child: Container(
-                        width: size.width * 0.35,
-                        height: size.width * 0.2,
-                        constraints: const BoxConstraints(maxWidth: 200, maxHeight: 100),
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffffffff),
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(width: 2.0, color: paymentCode == paymentMethod['code'] ? const Color(0xff31aca0) : AppColors.evenFadedText),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x03000000),
-                              offset: Offset(0, 30),
-                              blurRadius: 50,
-                            ),
-                          ],
-                        ),
-                        // child: Image.asset('assets/images/${cardUrls[index]}'),
-                        child: mutationResult!.isLoading && paymentCode == paymentMethod['code']
-                            ? BuildLoadingWidget(color: AppColors.primaryColor)
-                            : Center(
-                                child: Text(
-                                  paymentMethod['title'],
-                                  textAlign: TextAlign.center,
-                                  style: AppStyles.getMediumTextStyle(fontSize: 14),
                                 ),
-                              ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
   }
 
+// Create braintree token
   Future<String?> createBraintreeToken() async {
     var graphqlClient = GraphQLProvider.of(context);
     var data = await graphqlClient.value.mutate(MutationOptions(document: gql(PaymentServices.createBraintreeClientToken)));
@@ -438,6 +437,8 @@ class _CartPaymentState extends State<CartPayment> {
     }
 
     var token = data.data?['createBraintreeClientToken'];
+
+    // Process the token into BraintreeDropInRequest
     final request = BraintreeDropInRequest(
       clientToken: token,
       amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
@@ -447,10 +448,10 @@ class _CartPaymentState extends State<CartPayment> {
         currencyCode: cartData.cartData['cart']['prices']['grand_total']['currency'].toString(),
         billingAddressRequired: false,
       ),
-      paypalRequest: BraintreePayPalRequest(
-        amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
-        displayName: 'Vegam',
-      ),
+      // paypalRequest: BraintreePayPalRequest(
+      //   amount: cartData.cartData['cart']['prices']['grand_total']['value'].toString(),
+      //   displayName: 'Vegam',
+      // ),
     );
 
     BraintreeDropInResult? result = await BraintreeDropIn.start(request);
@@ -481,14 +482,12 @@ class _CartPaymentState extends State<CartPayment> {
 
       var options = {
         //test
+        // Insert your key here
         'key': 'rzp_test_kviuSU4uhhoBlr',
-        // live
-        // 'key': 'rzp_live_1LicnHl9VVn03e',
         // "description": storeConfig.storeData.storeConfig?.defaultDescription ?? "",
         'amount': amount.floor(), //in the smallest currency sub-unit.
         'name': 'Vegam',
         'order_id': orderId,
-        // 'order': {"order_id": data['placeRazorpayOrder']['rzp_order_id']},
         // Generate order_id using Orders API
         // 'description': 'Fine T-Shirt',
         'timeout': 300, // in seconds

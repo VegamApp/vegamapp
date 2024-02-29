@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -24,9 +23,14 @@ class CartView extends StatefulWidget {
 }
 
 class _CartViewState extends State<CartView> {
+  // To show numbers in a formated view
   var f = NumberFormat("#,##,##,##0.00", "en_IN");
+
   ScrollController scrollController = ScrollController();
+
+  // Package imported
   final deboucer = Debouncer(milliseconds: 500);
+
   late CartData cartData;
   late AuthToken token;
 
@@ -43,6 +47,7 @@ class _CartViewState extends State<CartView> {
     super.initState();
   }
 
+  // Refetch cart or get a new cart on cart exception
   functionOnException(Function()? refetch) async {
     await cartData.getCartData(context, token);
     refetch!();
@@ -65,7 +70,6 @@ class _CartViewState extends State<CartView> {
     final size = MediaQuery.of(context).size;
     cartData = Provider.of<CartData>(context);
     token = Provider.of<AuthToken>(context);
-    // log(jsonEncode(cartData.cartData));
     return BuildScaffold(
       currentIndex: 2,
       child: LayoutBuilder(builder: (context, constraints) {

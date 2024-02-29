@@ -16,13 +16,13 @@ import 'package:m2/utilities/widgets/widgets.dart';
 
 class CartSummaryWidget extends StatefulWidget {
   const CartSummaryWidget({
-    Key? key,
+    super.key,
     this.estimatedDelivery,
     this.onButtonTap,
     required this.buttonText,
     this.isLoading = false,
     required this.refetch,
-  }) : super(key: key);
+  });
   final int? estimatedDelivery;
   final void Function()? onButtonTap;
   final String buttonText;
@@ -138,7 +138,7 @@ class _CartSummaryWidgetState extends State<CartSummaryWidget> {
                   Mutation(
                       options: MutationOptions(
                         onCompleted: (data) async {
-                          print('${data}');
+                          print('$data');
                           if (data != null) {
                             // setState(() {
                             //   isAppliedCoupon = !isAppliedCoupon;

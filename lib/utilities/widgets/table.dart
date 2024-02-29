@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 // Show orders and product in a table
 
 class BuildTableWidget extends StatelessWidget {
-  const BuildTableWidget({Key? key, required this.size, required this.headers, required this.cells, this.onTap, this.urls, this.id}) : super(key: key);
+  const BuildTableWidget({super.key, required this.size, required this.headers, required this.cells, this.onTap, this.urls, this.id});
   final List<String> headers; // Table headers
   final List<Map<String, dynamic>> cells; // Table cells
   final List<String>? urls; // on click divert to the url

@@ -9,6 +9,7 @@ import '../services/app_responsive.dart';
 import '../utilities/utilities.dart';
 import '../utilities/widgets/widgets.dart';
 
+// CMS page contact
 class ContactView extends StatefulWidget {
   const ContactView({super.key});
   static String route = 'contact';
@@ -21,12 +22,17 @@ class _ContactViewState extends State<ContactView> {
   List<String> phoneNo = [];
   List<String> email = [];
 
+  // Read from the assets/src/contact_info.json file
   Future<void> readJson() async {
     final String response = await rootBundle.loadString('assets/src/contact_info.json');
     final data = await json.decode(response);
     // addresses = data['address_lines'].map((e) => e.toString()).toList();
+
+    // Address lines
     addresses = List<String>.generate(data['address_lines'].length, (index) => data['address_lines'][index]);
+    // Phone numbers
     phoneNo = List<String>.generate(data['phone_no'].length, (index) => data['phone_no'][index]);
+    // Emails
     email = List<String>.generate(data['email'].length, (index) => data['email'][index]);
     setState(() {});
   }
@@ -74,45 +80,10 @@ class _ContactViewState extends State<ContactView> {
             ),
           ),
           const SizedBox(height: 20),
-          // Query(
-          //     options: QueryOptions(document: gql(ApiServices.getCmsInfo), variables: const {'id': 'contact-us-info'}),
-          //     builder: (QueryResult result, {VoidCallback? refetch, FetchMore? fetchMore}) {
-          //       if (result.isLoading) {
-          //         return Container(
-          //             alignment: Alignment.center,
-          //             height: 200,
-          //             child: CircularProgressIndicator(
-          //               color: AppColors.buttonColor,
-          //             ));
-          //       }
-          //       print(result);
-          //       if (result.data == null) {
-          //         return Container(
-          //             alignment: Alignment.center,
-          //             height: 200,
-          //             child: Text('An error occured, Please try again', style: AppStyles.getRegularTextStyle(fontSize: 16, color: AppColors.fadedText)));
-          //       }
-          //       print(result.data!['cmsBlocks']['items'][0]['content']);
-          // return
+
           AppResponsive(
               mobile: Column(
                 children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  //   child: HtmlWidget(
-                  //     result.data!['cmsBlocks']['items'][0]['content'],
-                  //     customStylesBuilder: (element) {
-                  //       if (element.className.contains('box-title')) {
-                  //         return {'color': '#000000'};
-                  //       }
-                  //       if (element.className.contains('block-title')) {
-                  //         return {'color': '#0E887C'};
-                  //       }
-                  //       return null;
-                  //     },
-                  //     textStyle: AppStyles.getExtraLightTextStyle(fontSize: 15, color: AppColors.fadedText),
-                  //   ),
-                  // ),
                   const SizedBox(height: 20),
                   BuildContact(title: 'Phone', icon: FontAwesomeIcons.phone, details: phoneNo),
                   const SizedBox(height: 20),
@@ -130,20 +101,6 @@ class _ContactViewState extends State<ContactView> {
                   constraints: const BoxConstraints(maxWidth: 800),
                   child: Column(
                     children: [
-                      // HtmlWidget(
-                      //   result.data!['cmsBlocks']['items'][0]['content'],
-                      //   textStyle: AppStyles.getExtraLightTextStyle(fontSize: 15, color: AppColors.fadedText),
-                      //   customStylesBuilder: (element) {
-                      //     if (element.className.contains('box-title')) {
-                      //       return {'color': '#000000'};
-                      //     }
-                      //     if (element.className.contains('block-title')) {
-                      //       return {'color': '#0E887C', 'padding': '10px 0'};
-                      //     }
-                      //     return null;
-                      //   },
-                      // ),
-                      // const SizedBox(height: 50),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,28 +115,9 @@ class _ContactViewState extends State<ContactView> {
                     ],
                   ),
                 ),
-              ))
-          //       ;
-          // })
-          ,
+              )),
           const SizedBox(height: 50),
           // const BuildContactMessage(),
-          // const SizedBox(height: 50),
-          // Center(child: Text('Connect with us', style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.buttonColor))),
-          // const SizedBox(height: 15),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   mainAxisSize: MainAxisSize.min,
-          //   children: [
-          //     FaIcon(FontAwesomeIcons.linkedinIn, color: AppColors.primaryColor, size: 15),
-          //     const SizedBox(width: 25),
-          //     FaIcon(FontAwesomeIcons.facebookF, color: AppColors.primaryColor, size: 12.5),
-          //     const SizedBox(width: 25),
-          //     FaIcon(FontAwesomeIcons.twitter, color: AppColors.primaryColor, size: 15),
-          //     const SizedBox(width: 25),
-          //     FaIcon(FontAwesomeIcons.youtube, color: AppColors.primaryColor, size: 15),
-          //   ],
-          // ),
           // const SizedBox(height: 50),
         ],
       ),
@@ -188,7 +126,7 @@ class _ContactViewState extends State<ContactView> {
 }
 
 class BuildContact extends StatelessWidget {
-  const BuildContact({Key? key, required this.title, required this.icon, required this.details}) : super(key: key);
+  const BuildContact({super.key, required this.title, required this.icon, required this.details});
   final String title;
   final IconData icon;
   final List<String> details;
@@ -219,8 +157,9 @@ class BuildContact extends StatelessWidget {
   }
 }
 
+// User form (Note: Only if extension is activated in magento)
 class BuildContactMessage extends StatefulWidget {
-  const BuildContactMessage({Key? key}) : super(key: key);
+  const BuildContactMessage({super.key});
 
   @override
   State<BuildContactMessage> createState() => BuildContacttMessageState();

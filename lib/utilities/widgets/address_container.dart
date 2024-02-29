@@ -7,7 +7,7 @@ import 'package:m2/services/models/user.dart';
 import 'package:m2/utilities/utilities.dart';
 
 class BuildAddressContainer extends StatefulWidget {
-  const BuildAddressContainer({Key? key, required this.addressModel, required this.size, this.fromCart = false, this.onRemove, this.onEdit}) : super(key: key);
+  const BuildAddressContainer({super.key, required this.addressModel, required this.size, this.fromCart = false, this.onRemove, this.onEdit});
   final Addresses addressModel;
   final Size size;
   final bool fromCart;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:m2/services/state_management/wishlist/wishlist_dart.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,24 +23,28 @@ import 'utilities/app_style.dart';
 void main() async {
   await initHiveForFlutter();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // To store token even when app closed
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? key = sharedPreferences.getString('token');
   String? cart = sharedPreferences.getString('cartId');
 
   runApp(
     MultiProvider(providers: [
+      // Initializing state management models
       Provider<AuthToken>(create: (context) => AuthToken(key)),
       Provider<CartData>(create: (context) => CartData(cart)),
       Provider<CategoriesData>(create: (context) => CategoriesData()),
       Provider<HomeData>(create: (context) => HomeData()),
       Provider<UserData>(create: (context) => UserData()),
       Provider<CacheManager>(create: (context) => CacheManager()),
+      Provider<WishlistData>(create: (context) => WishlistData()),
     ], child: MyApp(token: key, cartId: cart)),
   );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, this.signIn = false, this.token, this.cartId}) : super(key: key);
+  const MyApp({super.key, this.signIn = false, this.token, this.cartId});
   final bool signIn;
   final String? token;
   final String? cartId;
@@ -51,7 +56,6 @@ class _MyAppState extends State<MyApp> {
   getToken() {
     final loginToken = Provider.of<AuthToken>(context, listen: false);
     final cartData = Provider.of<CartData>(context, listen: false);
-
     loginToken.putLoginToken(widget.token);
     cartData.putCartId(widget.cartId);
   }
@@ -67,14 +71,12 @@ class _MyAppState extends State<MyApp> {
     return Observer(builder: (_) {
       Link link;
       final loginToken = Provider.of<AuthToken>(context);
-      // final cartData = Provider.of<CartData>(context);
-      // getToken(loginToken, cartData);
 
+      // Initialising graphql
       final HttpLink httpLink = HttpLink(ApiServices.path, defaultHeaders: {'Content-Type': 'application/json'});
 
       if (loginToken.loginToken != null) {
         print('auth key initiated');
-        // print(loginToken.loginToken);
         final AuthLink authLink = AuthLink(
           getToken: () => 'Bearer ${loginToken.loginToken}',
         );

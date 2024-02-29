@@ -313,9 +313,6 @@ class ProductApi {
       name
       sku
       url_key
-      wishlistData{
-        wishlistItem
-      }
       url_suffix
       image{
         url
@@ -332,9 +329,9 @@ class ProductApi {
       ... on PhysicalProductInterface{
         weight
       }
-       wishlistData{
-         wishlistItem
-       }
+      # wishlistData{
+      #   wishlistItem
+      # }
       description {
         html
       }

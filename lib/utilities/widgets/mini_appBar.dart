@@ -6,7 +6,7 @@ import 'package:m2/views/product_views/product_view.dart';
 
 // Build a bar within a product display page to show various navigators
 class MiniAppBar extends StatelessWidget {
-  const MiniAppBar({Key? key, required this.screenWidth, required this.navigationChild, this.showActions = true}) : super(key: key);
+  const MiniAppBar({super.key, required this.screenWidth, required this.navigationChild, this.showActions = true});
   final double screenWidth;
   final List navigationChild;
   final bool showActions;

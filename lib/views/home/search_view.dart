@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/services/api_services/api_services.dart';
-import 'package:m2/services/api_services/product_apis.dart';
 import 'package:m2/services/search_services.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/scaffold_body.dart';
 import 'package:m2/views/product_views/product_view.dart';
 
 class SearchView extends StatefulWidget {
-  const SearchView({Key? key}) : super(key: key);
+  const SearchView({super.key});
   static String route = 'search';
   @override
   State<SearchView> createState() => _SearchViewState();

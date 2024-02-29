@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -18,6 +16,7 @@ class CmsView extends StatefulWidget {
   State<CmsView> createState() => _CmsViewState();
 }
 
+// CMS pages with the passed id from line no: 14
 class _CmsViewState extends State<CmsView> {
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,6 @@ class _CmsViewState extends State<CmsView> {
                   desktop: Center(
                     child: Column(
                       children: [
-                        // _getTopContainer(size),
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 800),
                           child: Column(
@@ -65,8 +63,8 @@ class _CmsViewState extends State<CmsView> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(flex: 3, child: _getOurStory(result.data!['cmsPage']['title'])),
-                                  Expanded(flex: 7, child: getOurStoryDetails(result.data!['cmsPage']['content'])),
+                                  Expanded(flex: 3, child: _getHeading(result.data!['cmsPage']['title'])),
+                                  Expanded(flex: 7, child: _getBody(result.data!['cmsPage']['content'])),
                                 ],
                               ),
                             ],
@@ -84,10 +82,10 @@ class _CmsViewState extends State<CmsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _getOurStory(result.data!['cmsPage']['title']),
+          _getHeading(result.data!['cmsPage']['title']),
           const SizedBox(height: 15),
           Flexible(
-            child: getOurStoryDetails(result.data!['cmsPage']['content']),
+            child: _getBody(result.data!['cmsPage']['content']),
           ),
           // const SizedBox(height: 30),
         ],
@@ -95,10 +93,8 @@ class _CmsViewState extends State<CmsView> {
     );
   }
 
-  getOurStoryDetails(String details) {
-    // return Text(ourStory, style: getExtraLightTextStyle(fontSize: 15, color: AppColors.fadedText));
-    // return HtmlWidget(details, textStyle: AppStyles.getExtraLightTextStyle(fontSize: 15, color: AppColors.fadedText));
-
+  _getBody(String details) {
+    // Initialize web view controller with the content
     var controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color.fromARGB(0, 255, 255, 255))
@@ -109,37 +105,5 @@ class _CmsViewState extends State<CmsView> {
     );
   }
 
-  Text _getOurStory(String title) => Text(title, style: AppStyles.getLightTextStyle(fontSize: 25, color: AppColors.fadedText));
-
-  // Container _getTopContainer(Size size) {
-  //   return Container(
-  //     width: size.width,
-  //     height: size.width * 0.4,
-  //     constraints: const BoxConstraints(maxHeight: 500),
-  //     padding: EdgeInsets.all(size.width * 0.05),
-  //     decoration: BoxDecoration(
-  //       image: DecorationImage(
-  //         image: const AssetImage(
-  //           'assets/images/build2.png',
-  //         ),
-  //         fit: BoxFit.cover,
-  //         colorFilter: ColorFilter.mode(AppColors.buttonColor, BlendMode.softLight),
-  //       ),
-  //     ),
-  //     child: Align(
-  //       alignment: Alignment.centerLeft,
-  //       child: Text.rich(
-  //         TextSpan(
-  //           children: [
-  //             TextSpan(
-  //               text: 'About Us\n',
-  //               style: AppStyles.getRegularTextStyle(fontSize: 18, color: Colors.white),
-  //             ),
-  //             TextSpan(text: aboutUs, style: getLightTextStyle(fontSize: 18, color: Colors.white)),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Text _getHeading(String title) => Text(title, style: AppStyles.getLightTextStyle(fontSize: 25, color: AppColors.fadedText));
 }

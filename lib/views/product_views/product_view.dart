@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:m2/services/models/product_model.dart' show ProductModel, Items;
 import 'package:m2/utilities/utilities.dart';
 import 'package:m2/utilities/widgets/widgets.dart';
 import 'package:m2/views/product_views/product_description_view.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ProductView extends StatefulWidget {
   const ProductView({super.key, this.urlKey, this.categoryId, this.categoryUid, this.viewAll = false, this.searchQuery});
@@ -24,20 +22,34 @@ class ProductView extends StatefulWidget {
 }
 
 class _ProductViewState extends State<ProductView> {
+  // Query string used in the listing/detail page api
   late String queryString;
 
-  final Map<String, dynamic> variables = {};
+  // final filter in query
   final Map<String, dynamic> filter = {};
+
+  // Variables used to filter results
+  final Map<String, dynamic> variables = {};
+
+  // filter keys to use in ui
   final Map<String, String?> filterKeys = {'category_uid': null, 'price': null};
 
+  // Product model includes all products, pages and aggregations.
   ProductModel productModel = ProductModel();
+
+  // All product items
   List<Items> items = <Items>[];
 
+  // Filter is implemented in a DraggableScrollableSheet. This is the controller for the same.
   DraggableScrollableController dController = DraggableScrollableController();
+
+  // Used for pagination
   FetchMoreOptions? opts;
   FetchMore? fetchMore;
 
+  // Scroll controller for product scroll view.
   final ScrollController _scrollController = ScrollController();
+  // Scroll controller for filter scroll view.
   final ScrollController _filterScrollController = ScrollController();
 
   int page = 1;
@@ -49,19 +61,16 @@ class _ProductViewState extends State<ProductView> {
   @override
   void initState() {
     super.initState();
-    dController.addListener(() {
-      if (dController.isAttached && variables.isEmpty) {
-        dController.reset();
-      }
-      log('dController.pixels ${dController.pixels}');
-      setState(() {});
-      dController.removeListener(() {});
-    });
+
+    // initializing variables with 20 products.
     variables.addAll({
       'pageSize': 20,
       'page': page,
     });
+
     getQueryString();
+
+    // For pagination. Listens to scroll controller to check whether the list is at the bottom.
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= (_scrollController.position.maxScrollExtent - 1200) && page <= totalPages && !isLoading) {
         page++;
@@ -73,7 +82,8 @@ class _ProductViewState extends State<ProductView> {
   getQueryString() {
     filterKeys.clear();
     variables.clear();
-    print(widget.searchQuery);
+
+    // If view all query needs to be called
     if (widget.viewAll == true) {
       queryString = ProductApi.viewAllProduct;
       variables.addAll({"pageSize": 20, "page": 1, "id": widget.categoryId});
@@ -85,20 +95,22 @@ class _ProductViewState extends State<ProductView> {
         'pageSize': 20,
         'page': 1,
       });
+
       if (widget.searchQuery != null) {
-        print('classicSearch');
+        // classicSearch
         variables.addAll({'searchQuery': widget.searchQuery});
       } else if (widget.categoryId != null) {
-        print('id');
+        // categoryId list
         variables['filter'] = {
           'category_id': {'eq': widget.categoryId}
         };
       } else if (widget.urlKey != null) {
+        // url_key list
         variables['filter'] = {
           'url_key': {'eq': widget.urlKey!.split('.')[0]}
         };
       } else {
-        print('uid');
+        // category_uid list
         variables['filter'] = {
           'category_uid': {'eq': widget.categoryUid}
         };
@@ -128,6 +140,7 @@ class _ProductViewState extends State<ProductView> {
           // WidgetsBinding.instance.addPostFrameCallback((_) => setState(() => isLoading = result.isLoading));
 
           if ((result.isLoading && result.data == null) || isLoading) {
+            // Return loading widget
             return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -136,9 +149,10 @@ class _ProductViewState extends State<ProductView> {
               body: const BuildLoadingWidget(),
             );
           }
-          // log(result.data.toString());
+
           if (result.hasException) {
-            log(result.exception.toString());
+            // return expection widget
+
             return Scaffold(
               key: key,
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -151,6 +165,7 @@ class _ProductViewState extends State<ProductView> {
             );
           }
           if ((widget.viewAll != true && result.data!['products']['items'].isEmpty) || (widget.viewAll == true && result.data!['viewallProducts']['products'].isEmpty)) {
+            // return no product widget
             return Scaffold(
                 key: key,
                 appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -159,9 +174,9 @@ class _ProductViewState extends State<ProductView> {
                 body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
           }
 
-          // log(jsonEncode(result.data));
           if (((widget.viewAll != true && result.data!['products']['items'].length == 1) || (widget.viewAll == true && result.data!['viewallProducts']['products'].length == 1)) &&
               widget.urlKey != null) {
+            // return product description view
             return Scaffold(
                 key: key,
                 appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
@@ -172,10 +187,6 @@ class _ProductViewState extends State<ProductView> {
           widget.viewAll != true
               ? productModel = ProductModel.fromJson(result.data!['products'])
               : items = (result.data!['viewallProducts']['products'] as List<dynamic>).map((item) => Items.fromJson(item)).toList();
-          // log(jsonEncode(result.data));
-          // print(productModel.pageInfo!.toJson());
-          // page = productModel.pageInfo!.currentPage!;
-          // totalPages = productModel.pageInfo!.totalPages!;
           if (widget.viewAll != true) {
             final Map pageInfo = result.data!['products']['page_info'];
             page = pageInfo['current_page'];
@@ -183,14 +194,8 @@ class _ProductViewState extends State<ProductView> {
           } else {
             totalPages = (result.data!['viewallProducts']['total_count'] / 20).ceil();
           }
-          print('totalPages $totalPages');
-          print('page $page');
-
-          // if (result.isConcrete) {
-          //   isLoading = false;
-          // }
-
           this.fetchMore = fetchMore;
+          // Initializing fetch more for pagination
           opts = FetchMoreOptions(
             document: gql(queryString),
             variables: {'page': ++page},
@@ -209,9 +214,7 @@ class _ProductViewState extends State<ProductView> {
               return fetchMoreResultData;
             },
           );
-          if (dController.isAttached) {
-            log("pixels: ${dController.pixels}");
-          }
+
           return WillPopScope(
             onWillPop: () async {
               // //print(dController.size);
@@ -226,8 +229,9 @@ class _ProductViewState extends State<ProductView> {
               appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 160),
               endDrawer: DrawerContainer(size: size),
               bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
-              floatingActionButton: AppResponsive.isDesktop(context) || widget.viewAll
+              floatingActionButton: AppResponsive.isDesktop(context) || widget.viewAll // Show close button or filter button for filter
                   ? null
+                  // show filter button
                   : dController.isAttached && dController.size <= 0.1
                       ? FloatingActionButton.extended(
                           onPressed: () async {
@@ -238,7 +242,9 @@ class _ProductViewState extends State<ProductView> {
                           isExtended: true,
                           label: Text('Filters', style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.scaffoldColor)),
                         )
-                      : FloatingActionButton(
+                      :
+                      // Show close button
+                      FloatingActionButton(
                           onPressed: () async {
                             await dController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
                             setState(() {});
@@ -249,6 +255,7 @@ class _ProductViewState extends State<ProductView> {
                         ),
               body: Row(
                 children: [
+                  // shows filter on left as a list if tab
                   if (AppResponsive.isDesktop(context))
                     Container(
                       padding: const EdgeInsets.only(left: 20),
@@ -268,6 +275,7 @@ class _ProductViewState extends State<ProductView> {
                               // crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 20),
+                                // If search query is not null, show search for text
                                 widget.searchQuery != null
                                     ? Text('Search result for "${widget.searchQuery}"', style: AppStyles.getMediumTextStyle(fontSize: 16, color: AppColors.fadedText))
                                     : MiniAppBar(
@@ -280,15 +288,13 @@ class _ProductViewState extends State<ProductView> {
                                   itemCount: productModel.items?.length ?? items.length,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
+                                  // If mobile show 2 grids, else show according to screen size
                                   gridDelegate: size.width < 500
                                       ? SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 2,
-                                          // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
                                           crossAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
                                           mainAxisSpacing: constraints.maxWidth < 800 ? 10 : 40,
-                                          mainAxisExtent: size.width * 0.8
-                                          // height: getGridViewHeight(constraints.maxWidth),
-                                          )
+                                          mainAxisExtent: size.width * 0.8)
                                       : SliverGridDelegateWithMaxCrossAxisExtent(
                                           maxCrossAxisExtent: 300,
                                           // crossAxisCount: constraints.maxWidth < 600 ? 2 : (constraints.maxWidth / 280).floor(),
@@ -307,6 +313,7 @@ class _ProductViewState extends State<ProductView> {
                                     var offer = productModel.items == null
                                         ? items[index].priceRange!.maximumPrice!.discount!.percentOff
                                         : productModel.items![index].priceRange!.maximumPrice!.discount!.percentOff;
+
                                     return ProductItem(
                                       productModel: productModel.items?[index] ?? items[index],
                                       price: price,
@@ -322,6 +329,7 @@ class _ProductViewState extends State<ProductView> {
                               ],
                             ),
                             if (productModel.aggregations != null && productModel.aggregations!.isNotEmpty)
+                              // Filter view
                               DraggableScrollableActuator(
                                 child: DraggableScrollableSheet(
                                   controller: dController,
@@ -348,36 +356,17 @@ class _ProductViewState extends State<ProductView> {
     );
   }
 
-  getGridViewHeight(double width) {
-    print(width);
-    // if (width > 500) return 400.0;
-    // if (width > 450) return width * 0.9;
-    // if (width > 400) return width;
-    // if (width > 350) return width * 1.05;
-    // if (width > 300) return width * 1.1;
-    // if (width > 250) return width * 1.2;
-    // return width * 1.3;
-    return 400.0;
-  }
-
+  // get Filter widget according to data provided
   getFilter(Size size, QueryResult result, VoidCallback? refetch, {ScrollController? scrollController}) {
-    // //print(jsonEncode(result.data));
     if (result.data!['products']['aggregations'] == null || result.data!['products']['aggregations'].isEmpty) {
       return Center(
         child: Text('No filters available', style: AppStyles.getRegularTextStyle(fontSize: 13)),
       );
     }
     return StatefulBuilder(builder: (context, setState) {
-      // //print(dController.pixels);
       return Container(
         decoration: BoxDecoration(
           color: AppColors.scaffoldColor,
-          // gradient: LinearGradient(
-          // colors: const [Colors.transparent, Colors.white],
-          //   begin: Alignment.topCenter,
-          //   end: Alignment.bottomCenter,
-          //   stops: dController.isAttached ? [dController.pixels > 100 ? 0.3 : 0.7, dController.pixels > 100 ? 0.3 : 0.7] : [0.3, 0.7],
-          // ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
@@ -390,6 +379,7 @@ class _ProductViewState extends State<ProductView> {
                 const SizedBox(height: 20),
                 Text('Filters', style: AppStyles.getRegularTextStyle(fontSize: 18, color: AppColors.fontColor)),
                 const SizedBox(height: 20),
+                // Generates widget accoriding to no of data in products->aggregations
                 Container(
                   color: Colors.white,
                   child: ListView.builder(
@@ -420,16 +410,12 @@ class _ProductViewState extends State<ProductView> {
                             shape: StadiumBorder(side: BorderSide(color: AppColors.fadedText)),
                           ),
                           onPressed: () {
+                            // clear all filter data and fetch the products
                             getQueryString();
-                            // isLoading = true;
-                            //print(variables);
                             refetch!();
                             try {
                               dController.reset();
                             } catch (e) {}
-
-                            // Navigator.pop(context);
-                            // clearFilter(result);
                           },
                           child: Text(
                             'Clear',
@@ -443,16 +429,9 @@ class _ProductViewState extends State<ProductView> {
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                             backgroundColor: AppColors.primaryColor,
                             shape: const StadiumBorder(),
-                            // fixedSize: Size(size.width * 0.4, 50),
-                            // maximumSize: const Size(150, 50),
                           ),
                           onPressed: () {
-                            //print(variables);
-
-                            // queryString = ProductQueries.filterProduct(filterAttribute: filteringAttributes.toString());
-                            // Navigator.pop(context);
-                            print(filter);
-                            // isLoading = true;
+                            // Apply filter data and reload products
                             refetch!();
                             try {
                               dController.reset();
@@ -475,12 +454,14 @@ class _ProductViewState extends State<ProductView> {
     });
   }
 
+// Get type of filter widget according to attribute_code
   getFilterWiget(var data, Size size) {
     return StatefulBuilder(builder: (context, setState) {
       if (data['attribute_code'] == 'price' && data['options'].length > 1) {
+        // get price slider
         return getPriceSlider(data);
       }
-      //print(filter);
+      // get all other filter widgets
       return ExpansionTile(
           initiallyExpanded: false,
           // tilePadding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -508,88 +489,76 @@ class _ProductViewState extends State<ProductView> {
               ],
             ),
           ),
+          // Generate radio buttons from children of the current attribute
           children: List.generate(
             data['options'].length,
-            (index) => data['attribute_code'] != 'category_uid' && data['attribute_code'] != 'category_id'
-                ? RadioListTile<String>(
-                    contentPadding: EdgeInsets.zero,
-                    value: data['options'][index]['value'].toString(),
-                    groupValue: filterKeys[data['attribute_code']],
-                    onChanged: (value) {
-                      // log(jsonEncode(data));
+            (index) =>
+                // If attribute_code != 'category_uid' or 'category_id' show normal radio button
+                data['attribute_code'] != 'category_uid' && data['attribute_code'] != 'category_id'
+                    ? RadioListTile<String>(
+                        contentPadding: EdgeInsets.zero,
+                        value: data['options'][index]['value'].toString(),
+                        groupValue: filterKeys[data['attribute_code']],
+                        onChanged: (value) {
+                          filter[data['attribute_code']] = {'eq': data['options'][index]['value']};
+                          variables['filter'] = filter;
+                          filterKeys[data['attribute_code']] = data['options'][index]['value'];
 
-                      //print(data['attribute_code']);
-                      //print(filter);
-                      // filter.clear();
-                      filter[data['attribute_code']] = {'eq': data['options'][index]['value']};
-                      variables['filter'] = filter;
-                      filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                      //print('variables $variables');
+                          setState(() {});
+                        },
+                        title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
+                      )
+                    :
+                    // else show special list with check option
+                    ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: SizedBox(height: 30, width: 30, child: Image.asset('assets/images/categoryicon.png')),
+                        trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']] ? Icon(Icons.check, color: AppColors.primaryColor) : null,
+                        // value: data['options'][index]['value'].toString(),
+                        // groupValue: filterKeys[data['attribute_code']],
+                        onTap: () {
+                          if (data['attribute_code'] == 'category_uid') {
+                            if (variables['filter']['category_uid'] != null) {
+                              variables['filter'].remove('category_uid');
+                            }
+                            filter.addAll({
+                              'category_uid': {'eq': data['options'][index]['value']}
+                            });
+                            variables['filter'] = filter;
+                            try {
+                              variables['filter'].remove("category_id");
+                            } catch (e) {
+                              //print(e);
+                            }
+                            filterKeys[data['attribute_code']] = data['options'][index]['value'];
+                            //print(variables);
+                            queryString = ProductApi.products;
+                          } else {
+                            if (variables['filter']['category_id'] != null) {
+                              variables['filter'].remove('category_id');
+                            }
+                            filter.addAll({
+                              'category_id': {'eq': data['options'][index]['value']}
+                            });
+                            try {
+                              variables['filter'].remove("category_uid");
+                            } catch (e) {}
+                            variables['filter'] = filter;
+                            filterKeys[data['attribute_code']] = data['options'][index]['value'];
+                            queryString = ProductApi.products;
+                          }
 
-                      //print(variables);
-                      setState(() {});
-                    },
-                    title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
-                  )
-                : ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: SizedBox(height: 30, width: 30, child: Image.asset('assets/images/categoryicon.png')),
-                    trailing: data['options'][index]['value'].toString() == filterKeys[data['attribute_code']] ? Icon(Icons.check, color: AppColors.primaryColor) : null,
-                    // value: data['options'][index]['value'].toString(),
-                    // groupValue: filterKeys[data['attribute_code']],
-                    onTap: () {
-                      //print(data);
-                      if (data['attribute_code'] == 'category_uid') {
-                        if (variables['filter']['category_uid'] != null) {
-                          variables['filter'].remove('category_uid');
-                        }
-                        filter.addAll({
-                          'category_uid': {'eq': data['options'][index]['value']}
-                        });
-                        variables['filter'] = filter;
-                        try {
-                          variables['filter'].remove("category_id");
-                        } catch (e) {
-                          //print(e);
-                        }
-                        filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                        //print(variables);
-                        queryString = ProductApi.products;
-                      } else {
-                        if (variables['filter']['category_id'] != null) {
-                          variables['filter'].remove('category_id');
-                        }
-                        filter.addAll({
-                          'category_id': {'eq': data['options'][index]['value']}
-                        });
-                        try {
-                          variables['filter'].remove("category_uid");
-                        } catch (e) {
-                          //print(e);
-                        }
-                        variables['filter'] = filter;
-                        filterKeys[data['attribute_code']] = data['options'][index]['value'];
-                        //print(variables);
-                        queryString = ProductApi.products;
-                      }
-
-                      //print(variables);
-                      setState(() {});
-                    },
-                    title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
-                  ),
+                          setState(() {});
+                        },
+                        title: Text(data['options'][index]['label'], style: AppStyles.getRegularTextStyle(fontSize: 12)),
+                      ),
           ));
     });
-    // } catch (e) {
-    //   //print(e);
-    //   return const SizedBox();
-    // }
-    // }
   }
 
   RangeValues? rangeValues;
   getPriceSlider(var data) {
-    // //print(jsonEncode(data));
+    // make rangevalues according to min and max data
     if (rangeValues == null ||
         rangeValues != RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]))) {
       rangeValues = RangeValues(double.parse(data['options'][0]['value'].split('_')[0]), double.parse(data['options'][data['options'].length - 1]['value'].split('_')[1]));
@@ -624,10 +593,10 @@ class _ProductViewState extends State<ProductView> {
               filter.addAll(Map<String, dynamic>.from(variables['filter']));
 
               variables['filter'] = filter;
-              // //print(variables);
             },
           ),
           const SizedBox(height: 10),
+          // show min and max price from the slider
           Text(
             'Price: $currency${rangeValues!.start.round()} - $currency${rangeValues!.end.round()}',
             style: AppStyles.getRegularTextStyle(fontSize: 14, isCurrency: true),

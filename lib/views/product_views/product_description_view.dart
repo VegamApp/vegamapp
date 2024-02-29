@@ -16,21 +16,33 @@ class ProductDescription extends StatefulWidget {
 }
 
 class _ProductDescriptionState extends State<ProductDescription> {
+  // generate product model from the get api
   late ProductModel productModel;
+
+  // show price
   String price = '';
+
+  // show original price. If special price is available, this price is crossed off
   String? originalPrice;
+  // if not null show %
   double? offer;
+
+  // for initial media gallery
   List<Map<String, dynamic>> originalMedia = [];
+
+  // if configurable, show media gallery of selected product
   List<Map<String, dynamic>> mediaGallery = [];
   @override
   void initState() {
+    // Initialize product model
     productModel = ProductModel.fromJson(widget.data['products']);
+
     originalMedia = List<Map<String, dynamic>>.from(widget.data['products']['items'][0]['media_gallery']);
     mediaGallery = originalMedia;
     if (productModel.items![0].variants != null && productModel.items![0].variants!.isNotEmpty) {
       mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
     }
-    log(jsonEncode(widget.data));
+
     price = productModel.items![0].specialPrice ?? productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff;
@@ -47,20 +59,24 @@ class _ProductDescriptionState extends State<ProductDescription> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       children: [
+        // Show mini app bar with categories
         MiniAppBar(screenWidth: size.width, navigationChild: widget.data['products']['items'][0]['categories']),
         const SizedBox(height: 10),
+        // Show media widget
         ProductMediaContainer(width: size.width, data: mediaGallery),
         const SizedBox(height: 30),
+        // Name
         Text(
           "${productModel.items?[0].name}",
           style: AppStyles.getMediumTextStyle(fontSize: 22, color: AppColors.fontColor),
         ),
         const SizedBox(height: 10),
+        // show rating
         BuildRating(
           rating: productModel.items?[0].ratingSummary,
           noOfReviews: productModel.items?[0].reviewCount,
         ),
-        // const SizedBox(height: 30),
+        // Show price
         BuildPriceWithOffer(
           price: price,
           currency: currency,
@@ -73,18 +89,21 @@ class _ProductDescriptionState extends State<ProductDescription> {
         const SizedBox(height: 30),
         Divider(height: 1, color: AppColors.dividerColor),
         const SizedBox(height: 20),
-        if (productModel.items![0].sTypename == 'ConfigurableProduct')
-          ProductVarientWidget(
-            productModel: productModel,
-            onUpdated: (newMedia) {
-              if (newMedia != null) {
-                setState(() => mediaGallery = newMedia);
-                ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
-              }
-            },
-          ),
-        if (productModel.items![0].sTypename == 'BundleProduct') const SizedBox(height: 30),
-        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!), const SizedBox(height: 20),
+        // Show varients if any
+        ProductVarientWidget(
+          productModel: productModel,
+          onUpdated: (newMedia) {
+            if (newMedia != null) {
+              setState(() => mediaGallery = newMedia);
+              ProductMediaContainerState.refreshCurrentDisplayWidget(newMedia[0]['url']);
+            }
+          },
+        ),
+        const SizedBox(height: 30),
+        // Description widget
+        BuildDescriptionReview(width: size.width, description: productModel.items![0].description!.html!, sku: productModel.items![0].sku!),
+        const SizedBox(height: 20),
+        // show related products if any
         if (productModel.items![0].relatedProducts != null && productModel.items![0].relatedProducts!.isNotEmpty)
           TwoColoredTitle(title: 'Related Products', firstHeadColor: AppColors.primaryColor, secondHeadColor: AppColors.fontColor),
         if (productModel.items![0].relatedProducts != null)

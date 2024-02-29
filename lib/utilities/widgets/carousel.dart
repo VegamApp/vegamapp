@@ -4,18 +4,17 @@ import 'dart:ui' as ui;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart' show CarouselController, CarouselOptions, CarouselSlider;
 import 'package:flutter/material.dart';
-import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/utilities/utilities.dart';
 import 'package:provider/provider.dart';
 
 class CarouselContainer extends StatefulWidget {
   const CarouselContainer({
-    Key? key,
+    super.key,
     required this.width,
     required this.data,
     this.padding,
-  }) : super(key: key);
+  });
   final double width;
   final Map<String, dynamic> data;
   final EdgeInsetsGeometry? padding;
@@ -51,8 +50,10 @@ class _CarouselContainerState extends State<CarouselContainer> {
     homeData = Provider.of<HomeData>(context);
     getAspectRatio();
     super.didChangeDependencies();
-    for (int index = 0; index < widget.data['sliders'].length; index++) {
-      precacheImage(CachedNetworkImageProvider(widget.data['sliders'][index]['slider_image']), context);
+    if (widget.data['sliders'] != null) {
+      for (int index = 0; index < widget.data['sliders'].length; index++) {
+        precacheImage(CachedNetworkImageProvider(widget.data['sliders'][index]['slider_image']), context);
+      }
     }
   }
 
