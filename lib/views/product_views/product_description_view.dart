@@ -35,6 +35,7 @@ class _ProductDescriptionState extends State<ProductDescription> {
   @override
   void initState() {
     // Initialize product model
+    // log(jsonEncode(widget.data));
     productModel = ProductModel.fromJson(widget.data['products']);
 
     originalMedia = List<Map<String, dynamic>>.from(widget.data['products']['items'][0]['media_gallery']);
@@ -42,10 +43,16 @@ class _ProductDescriptionState extends State<ProductDescription> {
     if (productModel.items![0].variants != null && productModel.items![0].variants!.isNotEmpty) {
       mediaGallery = productModel.items![0].variants![0].product!.mediaGallery!;
     }
-
-    price = productModel.items![0].specialPrice ?? productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
+    if (productModel.items?.first.sTypename == 'BundleProduct') {
+      String currency = productModel.items![0].priceRange!.minimumPrice!.regularPrice!.currency!;
+      price =
+          "$currency${productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value} to $currency${productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value}";
+    } else {
+      price = productModel.items![0].specialPrice ?? productModel.items![0].priceRange!.minimumPrice!.regularPrice!.value.toString();
+    }
     originalPrice = productModel.items![0].priceRange!.maximumPrice!.regularPrice!.value.toString();
     offer = productModel.items![0].priceRange!.maximumPrice!.discount!.percentOff;
+
     super.initState();
   }
 

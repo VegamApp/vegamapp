@@ -160,6 +160,24 @@ class ProductApi {
               name
               sku
               __typename
+              price_range {
+                minimum_price {
+                  regular_price {
+                    value
+                    currency
+                  }
+                }
+                maximum_price {
+                  regular_price {
+                    value
+                    currency
+                  }
+                  discount {
+                    amount_off
+                    percent_off
+                  }
+                }
+              }
             }
           }
         }

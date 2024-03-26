@@ -125,6 +125,14 @@ class Items {
   List<Items>? relatedProducts;
   String? wishlistItem;
 
+  // Bundle Product
+  bool? dynamicSku;
+  bool? dynamicPrice;
+  bool? dynamicWeight;
+  String? priceView;
+  String? shipBundleItems;
+  List<BundleItem>? items;
+
   Items({
     this.name,
     this.sku,
@@ -168,6 +176,16 @@ class Items {
     specialPrice = json['special_price']?.toString();
     priceRange = json['price_range'] != null ? PriceRange.fromJson(json['price_range']) : null;
     wishlistItem = json['wishlistData']?['wishlistItem'];
+
+    dynamicSku = json['dynamic_sku'];
+    dynamicPrice = json['dynamic_price'];
+    dynamicWeight = json['dynamic_weight'];
+    priceView = json['price_view'];
+    shipBundleItems = json['ship_bundle_items'];
+    if (json['items'] != null) {
+      items = <BundleItem>[];
+      json['items'].forEach((v) => items!.add(BundleItem.fromJson(v)));
+    }
 
     if (json['configurable_options'] != null) {
       configurableOptions = <ConfigurableOptions>[];
@@ -692,6 +710,93 @@ class PageInfo {
     data['current_page'] = currentPage;
     data['page_size'] = pageSize;
     data['total_pages'] = totalPages;
+    return data;
+  }
+}
+
+class BundleItem {
+  String? sTypename;
+  String? uid;
+  String? title;
+  bool? required;
+  String? type;
+  int? position;
+  String? sku;
+  List<Options>? options;
+
+  BundleItem({this.sTypename, this.uid, this.title, this.required, this.type, this.position, this.sku, this.options});
+
+  BundleItem.fromJson(Map<String, dynamic> json) {
+    sTypename = json['__typename'];
+    uid = json['uid'];
+    title = json['title'];
+    required = json['required'];
+    type = json['type'];
+    position = json['position'];
+    sku = json['sku'];
+    if (json['options'] != null) {
+      options = <Options>[];
+      json['options'].forEach((v) {
+        options!.add(Options.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['__typename'] = sTypename;
+    data['uid'] = uid;
+    data['title'] = title;
+    data['required'] = required;
+    data['type'] = type;
+    data['position'] = position;
+    data['sku'] = sku;
+    if (options != null) {
+      data['options'] = options!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Options {
+  String? sTypename;
+  String? uid;
+  int? quantity;
+  int? position;
+  bool? isDefault;
+  int? price;
+  String? priceType;
+  bool? canChangeQuantity;
+  String? label;
+  Items? product;
+
+  Options({this.sTypename, this.uid, this.quantity, this.position, this.isDefault, this.price, this.priceType, this.canChangeQuantity, this.label, this.product});
+
+  Options.fromJson(Map<String, dynamic> json) {
+    sTypename = json['__typename'];
+    uid = json['uid'];
+    quantity = json['quantity'];
+    position = json['position'];
+    isDefault = json['is_default'];
+    price = json['price'];
+    priceType = json['price_type'];
+    canChangeQuantity = json['can_change_quantity'];
+    label = json['label'];
+    product = Items.fromJson(json['product'] ?? {});
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['__typename'] = sTypename;
+    data['uid'] = uid;
+    data['quantity'] = quantity;
+    data['position'] = position;
+    data['is_default'] = isDefault;
+    data['price'] = price;
+    data['price_type'] = priceType;
+    data['can_change_quantity'] = canChangeQuantity;
+    data['label'] = label;
+    data['product'] = product;
     return data;
   }
 }

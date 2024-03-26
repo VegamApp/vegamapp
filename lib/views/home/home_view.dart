@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import 'dart:convert';
-import 'dart:developer';
-
-=======
->>>>>>> 6e71c9f952c7a4c2bf1886becd4bb754174169c9
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';

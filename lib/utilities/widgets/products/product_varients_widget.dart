@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:m2/services/models/product_model.dart';
@@ -17,7 +16,31 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
   double quantity = 1;
   late String? selectedSku = widget.productModel.items![0].variants?[0].product?.sku;
 
+  List<String?> bundleItems = [];
+
   TextEditingController pinCode = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.productModel.items?[0].sTypename == 'BundleProduct') {
+      bundleItems = List.generate(
+        widget.productModel.items![0].items!.length,
+        (index) => widget.productModel.items![0].items![index].options!.first.uid,
+      );
+      // bundleItems.clear();
+      // for (var i in widget.productModel.items![0].items!) {
+      //   for (var j in i.options!) {
+      //     if (j.isDefault == true) {
+      //       bundleItems.add(BundleItem.fromJson(i.toJson()));
+      //       // bundleItems.last.options!.clear();
+      //       bundleItems.last.options = List.from([j]);
+      //     }
+      //   }
+      // }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -25,7 +48,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.productModel.items![0].configurableOptions != null)
+        if (widget.productModel.items![0].configurableOptions != null) ...[
           ListView.separated(
             addAutomaticKeepAlives: true,
             shrinkWrap: true,
@@ -37,15 +60,31 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
                 : buildVarient(widget.productModel.items![0].configurableOptions![index].label!, index),
             // : SizedBox(),
           ),
-        if (widget.productModel.items![0].configurableOptions != null) const SizedBox(height: 20),
-        if (widget.productModel.items![0].configurableOptions != null) Divider(height: 1, color: AppColors.dividerColor),
-        if (widget.productModel.items![0].configurableOptions != null) const SizedBox(height: 20),
+          const SizedBox(height: 20),
+          Divider(height: 1, color: AppColors.dividerColor),
+          const SizedBox(height: 20),
+        ],
+        if (widget.productModel.items?[0].sTypename == 'BundleProduct') ...[
+          ListView.separated(
+            addAutomaticKeepAlives: true,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: widget.productModel.items![0].items!.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 20),
+            itemBuilder: (context, index) => switchBundleItem(widget.productModel.items![0].items![index], index),
+          ),
+          const SizedBox(height: 20),
+          Divider(height: 1, color: AppColors.dividerColor),
+          const SizedBox(height: 20),
+        ],
+
         buildQuantityChanger(),
         const SizedBox(height: 30),
         // buildDelivery(size),
         // const SizedBox(height: 20),
         Divider(height: 1, color: AppColors.dividerColor),
         const SizedBox(height: 20),
+
         Row(
           children: [
             Expanded(
@@ -360,4 +399,82 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
       ),
     );
   }
+
+  // check type of bundle item and return the widget
+  switchBundleItem(BundleItem bundleItem, int index) {
+    return switch (bundleItem.type) {
+      "radio" => buildBundleRadio(bundleItem, index),
+      "select" => buildBundleRadio(bundleItem, index),
+      "checkbox" => buildBundleRadio(bundleItem, index),
+      "multi" => buildBundleRadio(bundleItem, index),
+      _ => SizedBox(),
+    };
+  }
+
+  // Radio item widget for bundles
+  buildBundleRadio(BundleItem bundleItem, int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(bundleItem.title!, style: AppStyles.getMediumTextStyle(fontSize: 14)),
+        const SizedBox(height: 10),
+        ...bundleItem.options!.map(
+          (e) => RadioListTile<String>.adaptive(
+            value: e.uid!,
+            groupValue: bundleItems[index],
+            title: Text.rich(
+              TextSpan(
+                text: "${e.label ?? ""} + ",
+                children: [
+                  TextSpan(
+                    text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"}${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
+                    style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
+                  )
+                ],
+              ),
+              style: AppStyles.getRegularTextStyle(fontSize: 14),
+            ),
+            onChanged: (value) {
+              setState(() => bundleItems[index] = value);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // buildBundleCheckbox(BundleItem bundleItem, int index) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(bundleItem.title!, style: AppStyles.getMediumTextStyle(fontSize: 14)),
+  //       const SizedBox(height: 10),
+  //       ...bundleItem.options!.map(
+  //         (e) => CheckboxListTile.adaptive(
+  //           value: bundleItems.contains(e),
+  //           title: Text.rich(
+  //             TextSpan(
+  //               text: "${e.label ?? ""} + ",
+  //               children: [
+  //                 TextSpan(
+  //                   text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"}${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
+  //                   style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
+  //                 )
+  //               ],
+  //             ),
+  //             style: AppStyles.getRegularTextStyle(fontSize: 14),
+  //           ),
+  //           onChanged: (value) {
+  //             if (value!) {
+  //               bundleItems[index].options!.add(e);
+  //             } else {
+  //               bundleItems[index].options!.remove(e);
+  //             }
+  //             setState(() {});
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }

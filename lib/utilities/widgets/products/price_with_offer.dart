@@ -24,41 +24,41 @@ class BuildPriceWithOffer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text.rich(
-      TextSpan(
-        text: currency != null ? '$currency ' : '₹ ',
-        style: TextStyle(fontSize: priceSize, fontWeight: FontWeight.w600),
-        children: [
-          if (price != null)
-            TextSpan(
-              text: '${double.parse(price!).toStringAsFixed(2)}   ',
-              style: AppStyles.getMediumTextStyle(fontSize: priceSize, color: AppColors.fontColor),
+      double.tryParse(price!) != null
+          ? TextSpan(
+              text: currency != null ? '$currency ' : '₹ ',
+              style: AppStyles.getSemiBoldTextStyle(fontSize: priceSize),
+              children: [
+                if (price != null)
+                  TextSpan(
+                    text: '${double.parse(price!).toStringAsFixed(2)}   ',
+                    style: AppStyles.getMediumTextStyle(fontSize: priceSize, color: AppColors.fontColor),
+                  ),
+                if (originalPrice != null && offer != 0)
+                  TextSpan(
+                    text: currency != null ? '$currency' : '₹',
+                    style: AppStyles.getSemiBoldTextStyle(fontSize: offerSize ?? 13, color: AppColors.fadedText).copyWith(
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                if (originalPrice != null && offer != 0)
+                  TextSpan(
+                    text: '$originalPrice ',
+                    style: AppStyles.getMediumTextStyle(fontSize: offerSize ?? 13, color: AppColors.fadedText).copyWith(
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                if (originalPrice != null && offer != 0)
+                  TextSpan(
+                    text: '   $offer% off',
+                    style: AppStyles.getMediumTextStyle(fontSize: offerSize ?? 13, color: AppColors.buttonColor),
+                  ),
+              ],
+            )
+          : TextSpan(
+              text: price,
+              style: AppStyles.getSemiBoldTextStyle(fontSize: priceSize),
             ),
-          if (originalPrice != null && offer != 0)
-            TextSpan(
-                text: currency != null ? '$currency' : '₹',
-                style: TextStyle(
-                  color: AppColors.fadedText,
-                  fontSize: offerSize,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.lineThrough,
-                )),
-          if (originalPrice != null && offer != 0)
-            TextSpan(
-              text: '$originalPrice ',
-              style: TextStyle(
-                fontSize: offerSize,
-                fontWeight: FontWeight.w500,
-                color: AppColors.fadedText,
-                decoration: TextDecoration.lineThrough,
-              ),
-            ),
-          if (originalPrice != null && offer != 0)
-            TextSpan(
-              text: '   $offer% off',
-              style: AppStyles.getMediumTextStyle(fontSize: offerSize ?? 12, color: AppColors.buttonColor),
-            ),
-        ],
-      ),
     );
   }
 }

@@ -86,9 +86,7 @@ class BuildDescriptionReviewState extends State<BuildDescriptionReview> {
               ),
             );
           }
-          print('rgetr ${result.data!['products']['items'][0]['reviews']['items'][0]['nickname']}');
 
-          // //print(jsonEncode(result.data));
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
