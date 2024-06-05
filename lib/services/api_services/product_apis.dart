@@ -140,6 +140,7 @@ class ProductApi {
         price_view
         ship_bundle_items
         items {
+          option_id
           uid
           title
           required
@@ -147,6 +148,7 @@ class ProductApi {
           position
           sku
           options {
+            id
             uid
             quantity
             position
@@ -156,6 +158,7 @@ class ProductApi {
             can_change_quantity
             label
             product {
+              id
               uid
               name
               sku

@@ -44,7 +44,21 @@ class CartApis {
             }
           }
         }
-      }
+        
+
+      }... on BundleCartItem {
+            bundle_options {
+              uid
+              label
+              type
+              values {
+                id
+                label
+                price
+                quantity
+              }
+            }
+          }
       quantity
     }
       
@@ -112,6 +126,52 @@ class CartApis {
       code
       message
     }
+  }
+  }''';
+
+  static String addBundleProductToCart = r'''
+  mutation addBundleProductsToCart($input: AddBundleProductsToCartInput){
+    addBundleProductsToCart(
+     input: $input
+  ) {
+    cart {
+      items {
+        id
+        product {
+          name
+          sku
+          url_key
+          url_suffix
+          image{
+            url
+          }
+          stock_status
+          special_price
+          price_range{
+            minimum_price{
+              regular_price{
+                value
+                currency
+              }
+            }
+            maximum_price {
+              regular_price {
+                value
+                currency
+              }
+              discount {
+                  amount_off
+                  percent_off
+              }
+            }
+          }
+        }
+        quantity
+      }
+      
+      total_quantity
+    }
+    
   }
   }''';
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,7 @@ class BuildButtonSingle extends StatefulWidget {
     this.isBuyNow = false,
     this.margin,
     required this.quantity,
+    this.bundleData,
   });
 
   final EdgeInsets? margin;
@@ -38,12 +40,13 @@ class BuildButtonSingle extends StatefulWidget {
   final String? selectedSku;
   final bool isBuyNow;
   final double quantity;
+  final Map? bundleData;
   @override
   State<BuildButtonSingle> createState() => _BuildButtonSingleState();
 }
 
 class _BuildButtonSingleState extends State<BuildButtonSingle> {
-  MaterialStatesController statesController = MaterialStatesController();
+  WidgetStatesController statesController = WidgetStatesController();
 
   @override
   void initState() {
@@ -58,10 +61,13 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
 
     return Mutation(
         options: MutationOptions(
-            document: gql(CartApis.addProductToCart),
+            document: gql(widget.typeName == "BundleProduct" ? CartApis.addBundleProductToCart : CartApis.addProductToCart),
             onCompleted: (result) {
               print(result);
-              cart.putCartCount(result?['addProductsToCart']['cart']['total_quantity']);
+              if (result == null) return;
+
+              cart.putCartCount(
+                  widget.typeName == "BundleProduct" ? result['addBundleProductsToCart']['cart']['total_quantity'] : result['addProductsToCart']['cart']['total_quantity']);
               // Timer(const Duration(milliseconds: 1000), () => cart.getCartData(context, token));
               print(cart.cartCount);
               try {
@@ -70,7 +76,7 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                     backgroundColor: AppColors.snackbarErrorBackgroundColor,
                     textColor: AppColors.snackbarErrorTextColor,
                     context: context,
-                    message: result?['addProductsToCart']['user_errors'][0]['message'],
+                    message: result['addProductsToCart']['user_errors'][0]['message'],
                   );
                 } catch (e) {
                   print(e);
@@ -125,17 +131,17 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
           return TextButton(
             style: ButtonStyle(
               // fixedSize: Size(widget.width * 0.4, widget.width * 0.1),
-              maximumSize: MaterialStateProperty.all(const Size.fromHeight(40)),
-              shape: MaterialStateProperty.all(StadiumBorder(side: BorderSide(color: widget.buttonColor, width: 2))),
-              backgroundColor: MaterialStateProperty.resolveWith(getButtonColor),
-              foregroundColor: MaterialStateProperty.resolveWith(getTextColor),
-              padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
+              maximumSize: WidgetStateProperty.all(const Size.fromHeight(40)),
+              shape: WidgetStateProperty.all(StadiumBorder(side: BorderSide(color: widget.buttonColor, width: 2))),
+              backgroundColor: WidgetStateProperty.resolveWith(getButtonColor),
+              foregroundColor: WidgetStateProperty.resolveWith(getTextColor),
+              padding: WidgetStateProperty.all(const EdgeInsets.all(10)),
             ),
             statesController: statesController,
             onHover: (value) => setState(() {}),
             onPressed: () {
               print('data ${cart.cartId}');
-              print("ifbewifwrgiurwu ${widget.typeName}");
+              print("widget.typeName ${widget.typeName}");
               // print(widget.parentSku);
               // print(widget.selectedSku);
               if (widget.typeName == 'ConfigurableProduct') {
@@ -159,11 +165,27 @@ class _BuildButtonSingleState extends State<BuildButtonSingle> {
                   ]
                 });
               } else if (widget.typeName == 'BundleProduct') {
+                print(jsonEncode(widget.bundleData));
+
                 runMutation({
-                  'cartIdString': '${cart.cartId}',
-                  'cartItemsMap': [
-                    {'quantity': widget.quantity, 'sku': widget.parentSku}
-                  ]
+                  'input': {
+                    "cart_id": cart.cartId,
+                    "cart_items": [
+                      {
+                        "data": {"sku": widget.parentSku, "quantity": widget.quantity},
+                        "bundle_options": List.generate(
+                          widget.bundleData!.length,
+                          (index) => {
+                            "id": widget.bundleData!.entries.elementAt(index).key,
+                            "quantity": widget.bundleData!.entries.elementAt(index).value['quantity'],
+                            "value": widget.bundleData!.entries.elementAt(index).value['value'] is String
+                                ? [widget.bundleData!.entries.elementAt(index).value['value']]
+                                : widget.bundleData!.entries.elementAt(index).value['value'],
+                          },
+                        ),
+                      }
+                    ],
+                  }
                 });
               } else {
                 runMutation({

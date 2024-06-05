@@ -19,6 +19,12 @@ class _ProductDescriptionState extends State<ProductDescription> {
   // generate product model from the get api
   late ProductModel productModel;
 
+  // for initial media gallery
+  List<Map<String, dynamic>> originalMedia = [];
+
+  // if configurable, show media gallery of selected product
+  List<Map<String, dynamic>> mediaGallery = [];
+
   // show price
   String price = '';
 
@@ -27,11 +33,6 @@ class _ProductDescriptionState extends State<ProductDescription> {
   // if not null show %
   double? offer;
 
-  // for initial media gallery
-  List<Map<String, dynamic>> originalMedia = [];
-
-  // if configurable, show media gallery of selected product
-  List<Map<String, dynamic>> mediaGallery = [];
   @override
   void initState() {
     // Initialize product model

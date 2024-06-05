@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -117,7 +118,6 @@ class _ProductViewState extends State<ProductView> {
       }
     }
     // variables['filter'] = filter;
-    print(variables);
   }
 
   @override
@@ -151,6 +151,7 @@ class _ProductViewState extends State<ProductView> {
           }
 
           if (result.hasException) {
+            log(result.toString());
             // return expection widget
 
             return Scaffold(
@@ -173,6 +174,7 @@ class _ProductViewState extends State<ProductView> {
                 bottomNavigationBar: AppResponsive.isDesktop(context) ? null : const BuildBottomNavBar(currentIndex: -1),
                 body: Center(child: BuildErrorWidget(onRefresh: refetch, errorMsg: "No products to show")));
           }
+          // log(jsonEncode(result.data));
 
           if (((widget.viewAll != true && result.data!['products']['items'].length == 1) || (widget.viewAll == true && result.data!['viewallProducts']['products'].length == 1)) &&
               widget.urlKey != null) {

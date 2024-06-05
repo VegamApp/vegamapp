@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:m2/services/models/product_model.dart';
@@ -16,28 +18,39 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
   double quantity = 1;
   late String? selectedSku = widget.productModel.items![0].variants?[0].product?.sku;
 
-  List<String?> bundleItems = [];
+  Map<String, dynamic> bundleItems = {};
 
   TextEditingController pinCode = TextEditingController();
+
+  double bundlePrice = 00.00;
 
   @override
   void initState() {
     super.initState();
+
+    //setting init data for bundle products
     if (widget.productModel.items?[0].sTypename == 'BundleProduct') {
-      bundleItems = List.generate(
-        widget.productModel.items![0].items!.length,
-        (index) => widget.productModel.items![0].items![index].options!.first.uid,
-      );
-      // bundleItems.clear();
-      // for (var i in widget.productModel.items![0].items!) {
-      //   for (var j in i.options!) {
-      //     if (j.isDefault == true) {
-      //       bundleItems.add(BundleItem.fromJson(i.toJson()));
-      //       // bundleItems.last.options!.clear();
-      //       bundleItems.last.options = List.from([j]);
-      //     }
-      //   }
-      // }
+      // bundleItems = List.generate(
+      //   widget.productModel.items![0].items!.length,
+      //   (index) {
+      //     return widget.productModel.items![0].items![index].options!.first.uid;
+      //   },
+      // );
+      for (var i in widget.productModel.items![0].items!) {
+        if (i.type == 'radio' || i.type == 'select') {
+          var defaultElement = i.options!.firstWhere((element) => element.isDefault == true);
+          bundleItems[i.optionId!.toString()] = {'value': defaultElement.id, "quantity": "1", "type": i.type};
+          continue;
+        }
+        if (i.type == 'checkbox' || i.type == 'multi') {
+          var defaultElements = i.options!.where((element) => element.isDefault == true);
+          List ids = List.generate(defaultElements.length, (index) => defaultElements.elementAt(index).id);
+          bundleItems[i.optionId!.toString()] = {'value': ids, "quantity": "1", "type": i.type};
+          continue;
+        }
+      }
+      log(bundleItems.toString());
+      calculateBundlePrice();
     }
   }
 
@@ -76,6 +89,10 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
           const SizedBox(height: 20),
           Divider(height: 1, color: AppColors.dividerColor),
           const SizedBox(height: 20),
+          Text("$currency $bundlePrice", style: AppStyles.getSemiBoldTextStyle(fontSize: 22)),
+          const SizedBox(height: 20),
+          Divider(height: 1, color: AppColors.dividerColor),
+          const SizedBox(height: 20),
         ],
 
         buildQuantityChanger(),
@@ -91,6 +108,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
               child: BuildButtonSingle(
                 typeName: widget.productModel.items![0].sTypename!,
                 parentSku: widget.productModel.items![0].sku!,
+                bundleData: bundleItems,
                 selectedSku: selectedSku,
                 width: size.width,
                 title: 'ADD TO CART',
@@ -104,6 +122,7 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
             Expanded(
               child: BuildButtonSingle(
                 typeName: widget.productModel.items![0].sTypename!,
+                bundleData: bundleItems,
                 width: size.width,
                 title: 'BUY NOW',
                 buttonColor: AppColors.fontColor,
@@ -404,15 +423,16 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
   switchBundleItem(BundleItem bundleItem, int index) {
     return switch (bundleItem.type) {
       "radio" => buildBundleRadio(bundleItem, index),
-      "select" => buildBundleRadio(bundleItem, index),
-      "checkbox" => buildBundleRadio(bundleItem, index),
-      "multi" => buildBundleRadio(bundleItem, index),
-      _ => SizedBox(),
+      "select" => buildBundleDropdown(bundleItem, index),
+      "checkbox" => buildBundleCheckbox(bundleItem, index),
+      "multi" => buildBundleCheckbox(bundleItem, index, isMulti: true),
+      _ => const SizedBox(),
     };
   }
 
   // Radio item widget for bundles
   buildBundleRadio(BundleItem bundleItem, int index) {
+    TextEditingController quantity = TextEditingController(text: bundleItems[bundleItem.optionId!.toString()]['quantity'] ?? "1");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -420,14 +440,14 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
         const SizedBox(height: 10),
         ...bundleItem.options!.map(
           (e) => RadioListTile<String>.adaptive(
-            value: e.uid!,
-            groupValue: bundleItems[index],
+            value: e.id!,
+            groupValue: bundleItems[bundleItem.optionId!.toString()]['value'],
             title: Text.rich(
               TextSpan(
-                text: "${e.label ?? ""} + ",
+                text: "${e.label ?? ""} +",
                 children: [
                   TextSpan(
-                    text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"}${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
+                    text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"} ${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
                     style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
                   )
                 ],
@@ -435,46 +455,170 @@ class _ProductVarientWidgetState extends State<ProductVarientWidget> {
               style: AppStyles.getRegularTextStyle(fontSize: 14),
             ),
             onChanged: (value) {
-              setState(() => bundleItems[index] = value);
+              bundleItems[bundleItem.optionId!.toString()]['value'] = value;
+              calculateBundlePrice();
+              setState(() {});
             },
           ),
         ),
+        if (bundleItem.options!.firstWhere((element) => element.id == bundleItems[bundleItem.optionId!.toString()]['value']).canChangeQuantity == true) ...[
+          const SizedBox(height: 10),
+          Text("Quantity", style: AppStyles.getMediumTextStyle(fontSize: 14)),
+          const SizedBox(height: 10),
+          Container(
+            width: 70,
+            alignment: Alignment.centerLeft,
+            child: BuildTextField(
+              controller: quantity,
+              textAlign: TextAlign.center,
+              onChanged: (value) {
+                if (int.tryParse(value) != null) {
+                  bundleItems[bundleItem.optionId!.toString()]['quantity'] = value;
+                }
+                calculateBundlePrice();
+              },
+            ),
+          ),
+        ],
       ],
     );
   }
 
-  // buildBundleCheckbox(BundleItem bundleItem, int index) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text(bundleItem.title!, style: AppStyles.getMediumTextStyle(fontSize: 14)),
-  //       const SizedBox(height: 10),
-  //       ...bundleItem.options!.map(
-  //         (e) => CheckboxListTile.adaptive(
-  //           value: bundleItems.contains(e),
-  //           title: Text.rich(
-  //             TextSpan(
-  //               text: "${e.label ?? ""} + ",
-  //               children: [
-  //                 TextSpan(
-  //                   text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"}${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
-  //                   style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
-  //                 )
-  //               ],
-  //             ),
-  //             style: AppStyles.getRegularTextStyle(fontSize: 14),
-  //           ),
-  //           onChanged: (value) {
-  //             if (value!) {
-  //               bundleItems[index].options!.add(e);
-  //             } else {
-  //               bundleItems[index].options!.remove(e);
-  //             }
-  //             setState(() {});
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  // dropdown item widget for bundles
+  buildBundleDropdown(BundleItem bundleItem, int index) {
+    TextEditingController quantity = TextEditingController(text: bundleItems[bundleItem.optionId!.toString()]['quantity'] ?? "1");
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(bundleItem.title!, style: AppStyles.getMediumTextStyle(fontSize: 14)),
+        const SizedBox(height: 10),
+        DropdownButtonFormField(
+          value: bundleItems[bundleItem.optionId!.toString()]['value'],
+          hint: Text("Choose a selection", style: AppStyles.getRegularTextStyle(fontSize: 14)),
+          onChanged: (value) {
+            bundleItems[bundleItem.optionId!.toString()]['value'] = value;
+            calculateBundlePrice();
+            setState(() {});
+          },
+          items: bundleItem.options!
+              .map(
+                (e) => DropdownMenuItem<String>(
+                  value: e.id!,
+                  child: Text.rich(
+                    TextSpan(
+                      text: "${e.label ?? ""} +",
+                      children: [
+                        TextSpan(
+                          text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"} ${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
+                          style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
+                        )
+                      ],
+                    ),
+                    style: AppStyles.getRegularTextStyle(fontSize: 14),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        if (bundleItem.options!.firstWhere((element) => element.id == bundleItems[bundleItem.optionId!.toString()]['value']).canChangeQuantity == true) ...[
+          const SizedBox(height: 10),
+          Text("Quantity", style: AppStyles.getMediumTextStyle(fontSize: 14)),
+          const SizedBox(height: 10),
+          Container(
+            width: 70,
+            alignment: Alignment.centerLeft,
+            child: BuildTextField(
+              controller: quantity,
+              textAlign: TextAlign.center,
+              onChanged: (value) {
+                if (int.tryParse(value) != null) {
+                  bundleItems[bundleItem.optionId!.toString()]['quantity'] = value;
+                }
+                calculateBundlePrice();
+              },
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  buildBundleCheckbox(BundleItem bundleItem, int index, {bool isMulti = false}) {
+    // TextEditingController quantity = TextEditingController(text: bundleItems[bundleItem.optionId!.toString()]['quantity'] ?? "1");
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("${bundleItem.title!} ${isMulti ? "(Select atleast 1)" : ""}", style: AppStyles.getMediumTextStyle(fontSize: 14)),
+        const SizedBox(height: 10),
+        ...bundleItem.options!.map(
+          (e) => CheckboxListTile.adaptive(
+            value: bundleItems[bundleItem.optionId.toString()]['value'].contains(e.id),
+            title: Text.rich(
+              TextSpan(
+                text: "${e.label ?? ""} +",
+                children: [
+                  TextSpan(
+                    text: "${e.product?.priceRange?.minimumPrice?.regularPrice?.currency ?? "\$"} ${e.product?.priceRange?.minimumPrice?.regularPrice?.value}",
+                    style: AppStyles.getSemiBoldTextStyle(fontSize: 14),
+                  )
+                ],
+              ),
+              style: AppStyles.getRegularTextStyle(fontSize: 14),
+            ),
+            onChanged: (value) {
+              if (value!) {
+                bundleItems[bundleItem.optionId.toString()]['value'].add(e.id);
+              } else {
+                if (isMulti && bundleItems[bundleItem.optionId.toString()]['value'].length == 1) {
+                  return;
+                }
+                bundleItems[bundleItem.optionId.toString()]['value'].remove(e.id);
+              }
+              calculateBundlePrice();
+              setState(() {});
+            },
+          ),
+        ),
+        // if (e.canChangeQuantity == true) ...[
+        //   const SizedBox(height: 10),
+        //   Text("Quantity", style: AppStyles.getMediumTextStyle(fontSize: 14)),
+        //   const SizedBox(height: 10),
+        //   Container(
+        //     width: 70,
+        //     alignment: Alignment.centerLeft,
+        //     child: BuildTextField(
+        //       controller: quantity,
+        //       textAlign: TextAlign.center,
+        //       onChanged: (value) {
+        //         if (int.tryParse(value) != null) {
+        //           bundleItems[bundleItem.optionId!.toString()]['quantity'] = value;
+        //         }
+        //         calculateBundlePrice();
+        //       },
+        //     ),
+        //   ),
+        // ]
+      ],
+    );
+  }
+
+  //to calculate total price of the bundle
+  calculateBundlePrice() {
+    double price = 0;
+    print(bundleItems);
+    for (var item in widget.productModel.items!.first.items!) {
+      if (bundleItems[item.optionId.toString()]['type'] == 'radio' || bundleItems[item.optionId.toString()]['type'] == 'select') {
+        var option = item.options!.firstWhere((element) => element.id == bundleItems[item.optionId.toString()]['value']);
+        price = price + option.product!.priceRange!.minimumPrice!.regularPrice!.value!;
+      } else {
+        for (var id in bundleItems[item.optionId.toString()]['value']) {
+          var option = item.options!.firstWhere((element) => element.id == id);
+          price = price + option.product!.priceRange!.minimumPrice!.regularPrice!.value!;
+        }
+      }
+    }
+    print(price);
+    bundlePrice = price;
+  }
 }

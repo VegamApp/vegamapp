@@ -10,7 +10,7 @@ class ApiServices {
 
   // Change your domain here. You may need to restart the app if already running.
   // static String domain = 'https://magento.demo.ceymox.net/';
-  static String domain = 'https://flutter.ceymox.net/';
+  static String domain = 'https://flutter.ceymox.net';
   static String path = '$domain/graphql/';
 
   // Categories Query

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -80,7 +83,7 @@ class _CartViewState extends State<CartView> {
                 return const BuildLoadingWidget();
               }
               if (result.hasException) {
-                cartData.getCartData(context, token);
+                // cartData.getCartData(context, token);
                 return Center(
                   child: BuildErrorWidget(
                     onRefresh: () async {
@@ -98,6 +101,7 @@ class _CartViewState extends State<CartView> {
               }
               cartData.setCartData(result.data!);
               cartData.putCartCount(result.data!['cart']['total_quantity']);
+              log(jsonEncode(result.data));
               return ListView(
                 controller: scrollController,
                 padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth > 1400 ? (constraints.maxWidth - 1400) / 2 : 20, vertical: 20),
@@ -437,7 +441,32 @@ class _CartViewState extends State<CartView> {
                       SizedBox(height: 100, child: CachedNetworkImage(imageUrl: item['product']['image']['url'])),
                       const SizedBox(height: 15),
                       Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 15, color: AppColors.fontColor)),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
+                      if (item["bundle_options"] != null) ...[
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: item["bundle_options"].length,
+                          separatorBuilder: (context, index) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            var bundle = item["bundle_options"][index];
+                            return Text.rich(
+                              TextSpan(
+                                text: bundle['label'],
+                                style: AppStyles.getSemiBoldTextStyle(fontSize: 12),
+                                children: [
+                                  TextSpan(
+                                    text: ": ${bundle['values'][0]['quantity']} X ${bundle['values'][0]['label']} $currency ${bundle['values'][0]['price']}",
+                                    style: AppStyles.getRegularTextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                       BuildPriceWithOffer(
                         price: f.format(item['product']['special_price'] ?? item['product']['price_range']['minimum_price']['regular_price']['value']),
                         originalPrice: item['product']['price_range']['maximum_price']['regular_price']['value'].toString(),

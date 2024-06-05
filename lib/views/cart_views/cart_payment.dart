@@ -156,7 +156,6 @@ class _CartPaymentState extends State<CartPayment> {
                     },
                     onCompleted: (data) async {
                       if (data != null) {
-                        log(data.toString());
                         if (paymentCode == 'razorpay') {
                           getRazorPayId(data);
                         } else {

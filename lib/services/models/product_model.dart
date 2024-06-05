@@ -715,8 +715,9 @@ class PageInfo {
 }
 
 class BundleItem {
+  int? optionId;
   String? sTypename;
-  String? uid;
+  // String? uid;
   String? title;
   bool? required;
   String? type;
@@ -724,11 +725,21 @@ class BundleItem {
   String? sku;
   List<Options>? options;
 
-  BundleItem({this.sTypename, this.uid, this.title, this.required, this.type, this.position, this.sku, this.options});
+  BundleItem(
+      {this.sTypename,
+      // this.uid,
+      this.title,
+      this.required,
+      this.type,
+      this.position,
+      this.sku,
+      this.options,
+      this.optionId});
 
   BundleItem.fromJson(Map<String, dynamic> json) {
+    optionId = json['option_id'];
     sTypename = json['__typename'];
-    uid = json['uid'];
+    // uid = json['uid'];
     title = json['title'];
     required = json['required'];
     type = json['type'];
@@ -745,7 +756,7 @@ class BundleItem {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['__typename'] = sTypename;
-    data['uid'] = uid;
+    // data['uid'] = uid;
     data['title'] = title;
     data['required'] = required;
     data['type'] = type;
@@ -769,10 +780,11 @@ class Options {
   bool? canChangeQuantity;
   String? label;
   Items? product;
-
-  Options({this.sTypename, this.uid, this.quantity, this.position, this.isDefault, this.price, this.priceType, this.canChangeQuantity, this.label, this.product});
+  String? id;
+  Options({this.sTypename, this.uid, this.quantity, this.position, this.isDefault, this.price, this.priceType, this.canChangeQuantity, this.label, this.product, this.id});
 
   Options.fromJson(Map<String, dynamic> json) {
+    id = json['id'].toString();
     sTypename = json['__typename'];
     uid = json['uid'];
     quantity = json['quantity'];
