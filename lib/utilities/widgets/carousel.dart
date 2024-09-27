@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart' show CarouselController, CarouselOptions, CarouselSlider;
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:m2/services/state_management/home/home_data.dart';
 import 'package:m2/utilities/utilities.dart';
@@ -24,7 +24,7 @@ class CarouselContainer extends StatefulWidget {
 
 class _CarouselContainerState extends State<CarouselContainer> {
   int currentIndex = 0;
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   late HomeData homeData;
 
   getAspectRatio() async {
