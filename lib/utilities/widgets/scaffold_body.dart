@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:m2/services/app_responsive.dart';
 import 'package:m2/services/state_management/cache_clear/cache_manager.dart';
@@ -47,7 +49,8 @@ class _BuildScaffoldState extends State<BuildScaffold> {
         token.putWishlistCount(0);
       }
     }
-    if (categories.data.isEmpty || categories.data['categories']['items'].isEmpty) {
+    if (categories.data.isEmpty ||
+        categories.data['categories']['items'].isEmpty) {
       categories.getCategoryData(context);
     }
     if (homeData.data.isEmpty) {
@@ -66,14 +69,28 @@ class _BuildScaffoldState extends State<BuildScaffold> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     // getData(context);
-
+    if (Platform.isIOS) {
+      return Scaffold(
+        key: key,
+        appBar: BuildAppBar(scaffoldKey: key, height: 120),
+        body: widget.child,
+        endDrawer: DrawerContainer(size: size),
+        bottomNavigationBar: AppResponsive.isDesktop(context)
+            ? null
+            : BuildBottomNavBar(currentIndex: widget.currentIndex),
+      );
+    }
     return SafeArea(
       child: Scaffold(
         key: key,
-        appBar: BuildAppBar(scaffoldKey: key, height: !AppResponsive.isDesktop(context) ? 60 : 120),
+        appBar: BuildAppBar(
+            scaffoldKey: key,
+            height: !AppResponsive.isDesktop(context) ? 60 : 120),
         body: widget.child,
         endDrawer: DrawerContainer(size: size),
-        bottomNavigationBar: AppResponsive.isDesktop(context) ? null : BuildBottomNavBar(currentIndex: widget.currentIndex),
+        bottomNavigationBar: AppResponsive.isDesktop(context)
+            ? null
+            : BuildBottomNavBar(currentIndex: widget.currentIndex),
       ),
     );
   }

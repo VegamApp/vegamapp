@@ -34,43 +34,46 @@ class BuildAppBar extends StatelessWidget implements PreferredSize {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Align(
-      alignment: Alignment.center,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        height: AppResponsive.isDesktop(context) ? 160 : 60,
-        width: size.width,
-        decoration: BoxDecoration(
-          boxShadow: [BoxShadow(color: AppColors.shadowColor, blurRadius: 5, offset: const Offset(0, 3))],
-          color: AppColors.appBarColor,
-        ),
-        alignment: Alignment.center,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
-          child: AppResponsive(
-            desktop: Row(
-              children: [
-                getHomeButton(size),
-                // const SizedBox(width: 50),
-                // const DeliveryHoverWidget(),
-                const Expanded(
-                  child: AppbarCategories(),
-                )
-              ],
-            ),
-            mobile: Row(
-              children: [
-                getHomeButton(size),
-                const Spacer(),
-                InkWell(
-                  onTap: () => scaffoldKey.currentState?.openEndDrawer(),
-                  child: SizedBox(
-                    width: 40,
-                    child: Icon(Icons.menu, color: AppColors.fadedText),
-                  ),
+    print(height);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      height: height ?? (AppResponsive.isDesktop(context) ? 160 : 60),
+      width: size.width,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 5,
+              offset: const Offset(0, 3))
+        ],
+        color: AppColors.appBarColor,
+      ),
+      alignment: Alignment.bottomCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1400),
+        child: AppResponsive(
+          desktop: Row(
+            children: [
+              getHomeButton(size),
+              // const SizedBox(width: 50),
+              // const DeliveryHoverWidget(),
+              const Expanded(
+                child: AppbarCategories(),
+              )
+            ],
+          ),
+          mobile: Row(
+            children: [
+              getHomeButton(size),
+              const Spacer(),
+              InkWell(
+                onTap: () => scaffoldKey.currentState?.openEndDrawer(),
+                child: SizedBox(
+                  width: 40,
+                  child: Icon(Icons.menu, color: AppColors.fadedText),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -84,7 +87,8 @@ class BuildAppBar extends StatelessWidget implements PreferredSize {
         child: SizedBox(
           width: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
           height: size.width * 0.2 > 100 ? 100 : size.width * 0.2,
-          child: Align(alignment: Alignment.centerLeft, child: Image.asset(logoUrl)),
+          child: Align(
+              alignment: Alignment.centerLeft, child: Image.asset(logoUrl)),
         ),
       );
     });
@@ -118,7 +122,9 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
 
     return Observer(
       builder: (context) {
-        if (categories.data.isNotEmpty && categories.data['categories']['items'][0]['children'].isNotEmpty && categories.portalTargets.isEmpty) {
+        if (categories.data.isNotEmpty &&
+            categories.data['categories']['items'][0]['children'].isNotEmpty &&
+            categories.portalTargets.isEmpty) {
           categories.populateTargets();
         }
         return Row(
@@ -130,17 +136,28 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
               ...List.generate(
                 categories.data['categories']['items'][0]['children'].length,
                 (index) {
-                  if (categories.data['categories']['items'][0]['children'][index]['include_in_menu'] == 0) {
+                  if (categories.data['categories']['items'][0]['children']
+                          [index]['include_in_menu'] ==
+                      0) {
                     return const SizedBox();
                   }
-                  return categories.data['categories']['items'][0]['children'][index]['children'] == null ||
-                          categories.data['categories']['items'][0]['children'][index]['children'].isEmpty
+                  return categories.data['categories']['items'][0]['children']
+                                  [index]['children'] ==
+                              null ||
+                          categories
+                              .data['categories']['items'][0]['children'][index]
+                                  ['children']
+                              .isEmpty
                       ? InkWell(
                           onTap: () {
-                            print(categories.data['categories']['items'][0]['children'][index]);
+                            print(categories.data['categories']['items'][0]
+                                ['children'][index]);
                             context.goNamed(
                               ProductView.route,
-                              queryParameters: {'categoryUid': categories.data['categories']['items'][0]['children'][index]['uid']},
+                              queryParameters: {
+                                'categoryUid': categories.data['categories']
+                                    ['items'][0]['children'][index]['uid']
+                              },
                             );
                             // context.push(
                             //     '/${ProductView.route}/${categories.data['categories']['items'][0]['children'][index]['url_key']}${categories.data['categories']['items'][0]['children'][index]['url_suffix']}');
@@ -151,7 +168,8 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             alignment: Alignment.center,
                             child: Text(
-                              categories.data['categories']['items'][0]['children'][index]['name'],
+                              categories.data['categories']['items'][0]
+                                  ['children'][index]['name'],
                               style: AppStyles.getMediumTextStyle(fontSize: 14),
                             ),
                           ),
@@ -168,13 +186,18 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                             onEnter: (event) => categories.editTargets(index),
                             onExit: (event) => categories.populateTargets(),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 10),
                               constraints: const BoxConstraints(maxWidth: 500),
                               margin: const EdgeInsets.only(top: 10),
                               decoration: BoxDecoration(
                                 color: AppColors.scaffoldColor,
                                 boxShadow: [
-                                  BoxShadow(color: AppColors.fadedText.withOpacity(0.3), blurRadius: 5, offset: const Offset(0, 3)),
+                                  BoxShadow(
+                                      color:
+                                          AppColors.fadedText.withOpacity(0.3),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 3)),
                                 ],
                               ),
                               // height: 300,
@@ -182,45 +205,97 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: List.generate(
-                                  categories.data['categories']['items'][0]['children'][index]['children'].length,
+                                  categories
+                                      .data['categories']['items'][0]
+                                          ['children'][index]['children']
+                                      .length,
                                   (index2) {
-                                    if (categories.data['categories']['items'][0]['children'][index]['children'][index2]['include_in_menu'] == "0") {
+                                    if (categories.data['categories']['items']
+                                                    [0]['children'][index]
+                                                ['children'][index2]
+                                            ['include_in_menu'] ==
+                                        "0") {
                                       return const SizedBox();
                                     }
                                     return ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 200),
-                                      child: categories.data['categories']['items'][0]['children'][index]['children'][index2]['children'] == null ||
-                                              categories.data['categories']['items'][0]['children'][index]['children'][index2]['children'].isEmpty
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 200),
+                                      child: categories.data['categories']
+                                                                  ['items'][0]
+                                                              ['children']
+                                                          [index]['children']
+                                                      [index2]['children'] ==
+                                                  null ||
+                                              categories
+                                                  .data['categories']['items']
+                                                      [0]['children'][index]
+                                                      ['children'][index2]
+                                                      ['children']
+                                                  .isEmpty
                                           ? ListTile(
                                               onTap: () {
-                                                setState(() => categories.portalTargets[index] = false);
-                                                print(categories.data['categories']['items'][0]['children'][index]['children'][index2]);
+                                                setState(() => categories
+                                                        .portalTargets[index] =
+                                                    false);
+                                                print(categories.data[
+                                                                'categories']
+                                                            ['items'][0]
+                                                        ['children'][index]
+                                                    ['children'][index2]);
                                                 context.goNamed(
                                                   ProductView.route,
-                                                  queryParameters: {'categoryUid': categories.data['categories']['items'][0]['children'][index]['children'][index2]['uid']},
+                                                  queryParameters: {
+                                                    'categoryUid': categories
+                                                                        .data[
+                                                                    'categories']
+                                                                ['items'][0]
+                                                            ['children'][index][
+                                                        'children'][index2]['uid']
+                                                  },
                                                 );
                                                 // context.go(
                                                 //     '/${ProductView.route}?category_uid=${categories.data['categories']['items'][0]['children'][index]['children'][index2]['uid']}');
 
                                                 // print(categories.data['categories']['items'][0]['children'][index]['children'][index2]);
                                               },
-                                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
                                               title: Text(
-                                                categories.data['categories']['items'][0]['children'][index]['children'][index2]['name'],
-                                                style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fadedText),
+                                                categories.data['categories']
+                                                                ['items'][0]
+                                                            ['children'][index]
+                                                        ['children'][index2]
+                                                    ['name'],
+                                                style: AppStyles
+                                                    .getMediumTextStyle(
+                                                        fontSize: 14,
+                                                        color: AppColors
+                                                            .fadedText),
                                               ),
                                             )
                                           : InkWell(
                                               onTap: () {
-                                                setState(() => categories.portalTargets[index] = false);
+                                                setState(() => categories
+                                                        .portalTargets[index] =
+                                                    false);
 
-                                                print("expand: ${categories.data['categories']['items'][0]['children'][index]['children'][index2]}");
+                                                print(
+                                                    "expand: ${categories.data['categories']['items'][0]['children'][index]['children'][index2]}");
                                               },
                                               child: ExpansionTile(
                                                 initiallyExpanded: true,
                                                 title: Text(
-                                                  categories.data['categories']['items'][0]['children'][index]['children'][index2]['name'],
-                                                  style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fadedText),
+                                                  categories.data['categories']
+                                                                  ['items'][0]
+                                                              ['children']
+                                                          [index]['children']
+                                                      [index2]['name'],
+                                                  style: AppStyles
+                                                      .getMediumTextStyle(
+                                                          fontSize: 14,
+                                                          color: AppColors
+                                                              .fadedText),
                                                 ),
                                               ),
                                             ),
@@ -239,10 +314,13 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               categories.populateTargets();
                             },
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               child: Text(
-                                categories.data['categories']['items'][0]['children'][index]['name'],
-                                style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                categories.data['categories']['items'][0]
+                                    ['children'][index]['name'],
+                                style:
+                                    AppStyles.getMediumTextStyle(fontSize: 14),
                               ),
                             ),
                           ),
@@ -261,28 +339,37 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
 
             // cart button
             PortalTarget(
-              visible: cart.cartCount != 0 && cart.cartData['cart']?['items']! != null && cartPortalTarget,
+              visible: cart.cartCount != 0 &&
+                  cart.cartData['cart']?['items']! != null &&
+                  cartPortalTarget,
               anchor: const Aligned(
                 follower: Alignment(0.5, -1.0),
                 target: Alignment.bottomCenter,
                 shiftToWithinBound: AxisFlag(x: true, y: true),
               ),
               // anchor: Filled(),
-              portalFollower: cart.cartCount == 0 || cart.cartData['cart']?['items'] == null
+              portalFollower: cart.cartCount == 0 ||
+                      cart.cartData['cart']?['items'] == null
                   ? null
                   : MouseRegion(
-                      onEnter: (event) => setState(() => cartPortalTarget = true),
-                      onExit: (event) => setState(() => cartPortalTarget = false),
+                      onEnter: (event) =>
+                          setState(() => cartPortalTarget = true),
+                      onExit: (event) =>
+                          setState(() => cartPortalTarget = false),
                       child: Container(
                         width: 400,
                         // height: 200,
-                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
                         constraints: const BoxConstraints(maxWidth: 500),
                         margin: const EdgeInsets.only(top: 10),
                         decoration: BoxDecoration(
                           color: AppColors.scaffoldColor,
                           boxShadow: [
-                            BoxShadow(color: AppColors.fadedText.withOpacity(0.3), blurRadius: 5, offset: const Offset(0, 3)),
+                            BoxShadow(
+                                color: AppColors.fadedText.withOpacity(0.3),
+                                blurRadius: 5,
+                                offset: const Offset(0, 3)),
                           ],
                         ),
                         child: ListView(
@@ -295,11 +382,13 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               children: [
                                 Text(
                                   "Cart Subtotal: ${cart.cartData['cart']['prices']['subtotal_including_tax']['currency']} ${double.parse(cart.cartData['cart']['prices']['subtotal_including_tax']['value'].toString()).toStringAsFixed(2)}",
-                                  style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fadedText),
+                                  style: AppStyles.getMediumTextStyle(
+                                      fontSize: 14, color: AppColors.fadedText),
                                 ),
                                 Text(
                                   "${cart.cartCount} Item(s)",
-                                  style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fadedText),
+                                  style: AppStyles.getMediumTextStyle(
+                                      fontSize: 14, color: AppColors.fadedText),
                                 ),
                               ],
                             ),
@@ -309,48 +398,76 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: cart.cartData['cart']['items'].length,
                               separatorBuilder: (context, index) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5),
                                 child: Divider(color: AppColors.dividerColor),
                               ),
                               itemBuilder: (context, index) {
-                                var item = cart.cartData['cart']['items'][index];
+                                var item =
+                                    cart.cartData['cart']['items'][index];
                                 // return InkWell(
                                 //   onTap: () => print(item),
                                 //   child: Container(color: AppColors.primaryColor, height: 20),
                                 // );
                                 return Row(
                                   children: [
-                                    SizedBox(height: 100, child: CachedNetworkImage(imageUrl: item['product']['image']['url'])),
+                                    SizedBox(
+                                        height: 100,
+                                        child: CachedNetworkImage(
+                                            imageUrl: item['product']['image']
+                                                ['url'])),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(item['product']['name'], style: AppStyles.getMediumTextStyle(fontSize: 14, color: AppColors.fontColor)),
+                                          Text(item['product']['name'],
+                                              style:
+                                                  AppStyles.getMediumTextStyle(
+                                                      fontSize: 14,
+                                                      color:
+                                                          AppColors.fontColor)),
                                           const SizedBox(height: 10),
                                           BuildPriceWithOffer(
-                                            price: f.format(item['product']['price_range']['minimum_price']['regular_price']['value']),
+                                            price: f.format(item['product']
+                                                        ['price_range']
+                                                    ['minimum_price']
+                                                ['regular_price']['value']),
                                             priceSize: 15,
-                                            currency: item['product']['price_range']['minimum_price']['regular_price']['currency'],
+                                            currency: item['product']
+                                                        ['price_range']
+                                                    ['minimum_price']
+                                                ['regular_price']['currency'],
                                           ),
                                           Mutation(
                                               options: MutationOptions(
-                                                document: gql(CartApis.removeProductsFromCart),
+                                                document: gql(CartApis
+                                                    .removeProductsFromCart),
                                                 onCompleted: (data) async {
-                                                  print(data); // cartData.checkVirtualCart();
+                                                  print(
+                                                      data); // cartData.checkVirtualCart();
                                                   showSnackBar(
                                                       context: context,
-                                                      message: "Removed item from cart",
-                                                      backgroundColor: AppColors.snackbarSuccessBackgroundColor,
-                                                      textColor: AppColors.snackbarSuccessTextColor);
-                                                  cart.getCartData(context, authToken);
+                                                      message:
+                                                          "Removed item from cart",
+                                                      backgroundColor: AppColors
+                                                          .snackbarSuccessBackgroundColor,
+                                                      textColor: AppColors
+                                                          .snackbarSuccessTextColor);
+                                                  cart.getCartData(
+                                                      context, authToken);
                                                 },
                                                 onError: (error) {
                                                   showSnackBar(
                                                     context: context,
-                                                    message: error!.graphqlErrors[0].message,
-                                                    backgroundColor: AppColors.snackbarErrorBackgroundColor,
-                                                    textColor: AppColors.snackbarErrorTextColor,
+                                                    message: error!
+                                                        .graphqlErrors[0]
+                                                        .message,
+                                                    backgroundColor: AppColors
+                                                        .snackbarErrorBackgroundColor,
+                                                    textColor: AppColors
+                                                        .snackbarErrorTextColor,
                                                   );
 
                                                   print(error);
@@ -361,36 +478,60 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                                                   onPressed: () {
                                                     showDialog(
                                                       context: context,
-                                                      builder: (context) => AlertDialog(
-                                                        title: Text("Delete?", style: AppStyles.getMediumTextStyle(fontSize: 16)),
+                                                      builder: (context) =>
+                                                          AlertDialog(
+                                                        title: Text("Delete?",
+                                                            style: AppStyles
+                                                                .getMediumTextStyle(
+                                                                    fontSize:
+                                                                        16)),
                                                         content: Text(
                                                           "Are you sure you want to delete this item from cart?",
-                                                          style: AppStyles.getRegularTextStyle(fontSize: 14),
+                                                          style: AppStyles
+                                                              .getRegularTextStyle(
+                                                                  fontSize: 14),
                                                         ),
                                                         actions: [
                                                           TextButton(
-                                                            onPressed: () => Navigator.pop(context),
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context),
                                                             child: Text(
                                                               'Cancel',
-                                                              style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                                              style: AppStyles
+                                                                  .getMediumTextStyle(
+                                                                      fontSize:
+                                                                          14),
                                                             ),
                                                           ),
                                                           TextButton(
                                                             onPressed: () {
                                                               //print(item);
-                                                              Navigator.pop(context);
-                                                              runMutation({'cartId': cart.cartId, 'itemId': item['id']});
+                                                              Navigator.pop(
+                                                                  context);
+                                                              runMutation({
+                                                                'cartId':
+                                                                    cart.cartId,
+                                                                'itemId':
+                                                                    item['id']
+                                                              });
                                                             },
                                                             child: Text(
                                                               'OK',
-                                                              style: AppStyles.getMediumTextStyle(fontSize: 14),
+                                                              style: AppStyles
+                                                                  .getMediumTextStyle(
+                                                                      fontSize:
+                                                                          14),
                                                             ),
                                                           ),
                                                         ],
                                                       ),
                                                     );
                                                   },
-                                                  icon: Icon(Icons.delete_outline, color: AppColors.primaryColor),
+                                                  icon: Icon(
+                                                      Icons.delete_outline,
+                                                      color: AppColors
+                                                          .primaryColor),
                                                 );
                                               }),
                                         ],
@@ -406,7 +547,9 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               onPressed: () {
                                 context.goNamed(CartView.route);
                               },
-                              child: Text("View Cart", style: AppStyles.getMediumTextStyle(fontSize: 14)),
+                              child: Text("View Cart",
+                                  style: AppStyles.getMediumTextStyle(
+                                      fontSize: 14)),
                             )
                           ],
                         ),
@@ -431,9 +574,13 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                           child: Container(
                             width: 40,
                             height: 40,
-                            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 2, color: AppColors.buttonColor)),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    width: 2, color: AppColors.buttonColor)),
                             alignment: Alignment.center,
-                            child: FaIcon(FontAwesomeIcons.basketShopping, color: AppColors.buttonColor, size: 15),
+                            child: FaIcon(FontAwesomeIcons.basketShopping,
+                                color: AppColors.buttonColor, size: 15),
                           ),
                         ),
                         if (cart.cartCount != 0)
@@ -442,7 +589,9 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                             child: CircleAvatar(
                               backgroundColor: AppColors.buttonColor,
                               radius: 7.5,
-                              child: Text(cart.cartCount.toString(), style: AppStyles.getRegularTextStyle(fontSize: 9, color: Colors.white)),
+                              child: Text(cart.cartCount.toString(),
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 9, color: Colors.white)),
                             ),
                           ),
                       ],
@@ -468,18 +617,24 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                 child: Container(
                   width: 200,
                   // height: 200,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   constraints: const BoxConstraints(maxWidth: 500),
                   margin: const EdgeInsets.only(top: 10),
                   decoration: BoxDecoration(
                     color: AppColors.scaffoldColor,
                     boxShadow: [
-                      BoxShadow(color: AppColors.fadedText.withOpacity(0.3), blurRadius: 5, offset: const Offset(0, 3)),
+                      BoxShadow(
+                          color: AppColors.fadedText.withOpacity(0.3),
+                          blurRadius: 5,
+                          offset: const Offset(0, 3)),
                     ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: authToken.loginToken == null ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                    crossAxisAlignment: authToken.loginToken == null
+                        ? CrossAxisAlignment.center
+                        : CrossAxisAlignment.start,
                     children: authToken.loginToken == null
                         ? [
                             TextButton(
@@ -487,18 +642,27 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                                 // fixedSize: Size(widget.width * 0.4, widget.width * 0.1),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    side: BorderSide(color: AppColors.buttonColor, width: 2),
+                                    side: BorderSide(
+                                        color: AppColors.buttonColor, width: 2),
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                 ),
-                                backgroundColor: MaterialStateProperty.resolveWith(getButtonColor),
-                                foregroundColor: MaterialStateProperty.resolveWith(getTextColor),
-                                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 10, horizontal: 15)),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith(
+                                        getButtonColor),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith(
+                                        getTextColor),
+                                padding: MaterialStateProperty.all(
+                                    const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 15)),
                               ),
                               onPressed: () {
                                 context.go('/${Auth.route}');
                               },
-                              child: Text("Log in", style: AppStyles.getRegularTextStyle(fontSize: 14)),
+                              child: Text("Log in",
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 14)),
                             )
                           ]
                         : [
@@ -517,10 +681,15 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                                 padding: EdgeInsets.zero,
                               ),
                               onPressed: () {
-                                context.go('/account/${AccountInformationView.route}');
+                                context.go(
+                                    '/account/${AccountInformationView.route}');
                               },
-                              icon: SvgPicture.asset('assets/svg/person.svg', color: AppColors.fadedText, height: 20),
-                              label: Text("My Account", style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                              icon: SvgPicture.asset('assets/svg/person.svg',
+                                  color: AppColors.fadedText, height: 20),
+                              label: Text("My Account",
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.fadedText)),
                             ),
                             TextButton.icon(
                               style: TextButton.styleFrom(
@@ -529,8 +698,12 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               onPressed: () {
                                 context.go("/account/${OrdersView.route}");
                               },
-                              icon: SvgPicture.asset('assets/svg/orders.svg', color: AppColors.fadedText, height: 20),
-                              label: Text("Orders", style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                              icon: SvgPicture.asset('assets/svg/orders.svg',
+                                  color: AppColors.fadedText, height: 20),
+                              label: Text("Orders",
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.fadedText)),
                             ),
                             TextButton.icon(
                               style: TextButton.styleFrom(
@@ -539,16 +712,24 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                               onPressed: () {
                                 // context.go("/account/${OrdersView.route}");
                               },
-                              icon: SvgPicture.asset('assets/svg/wishlist.svg', color: AppColors.fadedText, height: 20),
-                              label: Text("Wishlist", style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                              icon: SvgPicture.asset('assets/svg/wishlist.svg',
+                                  color: AppColors.fadedText, height: 20),
+                              label: Text("Wishlist",
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.fadedText)),
                             ),
                             TextButton.icon(
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                               ),
-                              icon: SvgPicture.asset('assets/svg/sign_out.svg', color: AppColors.fadedText, height: 20),
+                              icon: SvgPicture.asset('assets/svg/sign_out.svg',
+                                  color: AppColors.fadedText, height: 20),
                               onPressed: () => signOut(context),
-                              label: Text("Sign out", style: AppStyles.getRegularTextStyle(fontSize: 14, color: AppColors.fadedText)),
+                              label: Text("Sign out",
+                                  style: AppStyles.getRegularTextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.fadedText)),
                             ),
                           ],
                   ),
@@ -568,7 +749,8 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.buttonTextColor,
-                      border: Border.all(color: AppColors.buttonColor, width: 2.5),
+                      border:
+                          Border.all(color: AppColors.buttonColor, width: 2.5),
                       // image: DecorationImage(image: CachedNetworkImageProvider(imgUrl)),
                       shape: BoxShape.circle,
                     ),
@@ -579,7 +761,8 @@ class _AppbarCategoriesState extends State<AppbarCategories> {
                         // user.firstname != null
                         //     ? Text(user.firstname![0], style: AppStyles.getMediumTextStyle(fontSize: 16, color: Colors.white))
                         // :
-                        FaIcon(FontAwesomeIcons.userLarge, color: AppColors.buttonColor, size: 15),
+                        FaIcon(FontAwesomeIcons.userLarge,
+                            color: AppColors.buttonColor, size: 15),
                   ),
                 ),
               ),

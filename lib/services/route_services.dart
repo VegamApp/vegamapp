@@ -1,5 +1,8 @@
 // import 'package:go_router/go_router.dart';
 
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2/utilities/widgets/account_sidebar.dart';
@@ -65,7 +68,8 @@ final router = GoRouter(
           // name: ProductView.route,
           path: '${ProductView.route}/:url',
           pageBuilder: (context, state) {
-            return getCustomTransition(state, ProductView(urlKey: state.pathParameters['url']));
+            return getCustomTransition(
+                state, ProductView(urlKey: state.pathParameters['url']));
           },
         ),
         GoRoute(
@@ -88,7 +92,8 @@ final router = GoRouter(
           name: 'account',
           path: 'account',
           pageBuilder: (context, state) {
-            return getCustomTransition(state, AccountSideBar(currentPage: AccountInformationView.route));
+            return getCustomTransition(state,
+                AccountSideBar(currentPage: AccountInformationView.route));
           },
           routes: [
             GoRoute(
@@ -96,7 +101,8 @@ final router = GoRouter(
               path: AccountInformationView.route,
               pageBuilder: (context, state) {
                 print(state.fullPath);
-                return getCustomTransition(state, const AccountInformationView());
+                return getCustomTransition(
+                    state, const AccountInformationView());
               },
             ),
             GoRoute(
@@ -111,7 +117,8 @@ final router = GoRouter(
               name: DownloadableProductsView.route,
               path: DownloadableProductsView.route,
               pageBuilder: (context, state) {
-                return getCustomTransition(state, const DownloadableProductsView());
+                return getCustomTransition(
+                    state, const DownloadableProductsView());
               },
             ),
             GoRoute(
@@ -139,14 +146,16 @@ final router = GoRouter(
               path: '${OrdersView.route}/:id',
               // name: OrdersView.route,
               pageBuilder: (context, state) {
-                return getCustomTransition(state, MyOrderDetailView(orderId: state.pathParameters['id']!));
+                return getCustomTransition(state,
+                    MyOrderDetailView(orderId: state.pathParameters['id']!));
               },
             ),
             GoRoute(
               path: BillingAgreementsView.route,
               name: BillingAgreementsView.route,
               pageBuilder: (context, state) {
-                return getCustomTransition(state, const BillingAgreementsView());
+                return getCustomTransition(
+                    state, const BillingAgreementsView());
               },
             ),
           ],
@@ -212,7 +221,10 @@ final router = GoRouter(
   ],
 );
 
-CustomTransitionPage<dynamic> getCustomTransition(GoRouterState state, Widget child) {
+getCustomTransition(GoRouterState state, Widget child) {
+  if (Platform.isIOS) {
+    return CupertinoPage(key: UniqueKey(), child: child);
+  }
   return CustomTransitionPage(
     key: UniqueKey(),
     child: child,
