@@ -34,7 +34,6 @@ class BuildAppBar extends StatelessWidget implements PreferredSize {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    print(height);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       height: height ?? (AppResponsive.isDesktop(context) ? 160 : 60),
@@ -48,7 +47,7 @@ class BuildAppBar extends StatelessWidget implements PreferredSize {
         ],
         color: AppColors.appBarColor,
       ),
-      alignment: Alignment.bottomCenter,
+      alignment:!AppResponsive.isDesktop(context)?  Alignment.bottomCenter: Alignment.center,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1400),
         child: AppResponsive(
