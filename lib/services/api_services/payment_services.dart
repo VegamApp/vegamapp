@@ -50,7 +50,7 @@ class PaymentServices {
   mutation placeRazorpayOrder($id: String!){
     placeRazorpayOrder (
         order_id: $id
-        referrer: "www.m2.festa.wiki"
+        referrer: "vegam.app"
     ){
       success
       rzp_order_id

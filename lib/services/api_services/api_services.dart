@@ -9,8 +9,7 @@ class ApiServices {
   static Map<String, String> header = {'Content-Type': 'application/json'};
 
   // Change your domain here. You may need to restart the app if already running.
-  static String domain = 'https://magento.demo.ceymox.net/';
-  // static String domain = 'https://flutter.ceymox.net';
+  static String domain = 'ENTER_YOUR_DOMAIN_HERE';
   static String path = '$domain/graphql/';
 
   // Categories Query
